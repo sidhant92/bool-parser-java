@@ -19,6 +19,9 @@ public abstract class AbstractDataType<T extends Comparable<? super T>> {
 
     public boolean defaultIsValid(final Object value, final ObjectMapper objectMapper) {
         try {
+            if (clazz.isInstance(value)) {
+                return true;
+            }
             return objectMapper.convertValue(value, clazz) != null;
         } catch (final Exception ex) {
             log.error("Unable to convert value = {} to type = {}", value, clazz);
@@ -28,7 +31,10 @@ public abstract class AbstractDataType<T extends Comparable<? super T>> {
 
     public Optional<T> defaultGetValue(final Object value, final ObjectMapper objectMapper) {
         try {
-            return (Optional<T>) Optional.of(objectMapper.convertValue(value, clazz));
+            if (clazz.isInstance(value)) {
+                return Optional.of(clazz.cast(value));
+            }
+            return Optional.of(objectMapper.convertValue(value, clazz));
         } catch (final Exception ex) {
             log.error("Unable to convert value = {} to type = {}", value, clazz);
         }
