@@ -39,7 +39,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     }
 
     @Override
-    public void exitComparatorExpression(BooleanExpressionBoolParser.ComparatorExpressionContext ctx) {
+    public void exitComparatorExpression(BooleanExpressionParser.ComparatorExpressionContext ctx) {
         final String variableName = ctx.left.getText();
         final DataType dataType = getDataType(ctx.right.getStart());
         final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
@@ -52,7 +52,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     }
 
     @Override
-    public void exitToExpression(BooleanExpressionBoolParser.ToExpressionContext ctx) {
+    public void exitToExpression(BooleanExpressionParser.ToExpressionContext ctx) {
         final String field = ctx.field.getText();
         final DataType lowerDataType = getDataType(ctx.lower.start);
         final Object lowerValue = ValueUtils.convertValue(ctx.lower.start.getText(), lowerDataType);
@@ -63,13 +63,13 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     }
 
     @Override
-    public void exitInExpression(BooleanExpressionBoolParser.InExpressionContext ctx) {
+    public void exitInExpression(BooleanExpressionParser.InExpressionContext ctx) {
         final String field = ctx.field.getText();
         final List<Pair<DataType, Object>> items = ctx.data.children
                 .stream()
-                .filter(child -> child instanceof BooleanExpressionBoolParser.TypesContext)
+                .filter(child -> child instanceof BooleanExpressionParser.TypesContext)
                 .map(child -> {
-                    final DataType dataType = getDataType(((BooleanExpressionBoolParser.TypesContext) child).start);
+                    final DataType dataType = getDataType(((BooleanExpressionParser.TypesContext) child).start);
                     final Object value = ValueUtils.convertValue(child.getText(), dataType);
                     return Pair.of(dataType, value);
                 })
@@ -106,7 +106,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     }
 
     @Override
-    public void exitParse(BooleanExpressionBoolParser.ParseContext ctx) {
+    public void exitParse(BooleanExpressionParser.ParseContext ctx) {
         if (this.token == null && this.currentTokens.size() == 1) {
             this.token = currentTokens.pop();
         } else {
@@ -117,7 +117,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     }
 
     @Override
-    public void exitNotExpression(BooleanExpressionBoolParser.NotExpressionContext ctx) {
+    public void exitNotExpression(BooleanExpressionParser.NotExpressionContext ctx) {
         if (currentTokens.isEmpty()) {
             if (lastToken == null) {
                 log.error("Error parsing not expression for the string {}", ctx.getText());
@@ -133,12 +133,12 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     }
 
     @Override
-    public void exitTypesExpression(BooleanExpressionBoolParser.TypesExpressionContext ctx) {
+    public void exitTypesExpression(BooleanExpressionParser.TypesExpressionContext ctx) {
         this.lastToken = ctx.start;
     }
 
     @Override
-    public void exitBinaryExpression(BooleanExpressionBoolParser.BinaryExpressionContext ctx) {
+    public void exitBinaryExpression(BooleanExpressionParser.BinaryExpressionContext ctx) {
         if (currentTokens.size() < 2) {
             log.error("Error parsing binary expression for the string {}", ctx.getText());
             throw new InvalidExpressionException();

@@ -16,169 +16,169 @@ public class BooleanExpressionBaseListener implements BooleanExpressionListener 
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterParse(BooleanExpressionBoolParser.ParseContext ctx) { }
+	@Override public void enterParse(BooleanExpressionParser.ParseContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitParse(BooleanExpressionBoolParser.ParseContext ctx) { }
+	@Override public void exitParse(BooleanExpressionParser.ParseContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBinaryExpression(BooleanExpressionBoolParser.BinaryExpressionContext ctx) { }
+	@Override public void enterBinaryExpression(BooleanExpressionParser.BinaryExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBinaryExpression(BooleanExpressionBoolParser.BinaryExpressionContext ctx) { }
+	@Override public void exitBinaryExpression(BooleanExpressionParser.BinaryExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTypesExpression(BooleanExpressionBoolParser.TypesExpressionContext ctx) { }
+	@Override public void enterTypesExpression(BooleanExpressionParser.TypesExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTypesExpression(BooleanExpressionBoolParser.TypesExpressionContext ctx) { }
+	@Override public void exitTypesExpression(BooleanExpressionParser.TypesExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterInExpression(BooleanExpressionBoolParser.InExpressionContext ctx) { }
+	@Override public void enterInExpression(BooleanExpressionParser.InExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitInExpression(BooleanExpressionBoolParser.InExpressionContext ctx) { }
+	@Override public void exitInExpression(BooleanExpressionParser.InExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterToExpression(BooleanExpressionBoolParser.ToExpressionContext ctx) { }
+	@Override public void enterToExpression(BooleanExpressionParser.ToExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitToExpression(BooleanExpressionBoolParser.ToExpressionContext ctx) { }
+	@Override public void exitToExpression(BooleanExpressionParser.ToExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNotExpression(BooleanExpressionBoolParser.NotExpressionContext ctx) { }
+	@Override public void enterNotExpression(BooleanExpressionParser.NotExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNotExpression(BooleanExpressionBoolParser.NotExpressionContext ctx) { }
+	@Override public void exitNotExpression(BooleanExpressionParser.NotExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterComparatorExpression(BooleanExpressionBoolParser.ComparatorExpressionContext ctx) { }
+	@Override public void enterComparatorExpression(BooleanExpressionParser.ComparatorExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitComparatorExpression(BooleanExpressionBoolParser.ComparatorExpressionContext ctx) { }
+	@Override public void exitComparatorExpression(BooleanExpressionParser.ComparatorExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterParentExpression(BooleanExpressionBoolParser.ParentExpressionContext ctx) { }
+	@Override public void enterParentExpression(BooleanExpressionParser.ParentExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitParentExpression(BooleanExpressionBoolParser.ParentExpressionContext ctx) { }
+	@Override public void exitParentExpression(BooleanExpressionParser.ParentExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterComparator(BooleanExpressionBoolParser.ComparatorContext ctx) { }
+	@Override public void enterComparator(BooleanExpressionParser.ComparatorContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitComparator(BooleanExpressionBoolParser.ComparatorContext ctx) { }
+	@Override public void exitComparator(BooleanExpressionParser.ComparatorContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterWordlist(BooleanExpressionBoolParser.WordlistContext ctx) { }
+	@Override public void enterWordlist(BooleanExpressionParser.WordlistContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitWordlist(BooleanExpressionBoolParser.WordlistContext ctx) { }
+	@Override public void exitWordlist(BooleanExpressionParser.WordlistContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNumericTypes(BooleanExpressionBoolParser.NumericTypesContext ctx) { }
+	@Override public void enterNumericTypes(BooleanExpressionParser.NumericTypesContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNumericTypes(BooleanExpressionBoolParser.NumericTypesContext ctx) { }
+	@Override public void exitNumericTypes(BooleanExpressionParser.NumericTypesContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTypes(BooleanExpressionBoolParser.TypesContext ctx) { }
+	@Override public void enterTypes(BooleanExpressionParser.TypesContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTypes(BooleanExpressionBoolParser.TypesContext ctx) { }
+	@Override public void exitTypes(BooleanExpressionParser.TypesContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBinary(BooleanExpressionBoolParser.BinaryContext ctx) { }
+	@Override public void enterBinary(BooleanExpressionParser.BinaryContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBinary(BooleanExpressionBoolParser.BinaryContext ctx) { }
+	@Override public void exitBinary(BooleanExpressionParser.BinaryContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBool(BooleanExpressionBoolParser.BoolContext ctx) { }
+	@Override public void enterBool(BooleanExpressionParser.BoolContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBool(BooleanExpressionBoolParser.BoolContext ctx) { }
+	@Override public void exitBool(BooleanExpressionParser.BoolContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

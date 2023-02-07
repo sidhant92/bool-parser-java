@@ -19,7 +19,8 @@ public enum Operator {
     GREATER_THAN_EQUAL,
     LESS_THAN,
     LESS_THAN_EQUAL,
-    NOT_EQUAL;
+    NOT_EQUAL,
+    IN;
 
     public static Optional<Operator> getOperatorFromSymbol(final String symbol) {
         return OperatorFactory.getAllOperators().stream().filter(operator -> operator.getSymbol().equals(symbol)).map(AbstractOperator::getOperator)

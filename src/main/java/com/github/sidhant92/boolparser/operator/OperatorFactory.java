@@ -18,12 +18,14 @@ public class OperatorFactory {
     }
 
     public static void initialize() {
-        operatorMap.put(Operator.EQUALS, new EqualsOperator());
+        final EqualsOperator equalsOperator = new EqualsOperator();
+        operatorMap.put(Operator.EQUALS, equalsOperator);
         operatorMap.put(Operator.GREATER_THAN, new GreaterThanOperator());
         operatorMap.put(Operator.GREATER_THAN_EQUAL, new GreaterThanEqualOperator());
         operatorMap.put(Operator.LESS_THAN, new LessThanOperator());
         operatorMap.put(Operator.LESS_THAN_EQUAL, new LessThanEqualOperator());
         operatorMap.put(Operator.NOT_EQUAL, new NotEqualsOperator());
+        operatorMap.put(Operator.IN, new InOperator(equalsOperator));
     }
 
     public static AbstractOperator getOperator(final Operator operator) {
