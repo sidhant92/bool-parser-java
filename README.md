@@ -135,4 +135,63 @@ private final List<Pair<DataType, Object>> items;
 ```
 
 
+## Applications
+
+### Boolean Expression Evaluator
+
+The library can be used to evaluate a boolean expression.
+
+The following Data Types are supported:
+1. String
+2. Integer
+3. Long
+4. Decimal
+5. Boolean
+6. Semantic Version
+
+Usage examples:
+
+Simple Numerical Comparison
+```
+final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpressionEvaluator();
+final Map<String, Object> data = new HashMap<>();
+data.put("age", 26);
+final Try<Boolean> result = booleanExpressionEvaluator.evaluate("age >= 27", data);
+assertTrue(booleanOptional.isPresent());
+assertFalse(booleanOptional.get());
+```
+Boolean Comparison
+```
+final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpressionEvaluator();
+final Map<String, Object> data = new HashMap<>();
+data.put("age", 25);
+data.put("name", "sid");
+final Try<Boolean> result = booleanExpressionEvaluator.evaluate("name = sid AND age = 25", data);
+assertTrue(booleanOptional.isPresent());
+assertTrue(booleanOptional.get());
+```
+Nested Boolean Comparison
+```
+final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpressionEvaluator();
+final Map<String, Object> data = new HashMap<>();
+data.put("age", 25);
+data.put("name", "sid");
+data.put("num", 45);
+final Try<Boolean> result = booleanExpressionEvaluator.evaluate("name:sid AND (age = 25 OR num = 44)", data);
+assertTrue(booleanOptional.isPresent());
+assertTrue(booleanOptional.get());
+```
+App Version Comparison
+```
+final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpressionEvaluator();
+final Map<String, Object> data = new HashMap<>();
+data.put("app_version", "1.5.9");
+final Try<Boolean> result = booleanExpressionEvaluator.evaluate("app_version < 1.5.10", data);
+assertTrue(booleanOptional.isPresent());
+assertTrue(booleanOptional.get());
+```
+
+The return type is `Try<Boolean>`. Failure means that parsing has failed and any fallback can be used.
+
+
 [For a complete list of examples please check out the test file](src/test/java/com/github/sidhant92/boolparser/application/BooleanExpressionEvaluatorTest.java)

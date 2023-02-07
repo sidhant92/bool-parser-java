@@ -1,6 +1,7 @@
 package com.github.sidhant92.boolparser.util;
 
 import java.util.Optional;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import com.github.sidhant92.boolparser.constant.DataType;
 
 public class ValueUtils {
@@ -14,6 +15,8 @@ public class ValueUtils {
                 return Double.parseDouble(value);
             case BOOLEAN:
                 return Boolean.parseBoolean(value);
+            case APP_VERSION:
+                new ComparableVersion(value);
             default:
                 if (value.startsWith("'") && value.endsWith("'")) {
                     return value.substring(1, value.length() -1);

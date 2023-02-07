@@ -16,8 +16,8 @@ public class BoolParser implements BoolExpressionParser {
     private Token getNode(final String expression) {
         BooleanExpressionLexer filterLexer = new BooleanExpressionLexer(CharStreams.fromString(expression));
         CommonTokenStream commonTokenStream = new CommonTokenStream(filterLexer);
-        BooleanExpressionBoolParser filterParser = new BooleanExpressionBoolParser(commonTokenStream);
-        BooleanExpressionBoolParser.ParseContext filterContext = filterParser.parse();
+        BooleanExpressionParser filterParser = new BooleanExpressionParser(commonTokenStream);
+        BooleanExpressionParser.ParseContext filterContext = filterParser.parse();
 
         ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
         final BooleanFilterListener listener = new BooleanFilterListener();
