@@ -4,9 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import com.github.sidhant92.boolparser.parser.BoolExpressionParser;
+import com.github.sidhant92.boolparser.exception.InvalidUnaryOperand;
 import com.github.sidhant92.boolparser.parser.antlr.BoolParser;
 import io.vavr.control.Try;
 
@@ -17,6 +16,33 @@ import io.vavr.control.Try;
 public class BooleanExpressionEvaluatorTest {
     private final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpressionEvaluator(new BoolParser());
 
+
+    @Test
+    public void testUnaryExpressionWithField() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("is_allowed", true);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("not is_allowed", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertFalse(booleanOptional.get());
+    }
+
+    @Test
+    public void testUnaryExpressionWithBoolean() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("is_allowed", true);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("not false", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testInvalidUnaryOperation() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("is_allowed", 123);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("not is_allowed", data);
+        assertTrue(booleanOptional.isFailure());
+        assertTrue(booleanOptional.getCause() instanceof InvalidUnaryOperand);
+    }
 
     @Test
     public void testSimpleTrueCorrectExpression() {
