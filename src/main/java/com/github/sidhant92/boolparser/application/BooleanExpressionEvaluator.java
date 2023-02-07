@@ -11,6 +11,8 @@ import com.github.sidhant92.boolparser.domain.NumericRangeToken;
 import com.github.sidhant92.boolparser.domain.NumericToken;
 import com.github.sidhant92.boolparser.domain.StringToken;
 import com.github.sidhant92.boolparser.domain.Token;
+import com.github.sidhant92.boolparser.domain.UnaryToken;
+import com.github.sidhant92.boolparser.exception.InvalidUnaryOperand;
 import com.github.sidhant92.boolparser.operator.OperatorService;
 import com.github.sidhant92.boolparser.parser.BoolExpressionParser;
 import io.vavr.control.Try;
@@ -46,6 +48,8 @@ public class BooleanExpressionEvaluator {
                 return evaluateNumericRangeToken((NumericRangeToken) token, data);
             case IN:
                 return evaluateInToken((InToken) token, data);
+            case UNARY:
+                return evaluateUnaryToken((UnaryToken) token, data);
             case BOOLEAN:
                 return evaluateBooleanNode((BooleanToken) token, data);
             default:
@@ -90,9 +94,22 @@ public class BooleanExpressionEvaluator {
         final DataType dataType = inToken.getItems().get(0).getLeft();
         final Object[] values = inToken.getItems()
                 .stream()
-                .map(Pair::getRight)
-                .toArray();
+                .map(Pair::getRight).toArray();
         return operatorService.evaluate(Operator.IN, ContainerDataType.primitive, dataType, fieldData, values);
+    }
+
+    private boolean evaluateUnaryToken(final UnaryToken unaryToken, final Map<String, Object> data) {
+        if (unaryToken.getDataType().equals(DataType.BOOLEAN)) {
+            return (boolean) unaryToken.getValue();
+        }
+        if (checkFieldDataMissing(unaryToken.getValue().toString(), data)) {
+            return false;
+        }
+        final Object fieldValue = data.get(unaryToken.getValue().toString());
+        if (!(fieldValue instanceof Boolean)) {
+            throw new InvalidUnaryOperand();
+        }
+        return (boolean) fieldValue;
     }
 
     private boolean evaluateBooleanNode(final BooleanToken booleanToken, final Map<String, Object> data) {
