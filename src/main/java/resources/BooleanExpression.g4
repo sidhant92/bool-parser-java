@@ -29,7 +29,7 @@ comparator
  ;
 
  types
- : APP_VERSION | bool | WORD | INTEGER | DECIMAL
+ : INTEGER | DECIMAL | APP_VERSION | bool | WORD |
  ;
 
 
@@ -58,7 +58,7 @@ EQ           : '=' ;
 LPAREN       : '(' ;
 RPAREN       : ')' ;
 DECIMAL      : [0-9]+ '.' [0-9]+;
-APP_VERSION  : [0-9] ('.' INTEGER)*;
+APP_VERSION  : [0-9] ('.' INTEGER)+;
 INTEGER      : [0-9]+;
 WS           : [ \r\t\u000C\n]+ -> skip;
 WORD         : (ALPHANUMERIC | '_' | '-' | '.' | SQ | DQ)+;
