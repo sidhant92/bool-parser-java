@@ -15,9 +15,8 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sidhant92.boolparser.parser.antlr.BoolParser;
+import com.github.sidhant92.boolparser.provider.BoolParserDataProvider;
 import lombok.SneakyThrows;
 
 /**
@@ -26,10 +25,8 @@ import lombok.SneakyThrows;
  */
 @State (Scope.Benchmark)
 @OutputTimeUnit (TimeUnit.MICROSECONDS)
-public class BoolParserBenchmarkService {
+public class EvaluationBenchmarkService {
     private static Map<String, Object> data;
-
-    private static String dataString;
 
     private static BoolParser parser;
 
@@ -38,7 +35,7 @@ public class BoolParserBenchmarkService {
     public static void main(String[] args) throws RunnerException, IOException {
 
         Options opt = new OptionsBuilder()
-                .include(BoolParserBenchmarkService.class.getSimpleName())
+                .include(EvaluationBenchmarkService.class.getSimpleName())
                 .forks(1)
                 .build();
         new Runner(opt).run();
@@ -47,9 +44,7 @@ public class BoolParserBenchmarkService {
     @SneakyThrows
     @Setup
     public void setup() {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        dataString = "{\"b\":1,\"c\":{\"d\":[\"x\",\"y\"],\"e\":\"xyz\"},\"f\":{\"g\":[\"arr1\",\"arr2\"],\"h\":{\"a\":\"b\",\"c\":\"d\",\"e\":true},\"j\":24},\"x\":[\"a1\",\"a2\",\"a3\",\"a4\"],\"y\":24, \"z\": \"c1\"}";
-        data = objectMapper.readValue(dataString, new TypeReference<Map<String, Object>>() {});
+        data = BoolParserDataProvider.getData();
         parser = new BoolParser();
         evaluator = new BooleanExpressionEvaluator(parser);
     }
@@ -60,14 +55,6 @@ public class BoolParserBenchmarkService {
     public void benchmarkEvaluation() {
         final String rule = "b>0 AND z IN ('c1', 'c2')";
         evaluator.evaluate(rule, data);
-    }
-
-    @Benchmark
-    @Warmup(iterations = 2)
-    @BenchmarkMode(Mode.SampleTime) // change here to check for specific mode
-    public void benchmarkParsing() {
-        final String rule = "b>0 AND z IN ('c1', 'c2')";
-        parser.parseExpression(rule);
     }
 
 }
