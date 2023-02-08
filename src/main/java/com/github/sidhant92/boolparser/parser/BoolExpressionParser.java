@@ -9,4 +9,6 @@ import io.vavr.control.Try;
  */
 public interface BoolExpressionParser {
     Try<Token> parseExpression(final String expression);
+
+    Try<Token> parseExpression(final String expression, final boolean useCache, final int maxCacheSize);
 }
