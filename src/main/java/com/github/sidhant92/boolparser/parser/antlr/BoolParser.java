@@ -16,21 +16,16 @@ public class BoolParser implements BoolExpressionParser {
 
     private final ParseTreeWalker parseTreeWalker = new ParseTreeWalker();
 
-    private final BooleanFilterListener listener = new BooleanFilterListener();
+    public BoolParser() {
+    }
 
-    private static final int MAX_CACHE_SIZE = 500;
-
-    @Override
-    public Try<Token> parseExpression(final String expression) {
-        return parseExpression(expression, false, MAX_CACHE_SIZE);
+    public BoolParser(final int maxCacheSize) {
+        this.useCache = true;
+        this.cache = Caffeine.newBuilder().maximumSize(maxCacheSize).build();
     }
 
     @Override
-    public Try<Token> parseExpression(final String expression, final boolean useCache, final int maxCacheSize) {
-        this.useCache = useCache;
-        if (useCache) {
-            this.cache = Caffeine.newBuilder().maximumSize(maxCacheSize).build();
-        }
+    public Try<Token> parseExpression(final String expression) {
         return Try.of(() -> getNode(expression));
     }
 
@@ -47,6 +42,7 @@ public class BoolParser implements BoolExpressionParser {
         BooleanExpressionParser filterParser = new BooleanExpressionParser(commonTokenStream);
         BooleanExpressionParser.ParseContext filterContext = filterParser.parse();
 
+        final BooleanFilterListener listener = new BooleanFilterListener();
         parseTreeWalker.walk(listener, filterContext);
 
         return listener.getNode();
