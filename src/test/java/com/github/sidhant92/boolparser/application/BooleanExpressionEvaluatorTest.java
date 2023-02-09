@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import com.github.sidhant92.boolparser.exception.InvalidDataType;
 import com.github.sidhant92.boolparser.exception.InvalidUnaryOperand;
 import com.github.sidhant92.boolparser.parser.antlr.BoolParser;
 import io.vavr.control.Try;
@@ -60,6 +61,15 @@ public class BooleanExpressionEvaluatorTest {
         final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = abc-", data);
         assertTrue(booleanOptional.isSuccess());
         assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testInvalidDataType() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("name", "abc-");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name > 123", data);
+        assertTrue(booleanOptional.isFailure());
+        assertTrue(booleanOptional.getCause() instanceof InvalidDataType);
     }
 
     @Test
@@ -311,8 +321,8 @@ public class BooleanExpressionEvaluatorTest {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", "sf");
         final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age = 24", data);
-        assertTrue(booleanOptional.isSuccess());
-        assertFalse(booleanOptional.get());
+        assertTrue(booleanOptional.isFailure());
+        assertTrue(booleanOptional.getCause() instanceof InvalidDataType);
     }
 
     @Test
