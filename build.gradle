@@ -31,8 +31,6 @@ repositories {
 }
 
 dependencies {
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
-
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     implementation 'ch.qos.logback.contrib:logback-json-classic:0.1.5'
     implementation 'ch.qos.logback.contrib:logback-jackson:0.1.5'
@@ -40,10 +38,9 @@ dependencies {
     implementation 'org.apache.maven:maven-artifact:3.5.2'
     implementation 'org.antlr:antlr4-runtime:4.11.1'
     implementation 'io.vavr:vavr:0.10.4'
-    testImplementation 'org.openjdk.jmh:jmh-core:1.35'
-    testImplementation 'org.openjdk.jmh:jmh-generator-annprocess:1.35'
-
+    implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
     implementation 'org.projectlombok:lombok:1.18.26'
+
     annotationProcessor 'org.projectlombok:lombok:1.18.26'
     testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
 
@@ -53,6 +50,7 @@ dependencies {
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.4.2'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.3.3'
     testImplementation group: 'org.mock-server', name: 'mockserver-junit-jupiter', version: '5.10.0'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
 test {

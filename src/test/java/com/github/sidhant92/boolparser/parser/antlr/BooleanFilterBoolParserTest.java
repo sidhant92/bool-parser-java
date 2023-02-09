@@ -104,7 +104,7 @@ public class BooleanFilterBoolParserTest {
 
     @Test
     public void testSingleIntRangeToken() {
-        final Try<Token> nodeOptional = boolExpressionBoolParser.parseExpression("age: 18 TO 44");
+        final Try<Token> nodeOptional = boolExpressionBoolParser.parseExpression("age 18 TO 44");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), TokenType.NUMERIC_RANGE.name());
         verifyNumericRangeToken((NumericRangeToken) nodeOptional.get(), "age", 18, 44);
@@ -120,7 +120,7 @@ public class BooleanFilterBoolParserTest {
 
     @Test
     public void testSingleDecimalRangeToken() {
-        final Try<Token> nodeOptional = boolExpressionBoolParser.parseExpression("age: 18.4 TO 44.2");
+        final Try<Token> nodeOptional = boolExpressionBoolParser.parseExpression("age 18.4 TO 44.2");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), TokenType.NUMERIC_RANGE.name());
         verifyNumericRangeToken((NumericRangeToken) nodeOptional.get(), "age", 18.4, 44.2);

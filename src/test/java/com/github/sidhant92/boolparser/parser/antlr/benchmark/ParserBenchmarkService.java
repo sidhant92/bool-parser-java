@@ -1,4 +1,4 @@
-package com.github.sidhant92.boolparser.application;
+package com.github.sidhant92.boolparser.parser.antlr.benchmark;
 
 import java.io.IOException;
 import java.util.Map;
