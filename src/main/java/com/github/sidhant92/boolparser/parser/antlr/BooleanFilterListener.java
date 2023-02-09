@@ -7,35 +7,32 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.Operator;
-import com.github.sidhant92.boolparser.domain.BooleanToken;
-import com.github.sidhant92.boolparser.domain.InToken;
-import com.github.sidhant92.boolparser.domain.Token;
-import com.github.sidhant92.boolparser.domain.NumericRangeToken;
-import com.github.sidhant92.boolparser.domain.NumericToken;
-import com.github.sidhant92.boolparser.domain.StringToken;
-import com.github.sidhant92.boolparser.domain.UnaryToken;
+import com.github.sidhant92.boolparser.domain.BooleanNode;
+import com.github.sidhant92.boolparser.domain.InNode;
+import com.github.sidhant92.boolparser.domain.Node;
+import com.github.sidhant92.boolparser.domain.NumericRangeNode;
+import com.github.sidhant92.boolparser.domain.ComparisonNode;
+import com.github.sidhant92.boolparser.domain.UnaryNode;
 import com.github.sidhant92.boolparser.exception.InvalidExpressionException;
-import com.github.sidhant92.boolparser.operator.OperatorFactory;
 import com.github.sidhant92.boolparser.util.ValueUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class BooleanFilterListener extends BooleanExpressionBaseListener {
-    private Token token;
+    private Node node;
 
-    private final Stack<Token> currentTokens;
+    private final Stack<Node> currentNodes;
 
     private org.antlr.v4.runtime.Token lastToken;
 
     public BooleanFilterListener() {
-        this.token = null;
+        this.node = null;
         this.lastToken = null;
-        this.currentTokens = new Stack<>();
-        OperatorFactory.initialize();
+        this.currentNodes = new Stack<>();
     }
 
-    public Token getNode() {
-        return this.token;
+    public Node getNode() {
+        return this.node;
     }
 
     @Override
@@ -43,11 +40,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
         final String variableName = ctx.left.getText();
         final DataType dataType = getDataType(ctx.right.getStart());
         final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
-        if (dataType == DataType.STRING) {
-            currentTokens.add(new StringToken(variableName, (String) ValueUtils.convertValue(ctx.right.getText(), DataType.STRING)));
-        } else {
-            currentTokens.add(new NumericToken(variableName, ValueUtils.convertValue(ctx.right.getText(), dataType), operator, dataType));
-        }
+        currentNodes.add(new ComparisonNode(variableName, ValueUtils.convertValue(ctx.right.getText(), dataType), operator, dataType));
         super.enterComparatorExpression(ctx);
     }
 
@@ -58,7 +51,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
         final Object lowerValue = ValueUtils.convertValue(ctx.lower.start.getText(), lowerDataType);
         final DataType upperDataType = getDataType(ctx.upper.start);
         final Object upperValue = ValueUtils.convertValue(ctx.upper.getText(), upperDataType);
-        currentTokens.add(new NumericRangeToken(field, lowerValue, upperValue, lowerDataType, upperDataType));
+        currentNodes.add(new NumericRangeNode(field, lowerValue, upperValue, lowerDataType, upperDataType));
         super.exitToExpression(ctx);
     }
 
@@ -74,7 +67,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
                     return Pair.of(dataType, value);
                 })
                 .collect(Collectors.toList());
-        currentTokens.add(new InToken(field, items));
+        currentNodes.add(new InNode(field, items));
         super.exitInExpression(ctx);
     }
 
@@ -107,8 +100,8 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     @Override
     public void exitParse(BooleanExpressionParser.ParseContext ctx) {
-        if (this.token == null && this.currentTokens.size() == 1) {
-            this.token = currentTokens.pop();
+        if (this.node == null && this.currentNodes.size() == 1) {
+            this.node = currentNodes.pop();
         } else {
             log.error("Error parsing expression for the string {}", ctx.getText());
             throw new InvalidExpressionException();
@@ -118,17 +111,17 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     @Override
     public void exitNotExpression(BooleanExpressionParser.NotExpressionContext ctx) {
-        if (currentTokens.isEmpty()) {
+        if (currentNodes.isEmpty()) {
             if (lastToken == null) {
                 log.error("Error parsing not expression for the string {}", ctx.getText());
                 throw new InvalidExpressionException();
             }
             final DataType dataType = getDataType(lastToken);
             final Object value = ValueUtils.convertValue(lastToken.getText(), dataType);
-            currentTokens.add(new UnaryToken(dataType, value));
+            currentNodes.add(new UnaryNode(dataType, value));
         }
-        final BooleanToken booleanToken = new BooleanToken(currentTokens.pop(), null, LogicalOperationType.NOT);
-        currentTokens.add(booleanToken);
+        final BooleanNode booleanToken = new BooleanNode(currentNodes.pop(), null, LogicalOperationType.NOT);
+        currentNodes.add(booleanToken);
         super.exitNotExpression(ctx);
     }
 
@@ -139,15 +132,15 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     @Override
     public void exitBinaryExpression(BooleanExpressionParser.BinaryExpressionContext ctx) {
-        if (currentTokens.size() < 2) {
+        if (currentNodes.size() < 2) {
             log.error("Error parsing binary expression for the string {}", ctx.getText());
             throw new InvalidExpressionException();
         }
-        final Token firstToken = currentTokens.pop();
-        final Token secondToken = currentTokens.pop();
+        final Node firstNode = currentNodes.pop();
+        final Node secondNode = currentNodes.pop();
         final LogicalOperationType operator = getLogicalOperator(ctx.op.getStart());
-        final BooleanToken booleanToken = new BooleanToken(secondToken, firstToken, operator);
-        currentTokens.add(booleanToken);
+        final BooleanNode booleanToken = new BooleanNode(secondNode, firstNode, operator);
+        currentNodes.add(booleanToken);
         super.enterBinaryExpression(ctx);
     }
 }

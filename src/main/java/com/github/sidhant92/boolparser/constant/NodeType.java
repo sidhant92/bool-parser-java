@@ -4,10 +4,9 @@ package com.github.sidhant92.boolparser.constant;
  * @author sidhant.aggarwal
  * @since 05/03/2023
  */
-public enum TokenType {
+public enum NodeType {
     BOOLEAN,
-    STRING,
-    NUMERIC,
+    COMPARISON,
     NUMERIC_RANGE,
     IN,
     UNARY

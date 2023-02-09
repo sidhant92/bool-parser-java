@@ -1,6 +1,6 @@
 package com.github.sidhant92.boolparser.parser;
 
-import com.github.sidhant92.boolparser.domain.Token;
+import com.github.sidhant92.boolparser.domain.Node;
 import io.vavr.control.Try;
 
 /**
@@ -8,5 +8,5 @@ import io.vavr.control.Try;
  * @since 05/03/2023
  */
 public interface BoolExpressionParser {
-    Try<Token> parseExpression(final String expression);
+    Try<Node> parseExpression(final String expression);
 }

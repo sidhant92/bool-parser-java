@@ -15,6 +15,4 @@ public abstract class AbstractOperator {
     public abstract Operator getOperator();
 
     public abstract String getSymbol();
-
-    //public boolean validate(final ContainerDataType containerDataType, final DataType dataType, final Object leftOperand)
 }

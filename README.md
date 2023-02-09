@@ -70,20 +70,12 @@ dependencies {
 Code
 ```
 final BoolParser boolParser = new BoolParser();
-final Try<Token> tokenOptional = boolParser.parseExpression("name = test");
+final Try<Node> nodeOptional = boolParser.parseExpression("name = test");
 ```
 
-### Token Types Post Parsing
+### Node Types Post Parsing
 ####
-StringToken
-```
-private final String field;
-
-private final String value;
-```
-
-####
-NumericToken
+NumericNode
 ```
 private final String field;
 
@@ -95,7 +87,7 @@ private final DataType dataType;
 ```
 
 ####
-NumericRangeToken
+NumericRangeNode
 ```
 private final String field;
 
@@ -109,17 +101,17 @@ private final DataType toDataType;
 ```
 
 ####
-BooleanToken
+BooleanNode
 ```
-private Token left;
+private Node left;
 
-private Token right;
+private Node right;
 
 private LogicalOperationType operator;
 ```
 
 ####
-UnaryToken
+UnaryNode
 ```
 private final DataType dataType;
 
@@ -127,7 +119,7 @@ private final Object value;
 ```
 
 ####
-InToken
+InNode
 ```
 private final String field;
 

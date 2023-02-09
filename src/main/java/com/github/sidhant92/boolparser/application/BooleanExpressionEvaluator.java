@@ -5,13 +5,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
-import com.github.sidhant92.boolparser.domain.BooleanToken;
-import com.github.sidhant92.boolparser.domain.InToken;
-import com.github.sidhant92.boolparser.domain.NumericRangeToken;
-import com.github.sidhant92.boolparser.domain.NumericToken;
-import com.github.sidhant92.boolparser.domain.StringToken;
-import com.github.sidhant92.boolparser.domain.Token;
-import com.github.sidhant92.boolparser.domain.UnaryToken;
+import com.github.sidhant92.boolparser.domain.BooleanNode;
+import com.github.sidhant92.boolparser.domain.InNode;
+import com.github.sidhant92.boolparser.domain.NumericRangeNode;
+import com.github.sidhant92.boolparser.domain.ComparisonNode;
+import com.github.sidhant92.boolparser.domain.Node;
+import com.github.sidhant92.boolparser.domain.UnaryNode;
 import com.github.sidhant92.boolparser.exception.InvalidUnaryOperand;
 import com.github.sidhant92.boolparser.operator.OperatorService;
 import com.github.sidhant92.boolparser.parser.BoolExpressionParser;
@@ -34,47 +33,37 @@ public class BooleanExpressionEvaluator {
     }
 
     public Try<Boolean> evaluate(final String expression, final Map<String, Object> data) {
-        final Try<Token> tokenOptional = boolExpressionParser.parseExpression(expression);
+        final Try<Node> tokenOptional = boolExpressionParser.parseExpression(expression);
         return tokenOptional.map(node -> evaluateToken(node, data));
     }
 
-    private boolean evaluateToken(final Token token, final Map<String, Object> data) {
-        switch (token.getTokenType()) {
-            case STRING:
-                return evaluateStringToken((StringToken) token, data);
-            case NUMERIC:
-                return evaluateNumericToken((NumericToken) token, data);
+    private boolean evaluateToken(final Node node, final Map<String, Object> data) {
+        switch (node.getTokenType()) {
+            case COMPARISON:
+                return evaluateComparisonToken((ComparisonNode) node, data);
             case NUMERIC_RANGE:
-                return evaluateNumericRangeToken((NumericRangeToken) token, data);
+                return evaluateNumericRangeToken((NumericRangeNode) node, data);
             case IN:
-                return evaluateInToken((InToken) token, data);
+                return evaluateInToken((InNode) node, data);
             case UNARY:
-                return evaluateUnaryToken((UnaryToken) token, data);
+                return evaluateUnaryToken((UnaryNode) node, data);
             case BOOLEAN:
-                return evaluateBooleanNode((BooleanToken) token, data);
+                return evaluateBooleanNode((BooleanNode) node, data);
             default:
                 return false;
         }
     }
 
-    private boolean evaluateStringToken(final StringToken stringToken, final Map<String, Object> data) {
-        if (checkFieldDataMissing(stringToken.getField(), data)) {
+    private boolean evaluateComparisonToken(final ComparisonNode comparisonToken, final Map<String, Object> data) {
+        if (checkFieldDataMissing(comparisonToken.getField(), data)) {
             return false;
         }
-        final Object fieldData = data.get(stringToken.getField());
-        return operatorService.evaluate(Operator.EQUALS, ContainerDataType.primitive, DataType.STRING, fieldData, stringToken.getValue());
+        final Object fieldData = data.get(comparisonToken.getField());
+        return operatorService.evaluate(comparisonToken.getOperator(), ContainerDataType.primitive, comparisonToken.getDataType(), fieldData,
+                                        comparisonToken.getValue());
     }
 
-    private boolean evaluateNumericToken(final NumericToken numericToken, final Map<String, Object> data) {
-        if (checkFieldDataMissing(numericToken.getField(), data)) {
-            return false;
-        }
-        final Object fieldData = data.get(numericToken.getField());
-        return operatorService.evaluate(numericToken.getOperator(), ContainerDataType.primitive, numericToken.getDataType(), fieldData,
-                                        numericToken.getValue());
-    }
-
-    private boolean evaluateNumericRangeToken(final NumericRangeToken numericRangeToken, final Map<String, Object> data) {
+    private boolean evaluateNumericRangeToken(final NumericRangeNode numericRangeToken, final Map<String, Object> data) {
         if (checkFieldDataMissing(numericRangeToken.getField(), data)) {
             return false;
         }
@@ -86,7 +75,7 @@ public class BooleanExpressionEvaluator {
                                                                                                       numericRangeToken.getToValue());
     }
 
-    private boolean evaluateInToken(final InToken inToken, final Map<String, Object> data) {
+    private boolean evaluateInToken(final InNode inToken, final Map<String, Object> data) {
         if (checkFieldDataMissing(inToken.getField(), data)) {
             return false;
         }
@@ -98,7 +87,7 @@ public class BooleanExpressionEvaluator {
         return operatorService.evaluate(Operator.IN, ContainerDataType.primitive, dataType, fieldData, values);
     }
 
-    private boolean evaluateUnaryToken(final UnaryToken unaryToken, final Map<String, Object> data) {
+    private boolean evaluateUnaryToken(final UnaryNode unaryToken, final Map<String, Object> data) {
         if (unaryToken.getDataType().equals(DataType.BOOLEAN)) {
             return (boolean) unaryToken.getValue();
         }
@@ -112,7 +101,7 @@ public class BooleanExpressionEvaluator {
         return (boolean) fieldValue;
     }
 
-    private boolean evaluateBooleanNode(final BooleanToken booleanToken, final Map<String, Object> data) {
+    private boolean evaluateBooleanNode(final BooleanNode booleanToken, final Map<String, Object> data) {
         switch (booleanToken.getOperator()) {
             case AND:
                 return evaluateToken(booleanToken.getLeft(), data) && evaluateToken(booleanToken.getRight(), data);
