@@ -47,7 +47,7 @@ public class ParserBenchmarkService {
     @Warmup (iterations = 2)
     @BenchmarkMode (Mode.SampleTime) //change here to check for specific mode
     public void benchmarkEvaluation() {
-        final String rule = "b>0 AND z IN ('c1', 'c2')";
+        final String rule = "b>0";
         parser.parseExpression(rule);
     }
 }

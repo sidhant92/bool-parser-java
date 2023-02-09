@@ -1,6 +1,6 @@
 package com.github.sidhant92.boolparser.domain;
 
-import com.github.sidhant92.boolparser.constant.TokenType;
+import com.github.sidhant92.boolparser.constant.NodeType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,15 +15,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class BooleanToken extends Token {
-    private Token left;
+public class BooleanNode extends Node {
+    private Node left;
 
-    private Token right;
+    private Node right;
 
     private LogicalOperationType operator;
 
     @Override
-    public TokenType getTokenType() {
-        return TokenType.BOOLEAN;
+    public NodeType getTokenType() {
+        return NodeType.BOOLEAN;
     }
 }

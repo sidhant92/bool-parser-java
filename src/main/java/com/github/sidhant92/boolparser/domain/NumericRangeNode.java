@@ -1,8 +1,7 @@
 package com.github.sidhant92.boolparser.domain;
 
 import com.github.sidhant92.boolparser.constant.DataType;
-import com.github.sidhant92.boolparser.constant.TokenType;
-import com.github.sidhant92.boolparser.constant.Operator;
+import com.github.sidhant92.boolparser.constant.NodeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,17 +15,19 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class NumericToken extends Token {
+public class NumericRangeNode extends Node {
     private final String field;
 
-    private final Object value;
+    private final Object fromValue;
 
-    private final Operator operator;
+    private final Object toValue;
 
-    private final DataType dataType;
+    private final DataType fromDataType;
+
+    private final DataType toDataType;
 
     @Override
-    public TokenType getTokenType() {
-        return TokenType.NUMERIC;
+    public NodeType getTokenType() {
+        return NodeType.NUMERIC_RANGE;
     }
 }
