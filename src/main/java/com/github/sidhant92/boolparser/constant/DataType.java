@@ -9,6 +9,6 @@ public enum DataType {
     INTEGER,
     LONG,
     DECIMAL,
-    APP_VERSION,
+    VERSION,
     BOOLEAN
 }

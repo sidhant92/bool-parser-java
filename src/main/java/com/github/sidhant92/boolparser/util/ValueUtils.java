@@ -15,7 +15,7 @@ public class ValueUtils {
                 return Double.parseDouble(value);
             case BOOLEAN:
                 return Boolean.parseBoolean(value);
-            case APP_VERSION:
+            case VERSION:
                 new ComparableVersion(value);
             default:
                 if (value.startsWith("'") && value.endsWith("'")) {

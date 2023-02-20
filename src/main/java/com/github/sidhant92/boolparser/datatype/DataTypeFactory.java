@@ -22,7 +22,7 @@ public class DataTypeFactory {
         abstractDataTypeMap.put(DataType.INTEGER, new IntegerDataType(objectMapper));
         abstractDataTypeMap.put(DataType.DECIMAL, new DecimalDataType(objectMapper));
         abstractDataTypeMap.put(DataType.LONG, new LongDataType(objectMapper));
-        abstractDataTypeMap.put(DataType.APP_VERSION, new AppVersionDataType(objectMapper));
+        abstractDataTypeMap.put(DataType.VERSION, new VersionDataType(objectMapper));
         abstractDataTypeMap.put(DataType.BOOLEAN, new BooleanDataType(objectMapper));
     }
 
