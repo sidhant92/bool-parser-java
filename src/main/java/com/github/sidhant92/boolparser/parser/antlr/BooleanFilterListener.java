@@ -78,7 +78,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
             case BooleanExpressionLexer.INTEGER:
                 return ValueUtils.getNumericDataType(token.getText());
             case BooleanExpressionLexer.APP_VERSION:
-                return DataType.APP_VERSION;
+                return DataType.VERSION;
             case BooleanExpressionLexer.TRUE:
             case BooleanExpressionLexer.FALSE:
                 return DataType.BOOLEAN;
