@@ -47,6 +47,7 @@ Parentheses, `(` and `)`, can be used for grouping.
 #### Usage Notes
 * Phrases that includes quotes, like `content = "It's a wonderful day"`
 * Phrases that includes quotes, like `attribute = 'She said "Hello World"'`
+* For nested keys in data map you can use the dot notation, like `person.age`
 
 ## Usage
 POM

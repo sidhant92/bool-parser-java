@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import com.github.sidhant92.boolparser.exception.DataNotFoundException;
 import com.github.sidhant92.boolparser.exception.InvalidDataType;
 import com.github.sidhant92.boolparser.exception.InvalidUnaryOperand;
 import com.github.sidhant92.boolparser.parser.antlr.BoolParser;
@@ -106,6 +107,28 @@ public class BooleanExpressionEvaluatorTest {
         final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age > 20", data);
         assertTrue(booleanOptional.isSuccess());
         assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testNestedField() {
+        final Map<String, Object> data = new HashMap<>();
+        final Map<String, Object> person = new HashMap<>();
+        person.put("age", 24);
+        data.put("person", person);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("person.age > 20", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testMissingNestedField() {
+        final Map<String, Object> data = new HashMap<>();
+        final Map<String, Object> person = new HashMap<>();
+        person.put("age", 24);
+        data.put("person", person);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("person.agee > 20", data);
+        assertTrue(booleanOptional.isFailure());
+        assertTrue(booleanOptional.getCause() instanceof DataNotFoundException);
     }
 
     @Test
@@ -330,8 +353,8 @@ public class BooleanExpressionEvaluatorTest {
         final Map<String, Object> data = new HashMap<>();
         data.put("agee", 34);
         final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age = 24", data);
-        assertTrue(booleanOptional.isSuccess());
-        assertFalse(booleanOptional.get());
+        assertTrue(booleanOptional.isFailure());
+        assertTrue(booleanOptional.getCause() instanceof DataNotFoundException);
     }
 
     @Test
