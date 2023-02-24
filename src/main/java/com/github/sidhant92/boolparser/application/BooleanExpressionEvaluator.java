@@ -11,9 +11,11 @@ import com.github.sidhant92.boolparser.domain.NumericRangeNode;
 import com.github.sidhant92.boolparser.domain.ComparisonNode;
 import com.github.sidhant92.boolparser.domain.Node;
 import com.github.sidhant92.boolparser.domain.UnaryNode;
+import com.github.sidhant92.boolparser.exception.DataNotFoundException;
 import com.github.sidhant92.boolparser.exception.InvalidUnaryOperand;
 import com.github.sidhant92.boolparser.operator.OperatorService;
 import com.github.sidhant92.boolparser.parser.BoolExpressionParser;
+import com.github.sidhant92.boolparser.util.ValueUtils;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,19 +57,13 @@ public class BooleanExpressionEvaluator {
     }
 
     private boolean evaluateComparisonToken(final ComparisonNode comparisonToken, final Map<String, Object> data) {
-        if (checkFieldDataMissing(comparisonToken.getField(), data)) {
-            return false;
-        }
-        final Object fieldData = data.get(comparisonToken.getField());
+        final Object fieldData = ValueUtils.getValueFromMap(comparisonToken.getField(), data).orElseThrow(DataNotFoundException::new);
         return operatorService.evaluate(comparisonToken.getOperator(), ContainerDataType.primitive, comparisonToken.getDataType(), fieldData,
                                         comparisonToken.getValue());
     }
 
     private boolean evaluateNumericRangeToken(final NumericRangeNode numericRangeToken, final Map<String, Object> data) {
-        if (checkFieldDataMissing(numericRangeToken.getField(), data)) {
-            return false;
-        }
-        final Object fieldData = data.get(numericRangeToken.getField());
+        final Object fieldData = ValueUtils.getValueFromMap(numericRangeToken.getField(), data).orElseThrow(DataNotFoundException::new);
         return operatorService.evaluate(Operator.GREATER_THAN_EQUAL, ContainerDataType.primitive, numericRangeToken.getFromDataType(), fieldData,
                                         numericRangeToken.getFromValue()) && operatorService.evaluate(Operator.LESS_THAN_EQUAL,
                                                                                                       ContainerDataType.primitive,
@@ -76,10 +72,7 @@ public class BooleanExpressionEvaluator {
     }
 
     private boolean evaluateInToken(final InNode inToken, final Map<String, Object> data) {
-        if (checkFieldDataMissing(inToken.getField(), data)) {
-            return false;
-        }
-        final Object fieldData = data.get(inToken.getField());
+        final Object fieldData = ValueUtils.getValueFromMap(inToken.getField(), data).orElseThrow(DataNotFoundException::new);
         final DataType dataType = inToken.getItems().get(0).getLeft();
         final Object[] values = inToken.getItems()
                 .stream()
@@ -91,14 +84,11 @@ public class BooleanExpressionEvaluator {
         if (unaryToken.getDataType().equals(DataType.BOOLEAN)) {
             return (boolean) unaryToken.getValue();
         }
-        if (checkFieldDataMissing(unaryToken.getValue().toString(), data)) {
-            return false;
-        }
-        final Object fieldValue = data.get(unaryToken.getValue().toString());
-        if (!(fieldValue instanceof Boolean)) {
+        final Object fieldData = ValueUtils.getValueFromMap(unaryToken.getValue().toString(), data).orElseThrow(DataNotFoundException::new);
+        if (!(fieldData instanceof Boolean)) {
             throw new InvalidUnaryOperand();
         }
-        return (boolean) fieldValue;
+        return (boolean) fieldData;
     }
 
     private boolean evaluateBooleanNode(final BooleanNode booleanToken, final Map<String, Object> data) {
@@ -110,13 +100,5 @@ public class BooleanExpressionEvaluator {
             default:
                 return !evaluateToken(booleanToken.getLeft(), data);
         }
-    }
-
-    private boolean checkFieldDataMissing(final String field, final Map<String, Object> data) {
-        if (!data.containsKey(field)) {
-            log.error("Error data not found for field {}", field);
-            return true;
-        }
-        return false;
     }
 }

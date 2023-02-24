@@ -1,10 +1,31 @@
 package com.github.sidhant92.boolparser.util;
 
+import java.util.Map;
 import java.util.Optional;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import com.github.sidhant92.boolparser.constant.DataType;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ValueUtils {
+    public static Optional<Object> getValueFromMap(final String key, final Map<String, Object> data) {
+        final String[] keys = key.split("\\.");
+        final int size = keys.length;
+        final Optional<Object> fieldData = Optional.ofNullable(data.get(keys[0]));
+        if (size == 1) {
+            return fieldData;
+        }
+        if (fieldData.isPresent() && fieldData.get() instanceof Map) {
+            try {
+                return getValueFromMap(keys[1], (Map<String, Object>) fieldData.get());
+            } catch (ClassCastException ex) {
+                return Optional.empty();
+            }
+        }
+        log.error("could not find key {} for the data {}", key, data);
+        return Optional.empty();
+    }
+
     public static Object convertValue(final String value, final DataType dataType) {
         switch (dataType) {
             case INTEGER:
