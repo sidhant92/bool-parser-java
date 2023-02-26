@@ -55,7 +55,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Increment Version
-        run: ./gradlew incrementVersion --versionIncrementType=PATCH --versionIncrementBranch=master
-        env:
-          gitUserEmail: ${{ secrets.GIT_USER_EMAIL }}
-          gitUserName: ${{ secrets.GIT_USER_NAME }}
+        run: |
+          git config --global user.email "sidhant92@hotmail.com"
+          git config --global user.name "Sidhant Aggarwal"
+          ./gradlew incrementVersion --versionIncrementType=PATCH --versionIncrementBranch=master
