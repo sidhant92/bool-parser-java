@@ -29,24 +29,29 @@ public class BoolParser implements BoolExpressionParser {
     }
 
     @Override
+    public Try<Node> parseExpression(final String expression, final String defaultField) {
+        return Try.of(() -> getNode(expression, defaultField));
+    }
+
+    @Override
     public Try<Node> parseExpression(final String expression) {
-        return Try.of(() -> getNode(expression));
+        return Try.of(() -> getNode(expression, null));
     }
 
-    private Node getNode(final String expression) {
+    private Node getNode(final String expression, final String defaultField) {
         if (useCache) {
-            return cache.get(expression, this::parse);
+            return cache.get(expression, ex -> parse(ex, defaultField));
         }
-        return parse(expression);
+        return parse(expression, defaultField);
     }
 
-    private Node parse(final String expression) {
+    private Node parse(final String expression, final String defaultField) {
         final BooleanExpressionLexer filterLexer = new BooleanExpressionLexer(CharStreams.fromString(expression));
         final CommonTokenStream commonTokenStream = new CommonTokenStream(filterLexer);
         final BooleanExpressionParser filterParser = new BooleanExpressionParser(commonTokenStream);
         final ParseTree parseTree = filterParser.parse();
 
-        final BooleanFilterListener listener = new BooleanFilterListener();
+        final BooleanFilterListener listener = new BooleanFilterListener(defaultField);
         parseTreeWalker.walk(listener, parseTree);
 
         return listener.getNode();
