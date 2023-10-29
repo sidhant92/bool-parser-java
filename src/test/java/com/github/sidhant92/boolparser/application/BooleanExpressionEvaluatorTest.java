@@ -419,4 +419,22 @@ public class BooleanExpressionEvaluatorTest {
         assertTrue(booleanOptional.isSuccess());
         assertTrue(booleanOptional.get());
     }
+
+    @Test
+    public void testDefaultFieldTrue() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("age", 19);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate(">= 18 AND < 20", data, "age");
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDefaultFieldFalse() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("age", 17);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate(">= 18 AND < 20", data, "age");
+        assertTrue(booleanOptional.isSuccess());
+        assertFalse(booleanOptional.get());
+    }
 }

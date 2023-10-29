@@ -1,8 +1,10 @@
 package com.github.sidhant92.boolparser.parser.antlr;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
@@ -25,7 +27,10 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     private org.antlr.v4.runtime.Token lastToken;
 
-    public BooleanFilterListener() {
+    private String defaultField;
+
+    public BooleanFilterListener(final String defaultField) {
+        this.defaultField = defaultField;
         this.node = null;
         this.lastToken = null;
         this.currentNodes = new Stack<>();
@@ -37,7 +42,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     @Override
     public void exitComparatorExpression(BooleanExpressionParser.ComparatorExpressionContext ctx) {
-        final String variableName = ctx.left.getText();
+        final String variableName = getField(ctx.left.getText());
         final DataType dataType = getDataType(ctx.right.getStart());
         final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
         currentNodes.add(new ComparisonNode(variableName, ValueUtils.convertValue(ctx.right.getText(), dataType), operator, dataType));
@@ -46,7 +51,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     @Override
     public void exitToExpression(BooleanExpressionParser.ToExpressionContext ctx) {
-        final String field = ctx.field.getText();
+        final String field = getField(ctx.field.getText());
         final DataType lowerDataType = getDataType(ctx.lower.start);
         final Object lowerValue = ValueUtils.convertValue(ctx.lower.start.getText(), lowerDataType);
         final DataType upperDataType = getDataType(ctx.upper.start);
@@ -57,7 +62,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     @Override
     public void exitInExpression(BooleanExpressionParser.InExpressionContext ctx) {
-        final String field = ctx.field.getText();
+        final String field = getField(ctx.field.getText());
         final List<Pair<DataType, Object>> items = ctx.data.children
                 .stream()
                 .filter(child -> child instanceof BooleanExpressionParser.TypesContext)
@@ -69,6 +74,13 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
                 .collect(Collectors.toList());
         currentNodes.add(new InNode(field, items));
         super.exitInExpression(ctx);
+    }
+
+    private String getField(final String field) {
+        if (Objects.isNull(defaultField)) {
+            return field;
+        }
+        return StringUtils.isBlank(field) ? defaultField : field;
     }
 
     private DataType getDataType(final org.antlr.v4.runtime.Token token) {

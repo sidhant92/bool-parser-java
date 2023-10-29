@@ -34,9 +34,13 @@ public class BooleanExpressionEvaluator {
         operatorService = new OperatorService();
     }
 
-    public Try<Boolean> evaluate(final String expression, final Map<String, Object> data) {
-        final Try<Node> tokenOptional = boolExpressionParser.parseExpression(expression);
+    public Try<Boolean> evaluate(final String expression, final Map<String, Object> data, final String defaultField) {
+        final Try<Node> tokenOptional = boolExpressionParser.parseExpression(expression, defaultField);
         return tokenOptional.map(node -> evaluateToken(node, data));
+    }
+
+    public Try<Boolean> evaluate(final String expression, final Map<String, Object> data) {
+        return evaluate(expression, data, null);
     }
 
     private boolean evaluateToken(final Node node, final Map<String, Object> data) {
