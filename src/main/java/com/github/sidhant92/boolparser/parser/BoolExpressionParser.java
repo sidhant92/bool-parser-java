@@ -9,4 +9,6 @@ import io.vavr.control.Try;
  */
 public interface BoolExpressionParser {
     Try<Node> parseExpression(final String expression);
+
+    Try<Node> parseExpression(final String expression, final String defaultField);
 }
