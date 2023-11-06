@@ -9,5 +9,6 @@ public enum NodeType {
     COMPARISON,
     NUMERIC_RANGE,
     IN,
+    ARRAY,
     UNARY
 }

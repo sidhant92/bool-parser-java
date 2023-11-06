@@ -9,6 +9,7 @@ import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.NodeType;
 import com.github.sidhant92.boolparser.constant.Operator;
+import com.github.sidhant92.boolparser.domain.ArrayNode;
 import com.github.sidhant92.boolparser.domain.BooleanNode;
 import com.github.sidhant92.boolparser.domain.InNode;
 import com.github.sidhant92.boolparser.domain.Node;
@@ -256,6 +257,23 @@ public class BooleanFilterBoolParserTest {
     }
 
     @Test
+    public void testNotIntegerList() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("age not IN (12,45)");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType().name(), NodeType.BOOLEAN.name());
+        assertNotNull(((BooleanNode)nodeOptional.get()).getLeft());
+        assertNull(((BooleanNode)nodeOptional.get()).getRight());
+        assertEquals(((BooleanNode)nodeOptional.get()).getOperator(), LogicalOperationType.NOT);
+        final InNode inToken = (InNode) ((BooleanNode)nodeOptional.get()).getLeft();
+        assertEquals(inToken.getItems().size(), 2);
+        assertEquals(inToken.getField(), "age");
+        assertEquals(inToken.getItems().get(0).getKey(), DataType.INTEGER);
+        assertEquals(inToken.getItems().get(1).getKey(), DataType.INTEGER);
+        assertEquals(inToken.getItems().get(0).getValue(), 12);
+        assertEquals(inToken.getItems().get(1).getValue(), 45);
+    }
+
+    @Test
     public void testStringList() {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name IN (abc, def, 'abc def')");
         assertTrue(nodeOptional.isSuccess());
@@ -317,6 +335,26 @@ public class BooleanFilterBoolParserTest {
         assertTrue(nodeOptional.getCause() instanceof InvalidExpressionException);
     }
 
+    @Test
+    public void testContainsAny() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("a contains_any (1,2,3)");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARRAY);
+        assertEquals(((ArrayNode) nodeOptional.get()).getField(), "a");
+        assertEquals(((ArrayNode) nodeOptional.get()).getOperator(), Operator.CONTAINS_ANY);
+        assertEquals(((ArrayNode) nodeOptional.get()).getItems().size(), 3);
+    }
+
+    @Test
+    public void testContainsAll() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("a contains_all (\"a\", \"b\"");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARRAY);
+        assertEquals(((ArrayNode) nodeOptional.get()).getField(), "a");
+        assertEquals(((ArrayNode) nodeOptional.get()).getOperator(), Operator.CONTAINS_ALL);
+        assertEquals(((ArrayNode) nodeOptional.get()).getItems().size(), 2);
+    }
+
     private void verifyStringToken(final ComparisonNode stringToken, final String field, final String value) {
         assertEquals(stringToken.getTokenType().name(), NodeType.COMPARISON.name());
         assertEquals(stringToken.getField(), field);
@@ -330,8 +368,7 @@ public class BooleanFilterBoolParserTest {
         assertEquals(comparisonToken.getOperator().name(), operator.name());
     }
 
-    private void verifyNumericRangeToken(final NumericRangeNode numericRangeToken, final String field, final Object fromValue,
-                                         final Object toValue) {
+    private void verifyNumericRangeToken(final NumericRangeNode numericRangeToken, final String field, final Object fromValue, final Object toValue) {
         assertEquals(numericRangeToken.getTokenType().name(), NodeType.NUMERIC_RANGE.name());
         assertEquals(numericRangeToken.getField(), field);
         assertEquals(numericRangeToken.getFromValue(), fromValue);

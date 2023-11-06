@@ -1,5 +1,8 @@
 package com.github.sidhant92.boolparser.operator;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
@@ -26,5 +29,15 @@ public class NotEqualsOperator extends AbstractOperator {
     @Override
     public String getSymbol() {
         return "!=";
+    }
+
+    @Override
+    public List<ContainerDataType> getAllowedContainerTypes() {
+        return Collections.singletonList(ContainerDataType.PRIMITIVE);
+    }
+
+    @Override
+    public List<DataType> getAllowedDataTypes() {
+        return Arrays.asList(DataType.values());
     }
 }

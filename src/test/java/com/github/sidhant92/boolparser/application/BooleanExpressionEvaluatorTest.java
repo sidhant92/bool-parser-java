@@ -1,8 +1,11 @@
 package com.github.sidhant92.boolparser.application;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import com.github.sidhant92.boolparser.exception.DataNotFoundException;
@@ -273,6 +276,15 @@ public class BooleanExpressionEvaluatorTest {
     }
 
     @Test
+    public void testNotInClauseForIntegers() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("age", 30);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age not in (26,56,34)", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
     public void testPositiveInClauseForIntegers() {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", 25);
@@ -434,6 +446,58 @@ public class BooleanExpressionEvaluatorTest {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", 17);
         final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate(">= 18 AND < 20", data, "age");
+        assertTrue(booleanOptional.isSuccess());
+        assertFalse(booleanOptional.get());
+    }
+
+    @Test
+    public void testContainsAnyTrueCondition() {
+        final Map<String, Object> data = new HashMap<>();
+        final List<Integer> ages = new ArrayList<>();
+        ages.add(1);
+        ages.add(2);
+        ages.add(3);
+        data.put("age", ages);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age contains_any (2)", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testContainsAnyFalseCondition() {
+        final Map<String, Object> data = new HashMap<>();
+        final List<Integer> ages = new ArrayList<>();
+        ages.add(1);
+        ages.add(2);
+        ages.add(3);
+        data.put("age", ages);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age contains_any (12)", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertFalse(booleanOptional.get());
+    }
+
+    @Test
+    public void testContainsAllTrueCondition() {
+        final Map<String, Object> data = new HashMap<>();
+        final List<Integer> ages = new ArrayList<>();
+        ages.add(1);
+        ages.add(2);
+        ages.add(3);
+        data.put("age", ages);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age contains_all (1,2)", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testContainsAllFalseCondition() {
+        final Map<String, Object> data = new HashMap<>();
+        final List<Integer> ages = new ArrayList<>();
+        ages.add(1);
+        ages.add(2);
+        ages.add(3);
+        data.put("age", ages);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age contains_all (2,5)", data);
         assertTrue(booleanOptional.isSuccess());
         assertFalse(booleanOptional.get());
     }

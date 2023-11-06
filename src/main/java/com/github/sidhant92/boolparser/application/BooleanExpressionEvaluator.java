@@ -5,6 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
+import com.github.sidhant92.boolparser.domain.ArrayNode;
 import com.github.sidhant92.boolparser.domain.BooleanNode;
 import com.github.sidhant92.boolparser.domain.InNode;
 import com.github.sidhant92.boolparser.domain.NumericRangeNode;
@@ -12,6 +13,7 @@ import com.github.sidhant92.boolparser.domain.ComparisonNode;
 import com.github.sidhant92.boolparser.domain.Node;
 import com.github.sidhant92.boolparser.domain.UnaryNode;
 import com.github.sidhant92.boolparser.exception.DataNotFoundException;
+import com.github.sidhant92.boolparser.exception.HeterogeneousArrayException;
 import com.github.sidhant92.boolparser.exception.InvalidUnaryOperand;
 import com.github.sidhant92.boolparser.operator.OperatorService;
 import com.github.sidhant92.boolparser.parser.BoolExpressionParser;
@@ -51,6 +53,8 @@ public class BooleanExpressionEvaluator {
                 return evaluateNumericRangeToken((NumericRangeNode) node, data);
             case IN:
                 return evaluateInToken((InNode) node, data);
+            case ARRAY:
+                return evaluateArrayToken((ArrayNode) node, data);
             case UNARY:
                 return evaluateUnaryToken((UnaryNode) node, data);
             case BOOLEAN:
@@ -62,15 +66,15 @@ public class BooleanExpressionEvaluator {
 
     private boolean evaluateComparisonToken(final ComparisonNode comparisonToken, final Map<String, Object> data) {
         final Object fieldData = ValueUtils.getValueFromMap(comparisonToken.getField(), data).orElseThrow(DataNotFoundException::new);
-        return operatorService.evaluate(comparisonToken.getOperator(), ContainerDataType.primitive, comparisonToken.getDataType(), fieldData,
+        return operatorService.evaluate(comparisonToken.getOperator(), ContainerDataType.PRIMITIVE, comparisonToken.getDataType(), fieldData,
                                         comparisonToken.getValue());
     }
 
     private boolean evaluateNumericRangeToken(final NumericRangeNode numericRangeToken, final Map<String, Object> data) {
         final Object fieldData = ValueUtils.getValueFromMap(numericRangeToken.getField(), data).orElseThrow(DataNotFoundException::new);
-        return operatorService.evaluate(Operator.GREATER_THAN_EQUAL, ContainerDataType.primitive, numericRangeToken.getFromDataType(), fieldData,
+        return operatorService.evaluate(Operator.GREATER_THAN_EQUAL, ContainerDataType.PRIMITIVE, numericRangeToken.getFromDataType(), fieldData,
                                         numericRangeToken.getFromValue()) && operatorService.evaluate(Operator.LESS_THAN_EQUAL,
-                                                                                                      ContainerDataType.primitive,
+                                                                                                      ContainerDataType.PRIMITIVE,
                                                                                                       numericRangeToken.getToDataType(), fieldData,
                                                                                                       numericRangeToken.getToValue());
     }
@@ -81,7 +85,21 @@ public class BooleanExpressionEvaluator {
         final Object[] values = inToken.getItems()
                 .stream()
                 .map(Pair::getRight).toArray();
-        return operatorService.evaluate(Operator.IN, ContainerDataType.primitive, dataType, fieldData, values);
+        return operatorService.evaluate(Operator.IN, ContainerDataType.PRIMITIVE, dataType, fieldData, values);
+    }
+
+    private boolean evaluateArrayToken(final ArrayNode arrayNode, final Map<String, Object> data) {
+        final Object fieldData = ValueUtils.getValueFromMap(arrayNode.getField(), data).orElseThrow(DataNotFoundException::new);
+        if (arrayNode.getItems()
+                .stream()
+                .map(Pair::getLeft).distinct().count() > 1) {
+            throw new HeterogeneousArrayException();
+        }
+        final DataType dataType = arrayNode.getItems().get(0).getLeft();
+        final Object[] values = arrayNode.getItems()
+                .stream()
+                .map(Pair::getRight).toArray();
+        return operatorService.evaluate(arrayNode.getOperator(), ContainerDataType.LIST, dataType, fieldData, values);
     }
 
     private boolean evaluateUnaryToken(final UnaryNode unaryToken, final Map<String, Object> data) {
