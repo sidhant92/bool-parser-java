@@ -1,4 +1,4 @@
-package com.github.sidhant92.boolparser.parser.antlr;// Generated from java-escape by ANTLR 4.11.1
+package com.github.sidhant92.boolparser.parser.antlr;// Generated from /Users/sid/Desktop/filter1/BooleanExpression.g4 by ANTLR 4.13.1
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -59,6 +59,18 @@ public class BooleanExpressionBaseListener implements BooleanExpressionListener 
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitInExpression(BooleanExpressionParser.InExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterArrayExpression(BooleanExpressionParser.ArrayExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArrayExpression(BooleanExpressionParser.ArrayExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -131,6 +143,18 @@ public class BooleanExpressionBaseListener implements BooleanExpressionListener 
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitWordlist(BooleanExpressionParser.WordlistContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterArrayOperators(BooleanExpressionParser.ArrayOperatorsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArrayOperators(BooleanExpressionParser.ArrayOperatorsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

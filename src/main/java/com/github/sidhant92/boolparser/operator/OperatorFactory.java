@@ -19,6 +19,7 @@ public class OperatorFactory {
 
     public static void initialize() {
         final EqualsOperator equalsOperator = new EqualsOperator();
+        final InOperator inOperator = new InOperator(equalsOperator);
         operatorMap.put(Operator.EQUALS, equalsOperator);
         operatorMap.put(Operator.GREATER_THAN, new GreaterThanOperator());
         operatorMap.put(Operator.GREATER_THAN_EQUAL, new GreaterThanEqualOperator());
@@ -26,6 +27,8 @@ public class OperatorFactory {
         operatorMap.put(Operator.LESS_THAN_EQUAL, new LessThanEqualOperator());
         operatorMap.put(Operator.NOT_EQUAL, new NotEqualsOperator());
         operatorMap.put(Operator.IN, new InOperator(equalsOperator));
+        operatorMap.put(Operator.CONTAINS_ALL, new ContainsAllOperator(inOperator));
+        operatorMap.put(Operator.CONTAINS_ANY, new ContainsAnyOperator(inOperator));
     }
 
     public static AbstractOperator getOperator(final Operator operator) {

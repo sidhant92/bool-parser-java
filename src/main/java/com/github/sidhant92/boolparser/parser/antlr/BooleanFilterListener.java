@@ -4,11 +4,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
 import java.util.stream.Collectors;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.Operator;
+import com.github.sidhant92.boolparser.domain.ArrayNode;
 import com.github.sidhant92.boolparser.domain.BooleanNode;
 import com.github.sidhant92.boolparser.domain.InNode;
 import com.github.sidhant92.boolparser.domain.Node;
@@ -51,6 +54,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     @Override
     public void exitToExpression(BooleanExpressionParser.ToExpressionContext ctx) {
+        validateField(ctx.field, ctx.getText());
         final String field = getField(ctx.field.getText());
         final DataType lowerDataType = getDataType(ctx.lower.start);
         final Object lowerValue = ValueUtils.convertValue(ctx.lower.start.getText(), lowerDataType);
@@ -61,9 +65,32 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     }
 
     @Override
-    public void exitInExpression(BooleanExpressionParser.InExpressionContext ctx) {
+    public void exitArrayExpression(BooleanExpressionParser.ArrayExpressionContext ctx) {
+        validateField(ctx.field, ctx.getText());
         final String field = getField(ctx.field.getText());
-        final List<Pair<DataType, Object>> items = ctx.data.children
+        final List<Pair<DataType, Object>> items = getArrayElements(ctx.data.children);
+        final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
+        currentNodes.add(new ArrayNode(field, operator, items));
+        super.exitArrayExpression(ctx);
+    }
+
+    @Override
+    public void exitInExpression(BooleanExpressionParser.InExpressionContext ctx) {
+        validateField(ctx.field, ctx.getText());
+        final String field = getField(ctx.field.getText());
+        final List<Pair<DataType, Object>> items = getArrayElements(ctx.data.children);
+        final InNode inNode = new InNode(field, items);
+        if (Objects.isNull(ctx.not)) {
+            currentNodes.add(inNode);
+        } else {
+            final BooleanNode booleanNode = new BooleanNode(inNode, null, LogicalOperationType.NOT);
+            currentNodes.add(booleanNode);
+        }
+        super.exitInExpression(ctx);
+    }
+
+    private List<Pair<DataType, Object>> getArrayElements(final List<ParseTree> trees) {
+        return trees
                 .stream()
                 .filter(child -> child instanceof BooleanExpressionParser.TypesContext)
                 .map(child -> {
@@ -72,14 +99,16 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
                     return Pair.of(dataType, value);
                 })
                 .collect(Collectors.toList());
-        currentNodes.add(new InNode(field, items));
-        super.exitInExpression(ctx);
+    }
+
+    private void validateField(final Token token, final String text) {
+        if (Objects.isNull(token) || (StringUtils.isBlank(token.getText()) && StringUtils.isBlank(this.defaultField))) {
+            log.error("Error parsing expression (missing field) for the string {}", text);
+            throw new InvalidExpressionException();
+        }
     }
 
     private String getField(final String field) {
-        if (Objects.isNull(defaultField)) {
-            return field;
-        }
         return StringUtils.isBlank(field) ? defaultField : field;
     }
 

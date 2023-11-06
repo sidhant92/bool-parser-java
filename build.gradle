@@ -22,7 +22,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group 'com.github.sidhant92'
-version = "1.1.0"
+version = "1.2.0"
 
 apply plugin: "com.dipien.semantic-version"
 
@@ -36,7 +36,7 @@ dependencies {
     implementation 'ch.qos.logback.contrib:logback-jackson:0.1.5'
     implementation 'net.logstash.logback:logstash-logback-encoder:5.2'
     implementation 'org.apache.maven:maven-artifact:3.5.2'
-    implementation 'org.antlr:antlr4-runtime:4.11.1'
+    implementation 'org.antlr:antlr4-runtime:4.13.1'
     implementation 'io.vavr:vavr:0.10.4'
     implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
     implementation 'org.projectlombok:lombok:1.18.26'
@@ -91,7 +91,7 @@ publishing {
             pom {
                 name = 'bool-parser'
                 description = 'Java parser for boolean expressions'
-                url = 'https://github.com/sidhant92/bool-parser'
+                url = 'https://github.com/sidhant92/bool-parser-java'
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
@@ -105,9 +105,9 @@ publishing {
                     }
                 }
                 scm {
-                    url = 'https://github.com/sidhant92/bool-parser'
-                    connection = 'scm:git://github.com/sidhant92/bool-parser.git'
-                    developerConnection = 'scm:git://github.com/sidhant92/bool-parser.git'
+                    url = 'https://github.com/sidhant92/bool-parser-java'
+                    connection = 'scm:git://github.com/sidhant92/bool-parser-java.git'
+                    developerConnection = 'scm:git://github.com/sidhant92/bool-parser-java.git'
                 }
             }
         }

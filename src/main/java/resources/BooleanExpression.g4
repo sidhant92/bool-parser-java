@@ -10,8 +10,9 @@ expression
  | left=expression op=comparator right=expression                    #comparatorExpression
  | left=expression op=binary right=expression                        #binaryExpression
  | types                                                             #typesExpression
- | field=WORD lower=numericTypes TO upper=numericTypes               #toExpression
- | field=WORD IN data=wordlist                                       #inExpression
+ | (field=WORD)? lower=numericTypes TO upper=numericTypes            #toExpression
+ | (field=WORD)? (not=NOT)? IN data=wordlist                         #inExpression
+ | (field=WORD)? op=arrayOperators data=wordlist                     #arrayExpression
  ;
 
 comparator
@@ -22,6 +23,10 @@ comparator
  wordlist
  : LPAREN WS* first=types WS* (',' WS* rest=types WS*)* RPAREN
  ;
+
+ arrayOperators
+  : CONTAINS_ANY | CONTAINS_ALL
+  ;
 
 
  numericTypes
@@ -49,6 +54,8 @@ OR           : 'OR' | 'or' | '||';
 NOT          : 'NOT' | 'not';
 TRUE         : 'TRUE' | 'true';
 FALSE        : 'FALSE' | 'false';
+CONTAINS_ALL : 'CONTAINS_ALL' | 'contains_all';
+CONTAINS_ANY : 'CONTAINS_ANY' | 'contains_any';
 NE           : '!=';
 GT           : '>' ;
 GE           : '>=' ;

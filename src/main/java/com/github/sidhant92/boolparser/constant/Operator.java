@@ -20,10 +20,16 @@ public enum Operator {
     LESS_THAN,
     LESS_THAN_EQUAL,
     NOT_EQUAL,
-    IN;
+    IN,
+    CONTAINS_ALL,
+    CONTAINS_ANY;
 
     public static Optional<Operator> getOperatorFromSymbol(final String symbol) {
-        return OperatorFactory.getAllOperators().stream().filter(operator -> operator.getSymbol().equals(symbol)).map(AbstractOperator::getOperator)
-                              .findFirst();
+        final String symbolLowerCase = symbol.toLowerCase();
+        return OperatorFactory.getAllOperators()
+                .stream()
+                .filter(operator -> operator.getSymbol().toLowerCase().equals(symbolLowerCase))
+                .map(AbstractOperator::getOperator)
+                .findFirst();
     }
 }
