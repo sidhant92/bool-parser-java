@@ -17,11 +17,11 @@ public abstract class AbstractDataType<T extends Comparable<? super T>> {
         this.clazz = clazz;
     }
 
-    public boolean defaultIsValid(final Object value, final ObjectMapper objectMapper) {
+    protected boolean defaultIsValid(final Object value, final ObjectMapper objectMapper) {
        return defaultIsValid(value, objectMapper, false);
     }
 
-    public boolean defaultIsValid(final Object value, final ObjectMapper objectMapper, final boolean useStrictValidation) {
+    protected boolean defaultIsValid(final Object value, final ObjectMapper objectMapper, final boolean useStrictValidation) {
         try {
             if (clazz.isInstance(value)) {
                 return true;
@@ -36,7 +36,7 @@ public abstract class AbstractDataType<T extends Comparable<? super T>> {
         return false;
     }
 
-    public Optional<T> defaultGetValue(final Object value, final ObjectMapper objectMapper) {
+    protected Optional<T> defaultGetValue(final Object value, final ObjectMapper objectMapper) {
         try {
             if (clazz.isInstance(value)) {
                 return Optional.of(clazz.cast(value));
