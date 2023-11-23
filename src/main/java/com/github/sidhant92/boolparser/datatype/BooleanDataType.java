@@ -27,6 +27,11 @@ public class BooleanDataType extends AbstractDataType<Boolean> {
     }
 
     @Override
+    public boolean isValid(final Object value, final boolean useStrictValidation) {
+        return super.defaultIsValid(value, objectMapper, useStrictValidation);
+    }
+
+    @Override
     public Optional<Boolean> getValue(Object value) {
         return defaultGetValue(value, objectMapper);
     }

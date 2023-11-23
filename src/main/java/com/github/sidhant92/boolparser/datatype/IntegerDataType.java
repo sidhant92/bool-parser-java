@@ -27,6 +27,11 @@ public class IntegerDataType extends AbstractDataType<Integer> {
     }
 
     @Override
+    public boolean isValid(final Object value, final boolean useStrictValidation) {
+        return super.defaultIsValid(value, objectMapper, useStrictValidation);
+    }
+
+    @Override
     public Optional<Integer> getValue(Object value) {
         return defaultGetValue(value, objectMapper);
     }
