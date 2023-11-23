@@ -18,9 +18,16 @@ public abstract class AbstractDataType<T extends Comparable<? super T>> {
     }
 
     public boolean defaultIsValid(final Object value, final ObjectMapper objectMapper) {
+       return defaultIsValid(value, objectMapper, false);
+    }
+
+    public boolean defaultIsValid(final Object value, final ObjectMapper objectMapper, final boolean useStrictValidation) {
         try {
             if (clazz.isInstance(value)) {
                 return true;
+            }
+            if (useStrictValidation) {
+                return false;
             }
             return objectMapper.convertValue(value, clazz) != null;
         } catch (final Exception ex) {
@@ -44,6 +51,8 @@ public abstract class AbstractDataType<T extends Comparable<? super T>> {
     public abstract DataType getDataType();
 
     public abstract boolean isValid(final Object value);
+
+    public abstract boolean isValid(final Object value, final boolean useStrictValidation);
 
     public abstract Optional<T> getValue(final Object value);
 }

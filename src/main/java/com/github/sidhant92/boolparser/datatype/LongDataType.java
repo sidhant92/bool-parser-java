@@ -27,6 +27,11 @@ public class LongDataType extends AbstractDataType<Long> {
     }
 
     @Override
+    public boolean isValid(final Object value, final boolean useStrictValidation) {
+        return super.defaultIsValid(value, objectMapper, useStrictValidation);
+    }
+
+    @Override
     public Optional<Long> getValue(Object value) {
         return defaultGetValue(value, objectMapper);
     }

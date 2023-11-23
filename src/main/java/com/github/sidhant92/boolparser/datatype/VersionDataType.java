@@ -28,6 +28,11 @@ public class VersionDataType extends AbstractDataType<ComparableVersion> {
     }
 
     @Override
+    public boolean isValid(final Object value, final boolean useStrictValidation) {
+        return super.defaultIsValid(value, objectMapper, useStrictValidation);
+    }
+
+    @Override
     public Optional<ComparableVersion> getValue(Object value) {
         return defaultGetValue(value, objectMapper);
     }
