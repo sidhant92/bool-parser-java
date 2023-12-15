@@ -124,6 +124,19 @@ public class BooleanExpressionEvaluatorTest {
     }
 
     @Test
+    public void testTwoNestedField() {
+        final Map<String, Object> data = new HashMap<>();
+        final Map<String, Object> person = new HashMap<>();
+        final Map<String, Object> details = new HashMap<>();
+        details.put("age", 24);
+        person.put("details", details);
+        data.put("person", person);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("person.details.age > 20", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
     public void testMissingNestedField() {
         final Map<String, Object> data = new HashMap<>();
         final Map<String, Object> person = new HashMap<>();
