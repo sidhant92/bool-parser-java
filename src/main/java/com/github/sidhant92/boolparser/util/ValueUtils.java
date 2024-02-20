@@ -1,7 +1,9 @@
 package com.github.sidhant92.boolparser.util;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import com.github.sidhant92.boolparser.constant.DataType;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +19,10 @@ public class ValueUtils {
         }
         if (fieldData.isPresent() && fieldData.get() instanceof Map) {
             try {
-                return getValueFromMap(keys[1], (Map<String, Object>) fieldData.get());
+                final String newKey = Arrays
+                        .stream(keys).skip(1)
+                        .collect(Collectors.joining("."));
+                return getValueFromMap(newKey, (Map<String, Object>) fieldData.get());
             } catch (ClassCastException ex) {
                 return Optional.empty();
             }
@@ -40,10 +45,10 @@ public class ValueUtils {
                 new ComparableVersion(value);
             default:
                 if (value.startsWith("'") && value.endsWith("'")) {
-                    return value.substring(1, value.length() -1);
+                    return value.substring(1, value.length() - 1);
                 }
                 if (value.startsWith("\"") && value.endsWith("\"")) {
-                    return value.substring(1, value.length() -1);
+                    return value.substring(1, value.length() - 1);
                 }
                 return value;
         }

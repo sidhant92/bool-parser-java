@@ -1,4 +1,4 @@
-package com.github.sidhant92.boolparser.parser.antlr;// Generated from java-escape by ANTLR 4.11.1
+package com.github.sidhant92.boolparser.parser.antlr;// Generated from /Users/sid/Desktop/filter1/BooleanExpression.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -52,6 +52,18 @@ public interface BooleanExpressionListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitInExpression(BooleanExpressionParser.InExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code arrayExpression}
+	 * labeled alternative in {@link BooleanExpressionParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterArrayExpression(BooleanExpressionParser.ArrayExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code arrayExpression}
+	 * labeled alternative in {@link BooleanExpressionParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitArrayExpression(BooleanExpressionParser.ArrayExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code toExpression}
 	 * labeled alternative in {@link BooleanExpressionParser#expression}.
@@ -120,6 +132,16 @@ public interface BooleanExpressionListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitWordlist(BooleanExpressionParser.WordlistContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BooleanExpressionParser#arrayOperators}.
+	 * @param ctx the parse tree
+	 */
+	void enterArrayOperators(BooleanExpressionParser.ArrayOperatorsContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BooleanExpressionParser#arrayOperators}.
+	 * @param ctx the parse tree
+	 */
+	void exitArrayOperators(BooleanExpressionParser.ArrayOperatorsContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link BooleanExpressionParser#numericTypes}.
 	 * @param ctx the parse tree

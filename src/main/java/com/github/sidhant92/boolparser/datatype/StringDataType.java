@@ -27,6 +27,11 @@ public class StringDataType extends AbstractDataType<String> {
     }
 
     @Override
+    public boolean isValid(final Object value, final boolean useStrictValidation) {
+        return super.defaultIsValid(value, objectMapper, useStrictValidation);
+    }
+
+    @Override
     public Optional<String> getValue(Object value) {
         return defaultGetValue(value, objectMapper);
     }

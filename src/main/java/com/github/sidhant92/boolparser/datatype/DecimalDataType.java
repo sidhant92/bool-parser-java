@@ -18,12 +18,17 @@ public class DecimalDataType extends AbstractDataType<Double> {
 
     @Override
     public DataType getDataType() {
-        return DataType.STRING;
+        return DataType.DECIMAL;
     }
 
     @Override
     public boolean isValid(final Object value) {
         return super.defaultIsValid(value, objectMapper);
+    }
+
+    @Override
+    public boolean isValid(final Object value, final boolean useStrictValidation) {
+        return super.defaultIsValid(value, objectMapper, useStrictValidation);
     }
 
     @Override

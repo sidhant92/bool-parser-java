@@ -7,35 +7,39 @@ import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * @author sidhant.aggarwal
- * @since 05/03/2023
- */
 @AllArgsConstructor
-public class InOperator extends AbstractOperator {
-    private final EqualsOperator equalsOperator;
+@Slf4j
+public class ContainsAnyOperator extends AbstractOperator {
+    private final InOperator inOperator;
 
     @Override
     public <T extends Comparable<? super T>> boolean evaluate(final ContainerDataType containerDataType, final DataType dataType,
                                                               final Object leftOperand, final Object... rightOperands) {
+        if (!containerDataType.isValid(dataType, leftOperand)) {
+            log.error("Validation failed for any operator for the operand {}", leftOperand);
+            return false;
+        }
+        final Object[] leftOperandArray = ((List<?>) leftOperand).toArray();
         return Arrays
-                .stream(rightOperands).anyMatch(a -> equalsOperator.evaluate(containerDataType, dataType, leftOperand, a));
+                .stream(rightOperands)
+                .anyMatch(rightOperand -> inOperator.evaluate(ContainerDataType.PRIMITIVE, dataType, rightOperand, leftOperandArray));
     }
 
     @Override
     public Operator getOperator() {
-        return Operator.IN;
+        return Operator.CONTAINS_ANY;
     }
 
     @Override
     public String getSymbol() {
-        return "IN";
+        return "CONTAINS_ANY";
     }
 
     @Override
     public List<ContainerDataType> getAllowedContainerTypes() {
-        return Collections.singletonList(ContainerDataType.PRIMITIVE);
+        return Collections.singletonList(ContainerDataType.LIST);
     }
 
     @Override
