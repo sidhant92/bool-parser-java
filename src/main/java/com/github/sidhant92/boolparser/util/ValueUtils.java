@@ -66,4 +66,20 @@ public class ValueUtils {
             return Optional.empty();
         }
     }
+
+    public static DataType getDataType(final Object value) {
+        if (value instanceof Boolean) {
+            return DataType.BOOLEAN;
+        }
+        if (value instanceof Float || value instanceof Double) {
+            return DataType.DECIMAL;
+        }
+        if (value instanceof Integer) {
+            return DataType.INTEGER;
+        }
+        if (value instanceof Long) {
+            return DataType.LONG;
+        }
+        return DataType.STRING;
+    }
 }

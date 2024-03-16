@@ -10,5 +10,8 @@ public enum NodeType {
     NUMERIC_RANGE,
     IN,
     ARRAY,
-    UNARY
+    UNARY,
+    ARITHMETIC,
+    ARITHMETIC_LEAF,
+    ARITHMETIC_UNARY
 }
