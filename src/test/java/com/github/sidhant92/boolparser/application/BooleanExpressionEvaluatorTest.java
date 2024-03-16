@@ -514,4 +514,32 @@ public class BooleanExpressionEvaluatorTest {
         assertTrue(booleanOptional.isSuccess());
         assertFalse(booleanOptional.get());
     }
+
+    @Test
+    public void testComparisonWithArithmeticTrueCondition() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("age", "20");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age > (5 + 10)", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testComparisonWithArithmeticFalseCondition() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("age", "20");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age > (5 + 20)", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertFalse(booleanOptional.get());
+    }
+
+    @Test
+    public void testComparisonWithArithmeticFalseCondition1() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("age", "20");
+        data.put("a", 20);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age > (5 + a)", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertFalse(booleanOptional.get());
+    }
 }

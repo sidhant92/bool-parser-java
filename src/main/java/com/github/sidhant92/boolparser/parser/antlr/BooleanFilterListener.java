@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
 import java.util.stream.Collectors;
+import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.Operator;
+import com.github.sidhant92.boolparser.domain.StringNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticLeafNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticUnaryNode;
@@ -32,6 +34,8 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     private final Stack<Node> currentNodes;
 
     private org.antlr.v4.runtime.Token lastToken;
+
+    private int tokenCount;
 
     private String defaultField;
 
@@ -207,6 +211,9 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
                 this.node = ArithmeticUnaryNode.builder().operand(secondNode).build();
             }
         }
+        if (this.node == null && tokenCount == 1 && lastToken instanceof CommonToken) {
+            this.node = StringNode.builder().field((lastToken.getText())).build();
+        }
         if (this.node == null) {
             log.error("Error parsing expression for the string {}", ctx.getText());
             throw new InvalidExpressionException();
@@ -232,6 +239,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     @Override
     public void exitTypesExpression(BooleanExpressionParser.TypesExpressionContext ctx) {
+        tokenCount++;
         this.lastToken = ctx.start;
     }
 

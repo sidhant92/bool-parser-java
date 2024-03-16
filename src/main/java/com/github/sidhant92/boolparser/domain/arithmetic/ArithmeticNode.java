@@ -16,7 +16,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class ArithmeticNode extends Node {
+public class ArithmeticNode extends ArithmeticBaseNode {
     private Node left;
 
     private Node right;

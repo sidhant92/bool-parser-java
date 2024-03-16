@@ -13,5 +13,6 @@ public enum NodeType {
     UNARY,
     ARITHMETIC,
     ARITHMETIC_LEAF,
-    ARITHMETIC_UNARY
+    ARITHMETIC_UNARY,
+    STRING
 }

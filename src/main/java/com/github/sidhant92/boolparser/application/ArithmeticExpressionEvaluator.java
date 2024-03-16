@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
+import com.github.sidhant92.boolparser.domain.StringNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticLeafNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticUnaryNode;
@@ -37,6 +38,10 @@ public class ArithmeticExpressionEvaluator {
         return tokenOptional.map(node -> evaluateToken(node, data));
     }
 
+    protected Object evaluate(final Node node, final Map<String, Object> data) {
+        return evaluateToken(node, data);
+    }
+
     private Object evaluateToken(final Node node, final Map<String, Object> data) {
         switch (node.getTokenType()) {
             case ARITHMETIC:
@@ -45,10 +50,16 @@ public class ArithmeticExpressionEvaluator {
                 return evaluateArithmeticLeafToken((ArithmeticLeafNode) node, data);
             case ARITHMETIC_UNARY:
                 return evaluateUnaryArithmeticToken((ArithmeticUnaryNode) node, data);
+            case STRING:
+                return evaluateStringToken((StringNode) node, data);
             default:
                 log.error("unsupported token {}", node.getTokenType());
                 throw new UnsupportedToken();
         }
+    }
+
+    private Object evaluateStringToken(final StringNode stringNode, final Map<String, Object> data) {
+        return ValueUtils.getValueFromMap(stringNode.getField(), data).orElse(stringNode.getField());
     }
 
     private Pair<Object, DataType> evaluateArithmeticLeafToken(final ArithmeticLeafNode arithmeticLeafNode, final Map<String, Object> data) {

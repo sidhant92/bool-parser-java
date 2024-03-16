@@ -134,6 +134,16 @@ public class ArithmeticExpressionEvaluatorTest {
     }
 
     @Test
+    public void testStringConcatenation() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", "first");
+        data.put("b", "second");
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("a + \" \" + b", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), "first second");
+    }
+
+    @Test
     public void testExpressionWithParenthesisNoVariable() {
         final Map<String, Object> data = new HashMap<>();
         data.put("a", 10);
@@ -176,5 +186,14 @@ public class ArithmeticExpressionEvaluatorTest {
         final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("- (a + 5)", data);
         assertTrue(resultOptional.isSuccess());
         assertEquals(resultOptional.get(), -15);
+    }
+
+    @Test
+    public void testExpressionWithNestedUnaryNode1() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", "test");
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("a", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), "test");
     }
 }
