@@ -1,4 +1,4 @@
-package com.github.sidhant92.boolparser.operator;
+package com.github.sidhant92.boolparser.operator.logical;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
 @Slf4j
-public class ContainsAnyOperator extends AbstractOperator {
+public class ContainsAllOperator extends AbstractOperator {
     private final InOperator inOperator;
 
     @Override
@@ -24,17 +24,17 @@ public class ContainsAnyOperator extends AbstractOperator {
         final Object[] leftOperandArray = ((List<?>) leftOperand).toArray();
         return Arrays
                 .stream(rightOperands)
-                .anyMatch(rightOperand -> inOperator.evaluate(ContainerDataType.PRIMITIVE, dataType, rightOperand, leftOperandArray));
+                .allMatch(rightOperand -> inOperator.evaluate(ContainerDataType.PRIMITIVE, dataType, rightOperand, leftOperandArray));
     }
 
     @Override
     public Operator getOperator() {
-        return Operator.CONTAINS_ANY;
+        return Operator.CONTAINS_ALL;
     }
 
     @Override
     public String getSymbol() {
-        return "CONTAINS_ANY";
+        return "CONTAINS_ALL";
     }
 
     @Override

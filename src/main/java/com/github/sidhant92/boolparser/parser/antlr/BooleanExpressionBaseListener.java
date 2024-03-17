@@ -28,6 +28,18 @@ public class BooleanExpressionBaseListener implements BooleanExpressionListener 
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterUnaryArithmeticExpression(BooleanExpressionParser.UnaryArithmeticExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUnaryArithmeticExpression(BooleanExpressionParser.UnaryArithmeticExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterBinaryExpression(BooleanExpressionParser.BinaryExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -100,6 +112,18 @@ public class BooleanExpressionBaseListener implements BooleanExpressionListener 
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterArithmeticExpression(BooleanExpressionParser.ArithmeticExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArithmeticExpression(BooleanExpressionParser.ArithmeticExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterComparatorExpression(BooleanExpressionParser.ComparatorExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -131,6 +155,18 @@ public class BooleanExpressionBaseListener implements BooleanExpressionListener 
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitComparator(BooleanExpressionParser.ComparatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterArithmeticOperator(BooleanExpressionParser.ArithmeticOperatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArithmeticOperator(BooleanExpressionParser.ArithmeticOperatorContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

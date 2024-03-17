@@ -1,4 +1,4 @@
-package com.github.sidhant92.boolparser.operator;
+package com.github.sidhant92.boolparser.operator.logical;
 
 import java.util.Arrays;
 import java.util.Collections;

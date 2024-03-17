@@ -1,7 +1,7 @@
 package com.github.sidhant92.boolparser.constant;
 
 import java.util.Optional;
-import com.github.sidhant92.boolparser.operator.AbstractOperator;
+import com.github.sidhant92.boolparser.operator.logical.AbstractOperator;
 import com.github.sidhant92.boolparser.operator.OperatorFactory;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,15 +21,32 @@ public enum Operator {
     LESS_THAN_EQUAL,
     NOT_EQUAL,
     IN,
+
+    ADD,
+    SUBTRACT,
+    MULTIPLY,
+    DIVIDE,
+    MODULUS,
+    EXPONENT,
+    UNARY,
+
     CONTAINS_ALL,
     CONTAINS_ANY;
 
     public static Optional<Operator> getOperatorFromSymbol(final String symbol) {
         final String symbolLowerCase = symbol.toLowerCase();
-        return OperatorFactory.getAllOperators()
+        final Optional<Operator> operator = OperatorFactory.getAllLogicalOperators()
                 .stream()
-                .filter(operator -> operator.getSymbol().toLowerCase().equals(symbolLowerCase))
+                .filter(op -> op.getSymbol().toLowerCase().equals(symbolLowerCase))
                 .map(AbstractOperator::getOperator)
+                .findFirst();
+        if (operator.isPresent()) {
+            return operator;
+        }
+        return OperatorFactory.getAllArithmeticOperators()
+                .stream()
+                .filter(op -> op.getSymbol().toLowerCase().equals(symbolLowerCase))
+                .map(com.github.sidhant92.boolparser.operator.arithmetic.AbstractOperator::getOperator)
                 .findFirst();
     }
 }

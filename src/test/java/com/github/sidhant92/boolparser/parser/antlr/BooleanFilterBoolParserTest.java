@@ -9,6 +9,9 @@ import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.NodeType;
 import com.github.sidhant92.boolparser.constant.Operator;
+import com.github.sidhant92.boolparser.domain.StringNode;
+import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticLeafNode;
+import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
 import com.github.sidhant92.boolparser.domain.ArrayNode;
 import com.github.sidhant92.boolparser.domain.BooleanNode;
 import com.github.sidhant92.boolparser.domain.InNode;
@@ -322,10 +325,10 @@ public class BooleanFilterBoolParserTest {
     }
 
     @Test
-    public void testInvalidExpression() {
+    public void testSingleToken() {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("a");
-        assertTrue(nodeOptional.isFailure());
-        assertTrue(nodeOptional.getCause() instanceof InvalidExpressionException);
+        assertTrue(nodeOptional.isSuccess());
+        assertTrue(nodeOptional.get() instanceof StringNode);
     }
 
     @Test
@@ -353,6 +356,68 @@ public class BooleanFilterBoolParserTest {
         assertEquals(((ArrayNode) nodeOptional.get()).getField(), "a");
         assertEquals(((ArrayNode) nodeOptional.get()).getOperator(), Operator.CONTAINS_ALL);
         assertEquals(((ArrayNode) nodeOptional.get()).getItems().size(), 2);
+    }
+
+    @Test
+    public void testAddOperatorString() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("a + b");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getOperand(), "a");
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.STRING);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getOperand(), "b");
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.STRING);
+        assertEquals(((ArithmeticNode) nodeOptional.get()).getOperator(), Operator.ADD);
+    }
+
+    @Test
+    public void testAddOperatorInt() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("20 + 5");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getOperand(), 20);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.INTEGER);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getOperand(), 5);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);
+        assertEquals(((ArithmeticNode) nodeOptional.get()).getOperator(), Operator.ADD);
+    }
+
+    @Test
+    public void testAddOperatorDecimal() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("20.5 + 5");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getOperand(), 20.5);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.DECIMAL);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getOperand(), 5);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);
+        assertEquals(((ArithmeticNode) nodeOptional.get()).getOperator(), Operator.ADD);
+    }
+
+    @Test
+    public void testAddOperatorBool() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("false + 5");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getOperand(), false);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.BOOLEAN);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getOperand(), 5);
+        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);
+        assertEquals(((ArithmeticNode) nodeOptional.get()).getOperator(), Operator.ADD);
+    }
+
+    @Test
+    public void testComparisonWithArithmetic() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("a > (10 + 20)");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.COMPARISON);
+        assertEquals((((ComparisonNode) nodeOptional.get()).getField()), "a");
+        final ArithmeticNode arithmeticNode = (ArithmeticNode) ((ComparisonNode) nodeOptional.get()).getValue();
+        assertEquals(((ArithmeticLeafNode)(arithmeticNode.getLeft())).getOperand(), 10);
+        assertEquals(((ArithmeticLeafNode)(arithmeticNode.getLeft())).getDataType(), DataType.INTEGER);
+        assertEquals(((ArithmeticLeafNode)(arithmeticNode.getRight())).getOperand(), 20);
+        assertEquals(((ArithmeticLeafNode)(arithmeticNode.getRight())).getDataType(), DataType.INTEGER);
+        assertEquals(arithmeticNode.getOperator(), Operator.ADD);
     }
 
     private void verifyStringToken(final ComparisonNode stringToken, final String field, final String value) {
