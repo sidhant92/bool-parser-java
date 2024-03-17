@@ -1,7 +1,6 @@
 package com.github.sidhant92.boolparser.datatype;
 
 import java.util.Optional;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sidhant92.boolparser.constant.DataType;
 
 /**
@@ -9,11 +8,8 @@ import com.github.sidhant92.boolparser.constant.DataType;
  * @since 05/03/2023
  */
 public class StringDataType extends AbstractDataType<String> {
-    private final ObjectMapper objectMapper;
-
-    public StringDataType(final ObjectMapper objectMapper) {
+    public StringDataType() {
         super(String.class);
-        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -23,16 +19,23 @@ public class StringDataType extends AbstractDataType<String> {
 
     @Override
     public boolean isValid(final Object value) {
-        return super.defaultIsValid(value, objectMapper);
+        return true;
     }
 
     @Override
     public boolean isValid(final Object value, final boolean useStrictValidation) {
-        return super.defaultIsValid(value, objectMapper, useStrictValidation);
+        if (!useStrictValidation) {
+            return isValid(value);
+        }
+        return super.defaultIsValid(value);
     }
 
     @Override
     public Optional<String> getValue(Object value) {
-        return defaultGetValue(value, objectMapper);
+        final Optional<String> result = defaultGetValue(value);
+        if (result.isPresent()) {
+            return result;
+        }
+        return Optional.of(value.toString());
     }
 }

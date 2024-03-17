@@ -85,7 +85,7 @@ public class BooleanExpressionEvaluator {
 
     private boolean evaluateInToken(final InNode inToken, final Map<String, Object> data) {
         final Object fieldData = ValueUtils.getValueFromMap(inToken.getField(), data).orElseThrow(DataNotFoundException::new);
-        final DataType dataType = inToken.getItems().get(0).getLeft();
+        final DataType dataType = ValueUtils.getDataType(fieldData);
         final Object[] values = inToken.getItems()
                 .stream()
                 .map(Pair::getRight).toArray();

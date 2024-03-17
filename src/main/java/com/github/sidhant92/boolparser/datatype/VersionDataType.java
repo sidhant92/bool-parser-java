@@ -2,7 +2,6 @@ package com.github.sidhant92.boolparser.datatype;
 
 import java.util.Optional;
 import org.apache.maven.artifact.versioning.ComparableVersion;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sidhant92.boolparser.constant.DataType;
 
 /**
@@ -10,11 +9,8 @@ import com.github.sidhant92.boolparser.constant.DataType;
  * @since 05/03/2023
  */
 public class VersionDataType extends AbstractDataType<ComparableVersion> {
-    private final ObjectMapper objectMapper;
-
-    public VersionDataType(final ObjectMapper objectMapper) {
+    public VersionDataType() {
         super(ComparableVersion.class);
-        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -24,16 +20,36 @@ public class VersionDataType extends AbstractDataType<ComparableVersion> {
 
     @Override
     public boolean isValid(final Object value) {
-        return super.defaultIsValid(value, objectMapper);
+        boolean isValid = super.defaultIsValid(value);
+        if (!isValid) {
+            try {
+                new ComparableVersion(value.toString());
+                return true;
+            } catch (Exception ex) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
     public boolean isValid(final Object value, final boolean useStrictValidation) {
-        return super.defaultIsValid(value, objectMapper, useStrictValidation);
+        if (!useStrictValidation) {
+            return isValid(value);
+        }
+        return super.defaultIsValid(value);
     }
 
     @Override
     public Optional<ComparableVersion> getValue(Object value) {
-        return defaultGetValue(value, objectMapper);
+        final Optional<ComparableVersion> result = defaultGetValue(value);
+        if (result.isPresent()) {
+            return result;
+        }
+        try {
+            return Optional.of(new ComparableVersion(value.toString()));
+        } catch (final Exception ignored) {
+        }
+        return Optional.empty();
     }
 }
