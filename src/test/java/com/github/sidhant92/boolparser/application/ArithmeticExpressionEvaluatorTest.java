@@ -196,4 +196,22 @@ public class ArithmeticExpressionEvaluatorTest {
         assertTrue(resultOptional.isSuccess());
         assertEquals(resultOptional.get(), "test");
     }
+
+    @Test
+    public void testUnaryNode() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("-a", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), -10);
+    }
+
+    @Test
+    public void testDoubleUnaryNode() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("--a", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 10);
+    }
 }

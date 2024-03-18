@@ -90,7 +90,7 @@ DECIMAL      : [0-9]+ '.' [0-9]+;
 APP_VERSION  : [0-9] ('.' INTEGER)+;
 INTEGER      : [0-9]+;
 WS           : [ \r\t\u000C\n]+ -> skip;
-WORD         : (ALPHANUMERIC | '_' | '-' | '.' | SQ | DQ)+;
+WORD         : (ALPHANUMERIC | SQ | DQ)+ (ALPHANUMERIC | '_' | '-' | '.' | SQ | DQ)*;
 ALPHANUMERIC : [a-zA-Z0-9];
 SQ           : '\''.*? '\'';
 DQ           : '"'.*? '"';
