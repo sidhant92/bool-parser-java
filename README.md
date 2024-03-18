@@ -48,6 +48,7 @@ Parentheses, `(` and `)`, can be used for grouping.
 * Phrases that includes quotes, like `content = "It's a wonderful day"`
 * Phrases that includes quotes, like `attribute = 'She said "Hello World"'`
 * For nested keys in data map you can use the dot notation, like `person.age`
+* There are two implementations for the parser, Boolparser and CachedBoolParser. CachedBoolParser takes input the max cache size.
 
 ## Usage
 POM
@@ -56,14 +57,14 @@ POM
         <dependency>
             <groupId>com.github.sidhant92</groupId>
             <artifactId>bool-parser-java</artifactId>
-            <version>1.0.0</version>
+            <version>2.0.0</version>
         </dependency>
     </dependencies>
 ```
 Gradle
 ```
 dependencies {
-	implementation "com.github.sidhant92:bool-parser-java:1.0.0"
+	implementation "com.github.sidhant92:bool-parser-java:2.0.0"
 }
 ```
 
@@ -146,45 +147,90 @@ Usage examples:
 
 Simple Numerical Comparison
 ```
-final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpressionEvaluator();
+final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpressionEvaluator(new Boolparser());
 final Map<String, Object> data = new HashMap<>();
 data.put("age", 26);
-final Try<Boolean> result = booleanExpressionEvaluator.evaluate("age >= 27", data);
-assertTrue(booleanOptional.isPresent());
-assertFalse(booleanOptional.get());
+final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("age >= 27", data);
+assertTrue(resultOptional.isPresent());
+assertFalse(resultOptional.get());
 ```
 Boolean Comparison
 ```
-final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpressionEvaluator();
+final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpressionEvaluator(new Boolparser());
 final Map<String, Object> data = new HashMap<>();
 data.put("age", 25);
 data.put("name", "sid");
-final Try<Boolean> result = booleanExpressionEvaluator.evaluate("name = sid AND age = 25", data);
-assertTrue(booleanOptional.isPresent());
-assertTrue(booleanOptional.get());
+final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("name = sid AND age = 25", data);
+assertTrue(resultOptional.isPresent());
+assertTrue(resultOptional.get());
 ```
 Nested Boolean Comparison
 ```
-final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpressionEvaluator();
+final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpressionEvaluator(new Boolparser());
 final Map<String, Object> data = new HashMap<>();
 data.put("age", 25);
 data.put("name", "sid");
 data.put("num", 45);
-final Try<Boolean> result = booleanExpressionEvaluator.evaluate("name:sid AND (age = 25 OR num = 44)", data);
-assertTrue(booleanOptional.isPresent());
-assertTrue(booleanOptional.get());
+final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("name:sid AND (age = 25 OR num = 44)", data);
+assertTrue(resultOptional.isPresent());
+assertTrue(resultOptional.get());
 ```
 App Version Comparison
 ```
-final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpressionEvaluator();
+final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpressionEvaluator(new Boolparser());
 final Map<String, Object> data = new HashMap<>();
 data.put("app_version", "1.5.9");
-final Try<Boolean> result = booleanExpressionEvaluator.evaluate("app_version < 1.5.10", data);
-assertTrue(booleanOptional.isPresent());
-assertTrue(booleanOptional.get());
+final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("app_version < 1.5.10", data);
+assertTrue(resultOptional.isPresent());
+assertTrue(resultOptional.get());
 ```
 
 The return type is `Try<Boolean>`. Failure means that parsing has failed and any fallback can be used.
 
 
 [For a complete list of examples please check out the test file](src/test/java/com/github/sidhant92/boolparser/application/BooleanExpressionEvaluatorTest.java)
+
+
+### Arithmetic Expression Evaluator
+
+The library can be used to evaluate a arithmetic expression.
+It supports both numbers and variables which will be substituted from the passed data.
+The passed variables can also be passed using the dot notation to access nested fields from the input data.
+
+The following Data Types are supported:
+1. String
+2. Integer
+3. Long
+4. Decimal
+
+The following Operators are supported:
+1. Addition (+)
+2. Subtraction (-)
+3. Multiplication (*)
+4. Division (/)
+5. Modulus (%)
+6. Exponent (^)
+
+Usage examples:
+
+Simple Addition Operation
+```
+final ArithmeticExpressionEvaluator evaluator = new ArithmeticExpressionEvaluator(new Boolparser());
+final Map<String, Object> data = new HashMap<>();
+data.put("a", 10);
+final Try<Object> resultOptional = evaluator.evaluate("a + 5", data);
+assertTrue(resultOptional.isPresent());
+assertTrue(resultOptional.get(), 15);
+```
+
+Complex Arithmetic Operation
+```
+final ArithmeticExpressionEvaluator evaluator = new ArithmeticExpressionEvaluator(new Boolparser());
+final Map<String, Object> data = new HashMap<>();
+data.put("a", 10);
+final Try<Object> resultOptional = evaluator.evaluate("((5 * 2) + a) * 2 + (1 + 3 * (a / 2))", data);
+assertTrue(resultOptional.isPresent());
+assertTrue(resultOptional.get(), 56);
+```
+
+[For a complete list of examples please check out the test file](src/test/java/com/github/sidhant92/boolparser/application/ArithmeticExpressionEvaluatorTest.java)
