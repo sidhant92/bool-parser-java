@@ -98,6 +98,26 @@ public class ArithmeticExpressionEvaluatorTest {
     }
 
     @Test
+    public void testSimpleSubtractOperationWithTwoVariable() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        data.put("b", 5);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("a-b", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 5);
+    }
+
+    @Test
+    public void testStringEvaluation() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        data.put("b", 5);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("\"a-b\"", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), "a-b");
+    }
+
+    @Test
     public void testSimpleMultiplyOperationWithVariable() {
         final Map<String, Object> data = new HashMap<>();
         data.put("a", 10);

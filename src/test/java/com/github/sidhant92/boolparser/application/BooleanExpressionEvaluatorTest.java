@@ -62,7 +62,7 @@ public class BooleanExpressionEvaluatorTest {
     public void testSimpleTrueCorrectExpressions() {
         final Map<String, Object> data = new HashMap<>();
         data.put("name", "abc-");
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = abc-", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = 'abc-'", data);
         assertTrue(booleanOptional.isSuccess());
         assertTrue(booleanOptional.get());
     }

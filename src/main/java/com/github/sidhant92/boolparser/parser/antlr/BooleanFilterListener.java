@@ -212,7 +212,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
             }
         }
         if (this.node == null && tokenCount == 1 && lastToken instanceof CommonToken) {
-            this.node = StringNode.builder().field((lastToken.getText())).build();
+            this.node = StringNode.builder().field(ValueUtils.convertValue(lastToken.getText(), DataType.STRING).toString()).build();
         }
         if (this.node == null) {
             log.error("Error parsing expression for the string {}", ctx.getText());
