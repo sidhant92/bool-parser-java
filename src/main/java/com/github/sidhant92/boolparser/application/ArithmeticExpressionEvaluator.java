@@ -1,7 +1,11 @@
 package com.github.sidhant92.boolparser.application;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
@@ -11,7 +15,9 @@ import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticLeafNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticUnaryNode;
 import com.github.sidhant92.boolparser.domain.Node;
+import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticFunctionNode;
 import com.github.sidhant92.boolparser.exception.UnsupportedToken;
+import com.github.sidhant92.boolparser.function.FunctionEvaluatorService;
 import com.github.sidhant92.boolparser.operator.OperatorService;
 import com.github.sidhant92.boolparser.parser.BoolExpressionParser;
 import com.github.sidhant92.boolparser.util.ValueUtils;
@@ -28,9 +34,12 @@ public class ArithmeticExpressionEvaluator {
 
     private final OperatorService operatorService;
 
+    private final FunctionEvaluatorService functionEvaluatorService;
+
     public ArithmeticExpressionEvaluator(final BoolExpressionParser boolExpressionParser) {
         this.boolExpressionParser = boolExpressionParser;
         operatorService = new OperatorService();
+        functionEvaluatorService = new FunctionEvaluatorService();
     }
 
     public Try<Object> evaluate(final String expression, final Map<String, Object> data) {
@@ -50,6 +59,8 @@ public class ArithmeticExpressionEvaluator {
                 return evaluateArithmeticLeafToken((ArithmeticLeafNode) node, data);
             case ARITHMETIC_UNARY:
                 return evaluateUnaryArithmeticToken((ArithmeticUnaryNode) node, data);
+            case ARITHMETIC_FUNCTION:
+                return evaluateArithmeticFunctionToken((ArithmeticFunctionNode) node, data);
             case STRING:
                 return evaluateStringToken((StringNode) node, data);
             default:
@@ -63,7 +74,8 @@ public class ArithmeticExpressionEvaluator {
     }
 
     private Pair<Object, DataType> evaluateArithmeticLeafToken(final ArithmeticLeafNode arithmeticLeafNode, final Map<String, Object> data) {
-        final Optional<Object> fetchedValue = ValueUtils.getValueFromMap(arithmeticLeafNode.getOperand().toString(), data);
+        final Optional<Object> fetchedValue = arithmeticLeafNode.getDataType() != DataType.STRING ? Optional.of(
+                arithmeticLeafNode.getOperand()) : ValueUtils.getValueFromMap(arithmeticLeafNode.getOperand().toString(), data);
         return fetchedValue
                 .map(o -> Pair.of(o, ValueUtils.getDataType(o)))
                 .orElseGet(() -> Pair.of(arithmeticLeafNode.getOperand(), arithmeticLeafNode.getDataType()));
@@ -78,6 +90,22 @@ public class ArithmeticExpressionEvaluator {
         }
         final DataType dataType = ValueUtils.getDataType(resolvedValue);
         return operatorService.evaluateArithmeticOperator(resolvedValue, dataType, null, null, Operator.UNARY, ContainerDataType.PRIMITIVE);
+    }
+
+    private Object evaluateArithmeticFunctionToken(final ArithmeticFunctionNode arithmeticFunctionNode, final Map<String, Object> data) {
+        final List<Pair<Object, DataType>> resolvedValues = arithmeticFunctionNode.getItems()
+                .stream()
+                .map(item -> evaluateArithmeticLeafToken(item, data))
+                .collect(Collectors.toList());
+        final List<Pair<Object, DataType>> flattenedValues = new ArrayList<>();
+        resolvedValues.forEach(value -> {
+            if (value.getKey() instanceof Collection) {
+                ((Collection<?>) value.getKey()).forEach(v -> flattenedValues.add(Pair.of(v, ValueUtils.getDataType(v))));
+            } else {
+                flattenedValues.add(value);
+            }
+        });
+        return functionEvaluatorService.evaluateArithmeticFunction(arithmeticFunctionNode.getFunctionType(), flattenedValues);
     }
 
     private Object evaluateArithmeticToken(final ArithmeticNode arithmeticNode, final Map<String, Object> data) {

@@ -15,6 +15,7 @@ expression
  | left=expression op= MODULUS right=expression                      #arithmeticExpression
  | left=expression op= ADD right=expression                          #arithmeticExpression
  | left=expression op= SUBTRACT right=expression                     #arithmeticExpression
+ | left=arrayArithmeticFunction data=wordlist                        #arithmeticFunctionExpression
  | left=expression op=binary right=expression                        #binaryExpression
  | types                                                             #typesExpression
  | (field=WORD)? lower=numericTypes TO upper=numericTypes            #toExpression
@@ -34,6 +35,18 @@ arithmeticOperator
  | MODULUS
  | EXPONENT
  ;
+
+ arrayArithmeticFunction
+  : MIN
+  | MAX
+  | SUM
+  | AVG
+  | MEAN
+  | MODE
+  | LEN
+  | MEDIAN
+  | INT
+  ;
 
 
  wordlist
@@ -72,6 +85,15 @@ TRUE         : 'TRUE' | 'true';
 FALSE        : 'FALSE' | 'false';
 CONTAINS_ALL : 'CONTAINS_ALL' | 'contains_all';
 CONTAINS_ANY : 'CONTAINS_ANY' | 'contains_any';
+MIN          : 'MIN' | 'min';
+MAX          : 'MAX' | 'max';
+AVG          : 'AVG' | 'avg';
+SUM          : 'SUM' | 'sum';
+MEAN         : 'MEAN' | 'mean';
+MODE         : 'MODE' | 'mode';
+MEDIAN       : 'MEDIAN' | 'median';
+LEN          : 'LEN' | 'len';
+INT          : 'INT' | 'int';
 ADD          : '+';
 SUBTRACT     : '-' ;
 MULTIPLY     : '*' ;

@@ -1,6 +1,7 @@
 package com.github.sidhant92.boolparser.parser.antlr;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,6 +11,7 @@ import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.NodeType;
 import com.github.sidhant92.boolparser.constant.Operator;
 import com.github.sidhant92.boolparser.domain.StringNode;
+import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticFunctionNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticLeafNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
 import com.github.sidhant92.boolparser.domain.ArrayNode;
@@ -392,6 +394,38 @@ public class BooleanFilterBoolParserTest {
         assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getOperand(), 5);
         assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);
         assertEquals(((ArithmeticNode) nodeOptional.get()).getOperator(), Operator.ADD);
+    }
+
+    @Test
+    public void testArithmeticArrayFunction() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("min (1,2,3)");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC_FUNCTION);
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getFunctionType().name(), "MIN");
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().size(), 3);
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0).getDataType(), DataType.INTEGER);
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0).getOperand(), 1);
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(1).getDataType(), DataType.INTEGER);
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(1).getOperand(), 2);
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(2).getDataType(), DataType.INTEGER);
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(2).getOperand(), 3);
+    }
+
+    @Test
+    public void testArithmeticArrayFunctionWithSubstitution() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("min(abc)");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC_FUNCTION);
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getFunctionType().name(), "MIN");
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().size(), 1);
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0).getDataType(), DataType.STRING);
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0).getOperand(), "abc");
+    }
+
+    @Test
+    public void testArithmeticArrayFunctionWithError() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("min abc");
+        assertTrue(nodeOptional.isFailure());
     }
 
     @Test

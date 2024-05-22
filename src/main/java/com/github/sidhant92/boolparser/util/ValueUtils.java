@@ -54,6 +54,13 @@ public class ValueUtils {
         }
     }
 
+    public static Object caseDouble(final double value) {
+        if ((int) value == value) {
+            return (int) value;
+        }
+        return value;
+    }
+
     public static DataType getNumericDataType(final String value) {
         final Optional<Integer> integerOptional = parseInteger(value);
         return integerOptional.isPresent() ? DataType.INTEGER : DataType.LONG;

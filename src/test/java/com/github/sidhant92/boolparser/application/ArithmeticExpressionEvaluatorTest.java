@@ -234,4 +234,167 @@ public class ArithmeticExpressionEvaluatorTest {
         assertTrue(resultOptional.isSuccess());
         assertEquals(resultOptional.get(), 10);
     }
+
+    @Test
+    public void testMinArithmeticFunctionInteger() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("min (1,2,3)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 1);
+    }
+
+    @Test
+    public void testMinArithmeticFunctionDouble() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("min (1,2,3,4.5)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 1);
+    }
+
+    @Test
+    public void testMaxArithmeticFunctionInteger() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("max (1,2,3)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 3);
+    }
+
+    @Test
+    public void testMaxArithmeticFunctionDouble() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("max (1,2,3,4.5)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 4.5d);
+    }
+
+    @Test
+    public void testAvgArithmeticFunctionInteger() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("avg (1,2,3)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 2);
+    }
+
+    @Test
+    public void testAvgArithmeticFunctionDouble() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("avg (1,2,3,4.5)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 2.625);
+    }
+
+    @Test
+    public void testSumArithmeticFunctionInteger() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("sum (1,2,3)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 6);
+    }
+
+    @Test
+    public void testSumArithmeticFunctionDouble() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("sum (1,2,3,4.5)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 10.5);
+    }
+
+    @Test
+    public void testMeanArithmeticFunctionInteger() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("mean (1,2,3)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 2);
+    }
+
+    @Test
+    public void testMeanArithmeticFunctionDouble() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("mean (1,2,3,4.5)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 2.625);
+    }
+
+    @Test
+    public void testModeArithmeticFunctionIntegerVariable() {
+        final Map<String, Object> data = new HashMap<>();
+        final List<Integer> numbers = new ArrayList<>();
+        numbers.add(1);
+        numbers.add(1);
+        numbers.add(2);
+        numbers.add(3);
+        data.put("a", numbers);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("mode (a)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 1);
+    }
+
+    @Test
+    public void testModeArithmeticFunctionDouble() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("mode (1,2,3,4.5)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 1);
+    }
+
+    @Test
+    public void testMedianArithmeticFunctionInteger() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("median (3, 13, 2, 34, 11, 17, 27, 47)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 15);
+    }
+
+    @Test
+    public void testIntArithmeticFunction() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 10);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("int (2.7)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 2);
+    }
+
+    @Test
+    public void testIntArithmeticFunctionWithVariable() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 2.7);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("int (a)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 2);
+    }
+
+    @Test
+    public void testLenArithmeticFunctionString() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", "lorem");
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("len (a)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 5);
+    }
+
+    @Test
+    public void testLenArithmeticFunctionIntegerVariable() {
+        final Map<String, Object> data = new HashMap<>();
+        final List<Integer> numbers = new ArrayList<>();
+        numbers.add(1);
+        numbers.add(1);
+        numbers.add(2);
+        numbers.add(3);
+        data.put("a", numbers);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("len (a)", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 4);
+    }
 }
