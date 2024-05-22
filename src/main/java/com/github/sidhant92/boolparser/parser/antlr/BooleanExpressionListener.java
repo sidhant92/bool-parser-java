@@ -89,6 +89,18 @@ public interface BooleanExpressionListener extends ParseTreeListener {
 	 */
 	void exitToExpression(BooleanExpressionParser.ToExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code arithmeticFunctionExpression}
+	 * labeled alternative in {@link BooleanExpressionParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterArithmeticFunctionExpression(BooleanExpressionParser.ArithmeticFunctionExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code arithmeticFunctionExpression}
+	 * labeled alternative in {@link BooleanExpressionParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitArithmeticFunctionExpression(BooleanExpressionParser.ArithmeticFunctionExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code notExpression}
 	 * labeled alternative in {@link BooleanExpressionParser#expression}.
 	 * @param ctx the parse tree
@@ -156,6 +168,16 @@ public interface BooleanExpressionListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitArithmeticOperator(BooleanExpressionParser.ArithmeticOperatorContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BooleanExpressionParser#arrayArithmeticFunction}.
+	 * @param ctx the parse tree
+	 */
+	void enterArrayArithmeticFunction(BooleanExpressionParser.ArrayArithmeticFunctionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BooleanExpressionParser#arrayArithmeticFunction}.
+	 * @param ctx the parse tree
+	 */
+	void exitArrayArithmeticFunction(BooleanExpressionParser.ArrayArithmeticFunctionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link BooleanExpressionParser#wordlist}.
 	 * @param ctx the parse tree

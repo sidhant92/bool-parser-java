@@ -37,6 +37,7 @@ dependencies {
     implementation 'io.vavr:vavr:0.10.4'
     implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
     implementation 'org.projectlombok:lombok:1.18.26'
+    implementation 'org.apache.commons:commons-math3:3.6.1'
 
     annotationProcessor 'org.projectlombok:lombok:1.18.26'
     testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'

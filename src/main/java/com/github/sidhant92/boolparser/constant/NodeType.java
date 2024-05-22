@@ -14,5 +14,6 @@ public enum NodeType {
     ARITHMETIC,
     ARITHMETIC_LEAF,
     ARITHMETIC_UNARY,
+    ARITHMETIC_FUNCTION,
     STRING
 }

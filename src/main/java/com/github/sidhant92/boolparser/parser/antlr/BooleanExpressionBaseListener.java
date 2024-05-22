@@ -100,6 +100,18 @@ public class BooleanExpressionBaseListener implements BooleanExpressionListener 
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterArithmeticFunctionExpression(BooleanExpressionParser.ArithmeticFunctionExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArithmeticFunctionExpression(BooleanExpressionParser.ArithmeticFunctionExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterNotExpression(BooleanExpressionParser.NotExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -167,6 +179,18 @@ public class BooleanExpressionBaseListener implements BooleanExpressionListener 
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitArithmeticOperator(BooleanExpressionParser.ArithmeticOperatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterArrayArithmeticFunction(BooleanExpressionParser.ArrayArithmeticFunctionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArrayArithmeticFunction(BooleanExpressionParser.ArrayArithmeticFunctionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

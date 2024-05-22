@@ -525,6 +525,30 @@ public class BooleanExpressionEvaluatorTest {
     }
 
     @Test
+    public void testComparisonWithArithmeticFunction() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("age", "20");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age > min (18, 25, 30)", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testComparisonWithArithmeticVariableFunction() {
+        final Map<String, Object> data = new HashMap<>();
+        final List<Integer> numbers = new ArrayList<>();
+        numbers.add(1);
+        numbers.add(1);
+        numbers.add(2);
+        numbers.add(30);
+        data.put("age", "20");
+        data.put("numbers", numbers);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age > max (numbers))", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertFalse(booleanOptional.get());
+    }
+
+    @Test
     public void testComparisonWithArithmeticFalseCondition() {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", "20");
