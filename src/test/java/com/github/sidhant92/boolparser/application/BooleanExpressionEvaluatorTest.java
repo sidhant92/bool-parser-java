@@ -543,7 +543,7 @@ public class BooleanExpressionEvaluatorTest {
         numbers.add(30);
         data.put("age", "20");
         data.put("numbers", numbers);
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age > max (numbers))", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age > max (numbers)", data);
         assertTrue(booleanOptional.isSuccess());
         assertFalse(booleanOptional.get());
     }
