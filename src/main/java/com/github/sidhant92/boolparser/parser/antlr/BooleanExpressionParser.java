@@ -24,11 +24,11 @@ public class BooleanExpressionParser extends Parser {
 		SQ=40, DQ=41;
 	public static final int
 		RULE_parse = 0, RULE_expression = 1, RULE_comparator = 2, RULE_arithmeticOperator = 3, 
-		RULE_arrayArithmeticFunction = 4, RULE_wordlist = 5, RULE_arrayOperators = 6, 
+		RULE_arithmeticFunction = 4, RULE_wordlist = 5, RULE_arrayOperators = 6, 
 		RULE_numericTypes = 7, RULE_types = 8, RULE_binary = 9, RULE_bool = 10;
 	private static String[] makeRuleNames() {
 		return new String[] {
-			"parse", "expression", "comparator", "arithmeticOperator", "arrayArithmeticFunction", 
+			"parse", "expression", "comparator", "arithmeticOperator", "arithmeticFunction", 
 			"wordlist", "arrayOperators", "numericTypes", "types", "binary", "bool"
 		};
 	}
@@ -283,10 +283,10 @@ public class BooleanExpressionParser extends Parser {
 	}
 	@SuppressWarnings("CheckReturnValue")
 	public static class ArithmeticFunctionExpressionContext extends ExpressionContext {
-		public ArrayArithmeticFunctionContext left;
+		public ArithmeticFunctionContext left;
 		public WordlistContext data;
-		public ArrayArithmeticFunctionContext arrayArithmeticFunction() {
-			return getRuleContext(ArrayArithmeticFunctionContext.class,0);
+		public ArithmeticFunctionContext arithmeticFunction() {
+			return getRuleContext(ArithmeticFunctionContext.class,0);
 		}
 		public WordlistContext wordlist() {
 			return getRuleContext(WordlistContext.class,0);
@@ -447,7 +447,7 @@ public class BooleanExpressionParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 				setState(34);
-				((ArithmeticFunctionExpressionContext)_localctx).left = arrayArithmeticFunction();
+				((ArithmeticFunctionExpressionContext)_localctx).left = arithmeticFunction();
 				setState(35);
 				((ArithmeticFunctionExpressionContext)_localctx).data = wordlist();
 				}
@@ -778,7 +778,7 @@ public class BooleanExpressionParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class ArrayArithmeticFunctionContext extends ParserRuleContext {
+	public static class ArithmeticFunctionContext extends ParserRuleContext {
 		public TerminalNode MIN() { return getToken(BooleanExpressionParser.MIN, 0); }
 		public TerminalNode MAX() { return getToken(BooleanExpressionParser.MAX, 0); }
 		public TerminalNode SUM() { return getToken(BooleanExpressionParser.SUM, 0); }
@@ -788,23 +788,23 @@ public class BooleanExpressionParser extends Parser {
 		public TerminalNode LEN() { return getToken(BooleanExpressionParser.LEN, 0); }
 		public TerminalNode MEDIAN() { return getToken(BooleanExpressionParser.MEDIAN, 0); }
 		public TerminalNode INT() { return getToken(BooleanExpressionParser.INT, 0); }
-		public ArrayArithmeticFunctionContext(ParserRuleContext parent, int invokingState) {
+		public ArithmeticFunctionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_arrayArithmeticFunction; }
+		@Override public int getRuleIndex() { return RULE_arithmeticFunction; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof BooleanExpressionListener ) ((BooleanExpressionListener)listener).enterArrayArithmeticFunction(this);
+			if ( listener instanceof BooleanExpressionListener ) ((BooleanExpressionListener)listener).enterArithmeticFunction(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof BooleanExpressionListener ) ((BooleanExpressionListener)listener).exitArrayArithmeticFunction(this);
+			if ( listener instanceof BooleanExpressionListener ) ((BooleanExpressionListener)listener).exitArithmeticFunction(this);
 		}
 	}
 
-	public final ArrayArithmeticFunctionContext arrayArithmeticFunction() throws RecognitionException {
-		ArrayArithmeticFunctionContext _localctx = new ArrayArithmeticFunctionContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_arrayArithmeticFunction);
+	public final ArithmeticFunctionContext arithmeticFunction() throws RecognitionException {
+		ArithmeticFunctionContext _localctx = new ArithmeticFunctionContext(_ctx, getState());
+		enterRule(_localctx, 8, RULE_arithmeticFunction);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -834,15 +834,15 @@ public class BooleanExpressionParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class WordlistContext extends ParserRuleContext {
-		public TypesContext first;
-		public TypesContext rest;
+		public ExpressionContext first;
+		public ExpressionContext rest;
 		public TerminalNode LPAREN() { return getToken(BooleanExpressionParser.LPAREN, 0); }
 		public TerminalNode RPAREN() { return getToken(BooleanExpressionParser.RPAREN, 0); }
-		public List<TypesContext> types() {
-			return getRuleContexts(TypesContext.class);
+		public List<ExpressionContext> expression() {
+			return getRuleContexts(ExpressionContext.class);
 		}
-		public TypesContext types(int i) {
-			return getRuleContext(TypesContext.class,i);
+		public ExpressionContext expression(int i) {
+			return getRuleContext(ExpressionContext.class,i);
 		}
 		public List<TerminalNode> WS() { return getTokens(BooleanExpressionParser.WS); }
 		public TerminalNode WS(int i) {
@@ -889,7 +889,7 @@ public class BooleanExpressionParser extends Parser {
 				_alt = getInterpreter().adaptivePredict(_input,7,_ctx);
 			}
 			setState(105);
-			((WordlistContext)_localctx).first = types();
+			((WordlistContext)_localctx).first = expression(0);
 			setState(109);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
@@ -929,7 +929,7 @@ public class BooleanExpressionParser extends Parser {
 					_alt = getInterpreter().adaptivePredict(_input,9,_ctx);
 				}
 				setState(119);
-				((WordlistContext)_localctx).rest = types();
+				((WordlistContext)_localctx).rest = expression(0);
 				setState(123);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
@@ -1339,13 +1339,13 @@ public class BooleanExpressionParser extends Parser {
 		"\u0000\u0000a\t\u0001\u0000\u0000\u0000bf\u0005 \u0000\u0000ce\u0005%"+
 		"\u0000\u0000dc\u0001\u0000\u0000\u0000eh\u0001\u0000\u0000\u0000fd\u0001"+
 		"\u0000\u0000\u0000fg\u0001\u0000\u0000\u0000gi\u0001\u0000\u0000\u0000"+
-		"hf\u0001\u0000\u0000\u0000im\u0003\u0010\b\u0000jl\u0005%\u0000\u0000"+
+		"hf\u0001\u0000\u0000\u0000im\u0003\u0002\u0001\u0000jl\u0005%\u0000\u0000"+
 		"kj\u0001\u0000\u0000\u0000lo\u0001\u0000\u0000\u0000mk\u0001\u0000\u0000"+
 		"\u0000mn\u0001\u0000\u0000\u0000n\u0080\u0001\u0000\u0000\u0000om\u0001"+
 		"\u0000\u0000\u0000pt\u0005\u0001\u0000\u0000qs\u0005%\u0000\u0000rq\u0001"+
 		"\u0000\u0000\u0000sv\u0001\u0000\u0000\u0000tr\u0001\u0000\u0000\u0000"+
 		"tu\u0001\u0000\u0000\u0000uw\u0001\u0000\u0000\u0000vt\u0001\u0000\u0000"+
-		"\u0000w{\u0003\u0010\b\u0000xz\u0005%\u0000\u0000yx\u0001\u0000\u0000"+
+		"\u0000w{\u0003\u0002\u0001\u0000xz\u0005%\u0000\u0000yx\u0001\u0000\u0000"+
 		"\u0000z}\u0001\u0000\u0000\u0000{y\u0001\u0000\u0000\u0000{|\u0001\u0000"+
 		"\u0000\u0000|\u007f\u0001\u0000\u0000\u0000}{\u0001\u0000\u0000\u0000"+
 		"~p\u0001\u0000\u0000\u0000\u007f\u0082\u0001\u0000\u0000\u0000\u0080~"+

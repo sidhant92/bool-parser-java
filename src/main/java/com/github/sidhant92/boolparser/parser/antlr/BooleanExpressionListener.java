@@ -169,15 +169,15 @@ public interface BooleanExpressionListener extends ParseTreeListener {
 	 */
 	void exitArithmeticOperator(BooleanExpressionParser.ArithmeticOperatorContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link BooleanExpressionParser#arrayArithmeticFunction}.
+	 * Enter a parse tree produced by {@link BooleanExpressionParser#arithmeticFunction}.
 	 * @param ctx the parse tree
 	 */
-	void enterArrayArithmeticFunction(BooleanExpressionParser.ArrayArithmeticFunctionContext ctx);
+	void enterArithmeticFunction(BooleanExpressionParser.ArithmeticFunctionContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link BooleanExpressionParser#arrayArithmeticFunction}.
+	 * Exit a parse tree produced by {@link BooleanExpressionParser#arithmeticFunction}.
 	 * @param ctx the parse tree
 	 */
-	void exitArrayArithmeticFunction(BooleanExpressionParser.ArrayArithmeticFunctionContext ctx);
+	void exitArithmeticFunction(BooleanExpressionParser.ArithmeticFunctionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link BooleanExpressionParser#wordlist}.
 	 * @param ctx the parse tree

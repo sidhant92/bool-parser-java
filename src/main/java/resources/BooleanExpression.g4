@@ -15,7 +15,7 @@ expression
  | left=expression op= MODULUS right=expression                      #arithmeticExpression
  | left=expression op= ADD right=expression                          #arithmeticExpression
  | left=expression op= SUBTRACT right=expression                     #arithmeticExpression
- | left=arrayArithmeticFunction data=wordlist                        #arithmeticFunctionExpression
+ | left=arithmeticFunction data=wordlist                             #arithmeticFunctionExpression
  | left=expression op=binary right=expression                        #binaryExpression
  | types                                                             #typesExpression
  | (field=WORD)? lower=numericTypes TO upper=numericTypes            #toExpression
@@ -36,7 +36,7 @@ arithmeticOperator
  | EXPONENT
  ;
 
- arrayArithmeticFunction
+arithmeticFunction
   : MIN
   | MAX
   | SUM
@@ -48,9 +48,8 @@ arithmeticOperator
   | INT
   ;
 
-
  wordlist
- : LPAREN WS* first=types WS* (',' WS* rest=types WS*)* RPAREN
+ : LPAREN WS* first=expression WS* (',' WS* rest=expression WS*)* RPAREN
  ;
 
  arrayOperators

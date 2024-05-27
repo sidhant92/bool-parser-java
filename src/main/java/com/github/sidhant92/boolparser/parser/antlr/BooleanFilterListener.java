@@ -13,7 +13,6 @@ import com.github.sidhant92.boolparser.constant.FunctionType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.Operator;
-import com.github.sidhant92.boolparser.domain.StringNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticFunctionNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticLeafNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
@@ -174,9 +173,9 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     private List<Pair<DataType, Object>> getArrayElements(final List<ParseTree> trees) {
         return trees
                 .stream()
-                .filter(child -> child instanceof BooleanExpressionParser.TypesContext)
+                .filter(child -> child instanceof BooleanExpressionParser.TypesExpressionContext)
                 .map(child -> {
-                    final DataType dataType = getDataType(((BooleanExpressionParser.TypesContext) child).start);
+                    final DataType dataType = getDataType(((BooleanExpressionParser.TypesExpressionContext) child).start);
                     final Object value = ValueUtils.convertValue(child.getText(), dataType);
                     return Pair.of(dataType, value);
                 })
@@ -186,9 +185,9 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     private List<ArithmeticLeafNode> getArithmeticArrayElements(final List<ParseTree> trees) {
         return trees
                 .stream()
-                .filter(child -> child instanceof BooleanExpressionParser.TypesContext)
+                .filter(child -> child instanceof BooleanExpressionParser.TypesExpressionContext)
                 .map(child -> {
-                    final DataType dataType = getDataType(((BooleanExpressionParser.TypesContext) child).start);
+                    final DataType dataType = getDataType(((BooleanExpressionParser.TypesExpressionContext) child).start);
                     final Object value = ValueUtils.convertValue(child.getText(), dataType);
                     return new ArithmeticLeafNode(value, dataType);
                 })
@@ -248,7 +247,8 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
             }
         }
         if (this.node == null && tokenCount == 1 && lastToken instanceof CommonToken) {
-            this.node = StringNode.builder().field(ValueUtils.convertValue(lastToken.getText(), DataType.STRING).toString()).build();
+            this.node = UnaryNode.builder().dataType(DataType.STRING).value(ValueUtils.convertValue(lastToken.getText(), DataType.STRING).toString())
+                                 .build();
         }
         if (this.node == null) {
             log.error("Error parsing expression for the string {}", ctx.getText());

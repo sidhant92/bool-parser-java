@@ -10,7 +10,6 @@ import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.NodeType;
 import com.github.sidhant92.boolparser.constant.Operator;
-import com.github.sidhant92.boolparser.domain.StringNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticFunctionNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticLeafNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
@@ -330,7 +329,9 @@ public class BooleanFilterBoolParserTest {
     public void testSingleToken() {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("a");
         assertTrue(nodeOptional.isSuccess());
-        assertTrue(nodeOptional.get() instanceof StringNode);
+        assertTrue(nodeOptional.get() instanceof UnaryNode);
+        assertEquals(((UnaryNode) nodeOptional.get()).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode) nodeOptional.get()).getValue(), "a");
     }
 
     @Test

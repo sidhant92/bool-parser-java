@@ -10,7 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
-import com.github.sidhant92.boolparser.domain.StringNode;
+import com.github.sidhant92.boolparser.domain.UnaryNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticLeafNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticUnaryNode;
@@ -61,16 +61,17 @@ public class ArithmeticExpressionEvaluator {
                 return evaluateUnaryArithmeticToken((ArithmeticUnaryNode) node, data);
             case ARITHMETIC_FUNCTION:
                 return evaluateArithmeticFunctionToken((ArithmeticFunctionNode) node, data);
-            case STRING:
-                return evaluateStringToken((StringNode) node, data);
+            case UNARY:
+                return evaluateStringToken((UnaryNode) node, data);
             default:
                 log.error("unsupported token {}", node.getTokenType());
                 throw new UnsupportedToken();
         }
     }
 
-    private Object evaluateStringToken(final StringNode stringNode, final Map<String, Object> data) {
-        return ValueUtils.getValueFromMap(stringNode.getField(), data).orElse(stringNode.getField());
+    private Object evaluateStringToken(final UnaryNode unaryNode, final Map<String, Object> data) {
+        return unaryNode.getDataType() == DataType.STRING ? ValueUtils.getValueFromMap(unaryNode.getValue().toString(), data)
+                                                                      .orElse(unaryNode.getValue()) : unaryNode.getValue();
     }
 
     private Pair<Object, DataType> evaluateArithmeticLeafToken(final ArithmeticLeafNode arithmeticLeafNode, final Map<String, Object> data) {

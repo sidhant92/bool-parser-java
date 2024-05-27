@@ -184,13 +184,13 @@ public class BooleanExpressionBaseListener implements BooleanExpressionListener 
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterArrayArithmeticFunction(BooleanExpressionParser.ArrayArithmeticFunctionContext ctx) { }
+	@Override public void enterArithmeticFunction(BooleanExpressionParser.ArithmeticFunctionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitArrayArithmeticFunction(BooleanExpressionParser.ArrayArithmeticFunctionContext ctx) { }
+	@Override public void exitArithmeticFunction(BooleanExpressionParser.ArithmeticFunctionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
