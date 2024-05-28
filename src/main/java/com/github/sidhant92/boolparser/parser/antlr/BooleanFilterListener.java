@@ -171,6 +171,9 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     }
 
     private List<Pair<DataType, Object>> getArrayElements(final List<ParseTree> trees) {
+        trees.forEach(tr -> {
+            System.out.println("**********" + tr.getClass());
+        });
         return trees
                 .stream()
                 .filter(child -> child instanceof BooleanExpressionParser.TypesExpressionContext)

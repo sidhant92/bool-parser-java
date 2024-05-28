@@ -6,6 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.FunctionType;
+import com.github.sidhant92.boolparser.domain.EvaluatedNode;
 
 /**
  * @author sidhant.aggarwal
@@ -13,9 +14,9 @@ import com.github.sidhant92.boolparser.constant.FunctionType;
  */
 public class LenFunction extends AbstractFunction {
     @Override
-    public Object evaluate(final List<Pair<Object, DataType>> items) {
-        if (items.size() == 1 && items.get(0).getKey() instanceof String) {
-            return ((String) items.get(0).getKey()).length();
+    public Object evaluate(final List<EvaluatedNode> items) {
+        if (items.size() == 1 && items.get(0).getValue() instanceof String) {
+            return ((String) items.get(0).getValue()).length();
         }
         return items.size();
     }

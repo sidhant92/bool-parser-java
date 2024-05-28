@@ -9,6 +9,8 @@ import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.FunctionType;
+import com.github.sidhant92.boolparser.domain.EvaluatedNode;
+import com.github.sidhant92.boolparser.util.ValueUtils;
 
 /**
  * @author sidhant.aggarwal
@@ -16,13 +18,10 @@ import com.github.sidhant92.boolparser.constant.FunctionType;
  */
 public class MeanFunction extends AbstractFunction {
     @Override
-    public Object evaluate(final List<Pair<Object, DataType>> items) {
+    public Object evaluate(final List<EvaluatedNode> items) {
         final double mean = StatUtils.mean(items
-                                                   .stream().mapToDouble(a -> Double.parseDouble(a.getKey().toString())).toArray());
-        if ((int) mean == mean) {
-            return (int) mean;
-        }
-        return mean;
+                                                   .stream().mapToDouble(a -> Double.parseDouble(a.getValue().toString())).toArray());
+        return ValueUtils.caseDouble(mean);
     }
 
     @Override

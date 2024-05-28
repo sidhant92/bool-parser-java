@@ -9,6 +9,7 @@ import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.FunctionType;
+import com.github.sidhant92.boolparser.domain.EvaluatedNode;
 import com.github.sidhant92.boolparser.util.ValueUtils;
 
 /**
@@ -17,9 +18,9 @@ import com.github.sidhant92.boolparser.util.ValueUtils;
  */
 public class ModeFunction extends AbstractFunction {
     @Override
-    public Object evaluate(final List<Pair<Object, DataType>> items) {
+    public Object evaluate(final List<EvaluatedNode> items) {
         final double mode = StatUtils.mode(items
-                                                   .stream().mapToDouble(a -> Double.parseDouble(a.getKey().toString())).toArray())[0];
+                                                   .stream().mapToDouble(a -> Double.parseDouble(a.getValue().toString())).toArray())[0];
         return ValueUtils.caseDouble(mode);
     }
 
