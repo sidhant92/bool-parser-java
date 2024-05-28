@@ -11,7 +11,6 @@ import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
 import com.github.sidhant92.boolparser.domain.EvaluatedNode;
 import com.github.sidhant92.boolparser.domain.UnaryNode;
-import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticLeafNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticUnaryNode;
 import com.github.sidhant92.boolparser.domain.Node;
@@ -56,7 +55,7 @@ public class ArithmeticExpressionEvaluator {
             case ARITHMETIC:
                 return evaluateArithmeticToken((ArithmeticNode) node, data);
             case ARITHMETIC_LEAF:
-                return evaluateArithmeticLeafToken((ArithmeticLeafNode) node, data);
+                return evaluateUnaryNode((UnaryNode) node, data);
             case ARITHMETIC_UNARY:
                 return evaluateUnaryArithmeticToken((ArithmeticUnaryNode) node, data);
             case ARITHMETIC_FUNCTION:
@@ -74,12 +73,12 @@ public class ArithmeticExpressionEvaluator {
                                                                       .orElse(unaryNode.getValue()) : unaryNode.getValue();
     }
 
-    private EvaluatedNode evaluateArithmeticLeafToken(final ArithmeticLeafNode arithmeticLeafNode, final Map<String, Object> data) {
-        final Optional<Object> fetchedValue = arithmeticLeafNode.getDataType() != DataType.STRING ? Optional.of(
-                arithmeticLeafNode.getOperand()) : ValueUtils.getValueFromMap(arithmeticLeafNode.getOperand().toString(), data);
+    private EvaluatedNode evaluateUnaryNode(final UnaryNode unaryNode, final Map<String, Object> data) {
+        final Optional<Object> fetchedValue = unaryNode.getDataType() != DataType.STRING ? Optional.of(
+                unaryNode.getValue()) : ValueUtils.getValueFromMap(unaryNode.getValue().toString(), data);
         return fetchedValue
                 .map(o -> EvaluatedNode.builder().value(o).dataType(ValueUtils.getDataType(o)).build())
-                .orElseGet(() -> EvaluatedNode.builder().value(arithmeticLeafNode.getOperand()).dataType(arithmeticLeafNode.getDataType()).build());
+                .orElseGet(() -> EvaluatedNode.builder().value(unaryNode.getValue()).dataType(unaryNode.getDataType()).build());
     }
 
     private Object evaluateUnaryArithmeticToken(final ArithmeticUnaryNode arithmeticUnaryNode, final Map<String, Object> data) {
@@ -94,16 +93,26 @@ public class ArithmeticExpressionEvaluator {
     }
 
     private Object evaluateArithmeticFunctionToken(final ArithmeticFunctionNode arithmeticFunctionNode, final Map<String, Object> data) {
-        final List<EvaluatedNode> resolvedValues = arithmeticFunctionNode.getItems()
+        final List<Object> resolvedValues = arithmeticFunctionNode.getItems()
                 .stream()
-                .map(item -> evaluateArithmeticLeafToken(item, data))
+                .map(item -> evaluate(item, data))
                 .collect(Collectors.toList());
         final List<EvaluatedNode> flattenedValues = new ArrayList<>();
         resolvedValues.forEach(value -> {
-            if (value.getValue() instanceof Collection) {
-                ((Collection<?>) value.getValue()).forEach(v -> flattenedValues.add(EvaluatedNode.builder().value(v).dataType(ValueUtils.getDataType(v)).build()));
+            if (value instanceof EvaluatedNode) {
+                final EvaluatedNode node = (EvaluatedNode) value;
+                if (node.getValue() instanceof Collection) {
+                    ((Collection<?>) node.getValue()).forEach(
+                            v -> flattenedValues.add(EvaluatedNode.builder().value(v).dataType(ValueUtils.getDataType(v)).build()));
+                } else {
+                    flattenedValues.add(node);
+                }
+            }
+            if (value instanceof Collection) {
+                ((Collection<?>) value).forEach(
+                        v -> flattenedValues.add(EvaluatedNode.builder().value(v).dataType(ValueUtils.getDataType(v)).build()));
             } else {
-                flattenedValues.add(value);
+                flattenedValues.add(EvaluatedNode.builder().value(value).dataType(ValueUtils.getDataType(value)).build());
             }
         });
         return functionEvaluatorService.evaluateArithmeticFunction(arithmeticFunctionNode.getFunctionType(), flattenedValues);
@@ -115,8 +124,8 @@ public class ArithmeticExpressionEvaluator {
         if (leftValue instanceof EvaluatedNode && rightValue instanceof EvaluatedNode) {
             final EvaluatedNode leftPair = (EvaluatedNode) leftValue;
             final EvaluatedNode rightPair = (EvaluatedNode) rightValue;
-            return operatorService.evaluateArithmeticOperator(leftPair.getValue(), leftPair.getDataType(), rightPair.getValue(), rightPair.getDataType(),
-                                                              arithmeticNode.getOperator(), ContainerDataType.PRIMITIVE);
+            return operatorService.evaluateArithmeticOperator(leftPair.getValue(), leftPair.getDataType(), rightPair.getValue(),
+                                                              rightPair.getDataType(), arithmeticNode.getOperator(), ContainerDataType.PRIMITIVE);
         } else if (leftValue instanceof EvaluatedNode) {
             final EvaluatedNode leftPair = (EvaluatedNode) leftValue;
             final DataType rightDataType = ValueUtils.getDataType(rightValue);

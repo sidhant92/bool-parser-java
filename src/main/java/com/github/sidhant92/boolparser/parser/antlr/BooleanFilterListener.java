@@ -14,7 +14,6 @@ import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.Operator;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticFunctionNode;
-import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticLeafNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticUnaryNode;
 import com.github.sidhant92.boolparser.domain.ArrayNode;
@@ -72,27 +71,27 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
         super.enterComparatorExpression(ctx);
     }
 
-    private ArithmeticLeafNode getArithmeticLeafNode(final BooleanExpressionParser.TypesExpressionContext ctx) {
+    private UnaryNode getUnaryNode(final BooleanExpressionParser.TypesExpressionContext ctx) {
         final DataType dataType = getDataType(ctx.getStart());
         final Object operand = ValueUtils.convertValue(ctx.getText(), dataType);
-        return ArithmeticLeafNode.builder().operand(operand).dataType(dataType).build();
+        return UnaryNode.builder().value(operand).dataType(dataType).build();
     }
 
     @Override
     public void exitArithmeticExpression(BooleanExpressionParser.ArithmeticExpressionContext ctx) {
         final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
         if (ctx.left instanceof BooleanExpressionParser.TypesExpressionContext && ctx.right instanceof BooleanExpressionParser.TypesExpressionContext) {
-            final ArithmeticLeafNode left = getArithmeticLeafNode((BooleanExpressionParser.TypesExpressionContext) ctx.left);
-            final ArithmeticLeafNode right = getArithmeticLeafNode((BooleanExpressionParser.TypesExpressionContext) ctx.right);
+            final UnaryNode left = getUnaryNode((BooleanExpressionParser.TypesExpressionContext) ctx.left);
+            final UnaryNode right = getUnaryNode((BooleanExpressionParser.TypesExpressionContext) ctx.right);
             final ArithmeticNode node = ArithmeticNode.builder().left(left).right(right).operator(operator).build();
             currentNodes.add(node);
         } else if (ctx.left instanceof BooleanExpressionParser.TypesExpressionContext) {
-            final ArithmeticLeafNode left = getArithmeticLeafNode((BooleanExpressionParser.TypesExpressionContext) ctx.left);
+            final UnaryNode left = getUnaryNode((BooleanExpressionParser.TypesExpressionContext) ctx.left);
             final Node right = currentNodes.pop();
             final ArithmeticNode node = ArithmeticNode.builder().left(left).right(right).operator(operator).build();
             currentNodes.add(node);
         } else if (ctx.right instanceof BooleanExpressionParser.TypesExpressionContext) {
-            final ArithmeticLeafNode right = getArithmeticLeafNode((BooleanExpressionParser.TypesExpressionContext) ctx.right);
+            final UnaryNode right = getUnaryNode((BooleanExpressionParser.TypesExpressionContext) ctx.right);
             final Node left = currentNodes.pop();
             final ArithmeticNode node = ArithmeticNode.builder().left(left).right(right).operator(operator).build();
             currentNodes.add(node);
@@ -113,7 +112,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     public void exitUnaryArithmeticExpression(BooleanExpressionParser.UnaryArithmeticExpressionContext ctx) {
         final DataType dataType = getDataType(ctx.exp.getStart());
         final Object operand = ValueUtils.convertValue(ctx.exp.getText(), dataType);
-        final ArithmeticLeafNode leafNode = ArithmeticLeafNode.builder().operand(operand).dataType(dataType).build();
+        final UnaryNode leafNode = UnaryNode.builder().value(operand).dataType(dataType).build();
         currentNodes.add(ArithmeticUnaryNode.builder().operand(leafNode).build());
         super.enterUnaryArithmeticExpression(ctx);
     }
@@ -150,7 +149,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
             log.error("Error parsing expression for the string {}", ctx.getText());
             return new InvalidExpressionException();
         });
-        final List<ArithmeticLeafNode> items = getArithmeticArrayElements(ctx.data.children);
+        final List<Node> items = getArithmeticArrayElements(ctx.data.children);
         currentNodes.add(new ArithmeticFunctionNode(functionType, items));
         super.exitArithmeticFunctionExpression(ctx);
     }
@@ -185,14 +184,14 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
                 .collect(Collectors.toList());
     }
 
-    private List<ArithmeticLeafNode> getArithmeticArrayElements(final List<ParseTree> trees) {
+    private List<Node> getArithmeticArrayElements(final List<ParseTree> trees) {
         return trees
                 .stream()
                 .filter(child -> child instanceof BooleanExpressionParser.TypesExpressionContext)
                 .map(child -> {
                     final DataType dataType = getDataType(((BooleanExpressionParser.TypesExpressionContext) child).start);
                     final Object value = ValueUtils.convertValue(child.getText(), dataType);
-                    return new ArithmeticLeafNode(value, dataType);
+                    return new UnaryNode(dataType, value);
                 })
                 .collect(Collectors.toList());
     }

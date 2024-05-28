@@ -11,7 +11,6 @@ import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.NodeType;
 import com.github.sidhant92.boolparser.constant.Operator;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticFunctionNode;
-import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticLeafNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
 import com.github.sidhant92.boolparser.domain.ArrayNode;
 import com.github.sidhant92.boolparser.domain.BooleanNode;
@@ -265,10 +264,10 @@ public class BooleanFilterBoolParserTest {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("age not IN (12,45)");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), NodeType.BOOLEAN.name());
-        assertNotNull(((BooleanNode)nodeOptional.get()).getLeft());
-        assertNull(((BooleanNode)nodeOptional.get()).getRight());
-        assertEquals(((BooleanNode)nodeOptional.get()).getOperator(), LogicalOperationType.NOT);
-        final InNode inToken = (InNode) ((BooleanNode)nodeOptional.get()).getLeft();
+        assertNotNull(((BooleanNode) nodeOptional.get()).getLeft());
+        assertNull(((BooleanNode) nodeOptional.get()).getRight());
+        assertEquals(((BooleanNode) nodeOptional.get()).getOperator(), LogicalOperationType.NOT);
+        final InNode inToken = (InNode) ((BooleanNode) nodeOptional.get()).getLeft();
         assertEquals(inToken.getItems().size(), 2);
         assertEquals(inToken.getField(), "age");
         assertEquals(inToken.getItems().get(0).getKey(), DataType.INTEGER);
@@ -366,10 +365,10 @@ public class BooleanFilterBoolParserTest {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("a + b");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getOperand(), "a");
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.STRING);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getOperand(), "b");
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getValue(), "a");
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getValue(), "b");
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.STRING);
         assertEquals(((ArithmeticNode) nodeOptional.get()).getOperator(), Operator.ADD);
     }
 
@@ -378,10 +377,10 @@ public class BooleanFilterBoolParserTest {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("20 + 5");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getOperand(), 20);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.INTEGER);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getOperand(), 5);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getValue(), 20);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getValue(), 5);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);
         assertEquals(((ArithmeticNode) nodeOptional.get()).getOperator(), Operator.ADD);
     }
 
@@ -390,10 +389,10 @@ public class BooleanFilterBoolParserTest {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("20.5 + 5");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getOperand(), 20.5);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.DECIMAL);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getOperand(), 5);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getValue(), 20.5);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.DECIMAL);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getValue(), 5);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);
         assertEquals(((ArithmeticNode) nodeOptional.get()).getOperator(), Operator.ADD);
     }
 
@@ -404,12 +403,12 @@ public class BooleanFilterBoolParserTest {
         assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC_FUNCTION);
         assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getFunctionType().name(), "MIN");
         assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().size(), 3);
-        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0).getDataType(), DataType.INTEGER);
-        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0).getOperand(), 1);
-        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(1).getDataType(), DataType.INTEGER);
-        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(1).getOperand(), 2);
-        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(2).getDataType(), DataType.INTEGER);
-        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(2).getOperand(), 3);
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0)).getValue(), 1);
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(1)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(1)).getValue(), 2);
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(2)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(2)).getValue(), 3);
     }
 
     @Test
@@ -419,8 +418,8 @@ public class BooleanFilterBoolParserTest {
         assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC_FUNCTION);
         assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getFunctionType().name(), "MIN");
         assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().size(), 1);
-        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0).getDataType(), DataType.STRING);
-        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0).getOperand(), "abc");
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0)).getValue(), "abc");
     }
 
     @Test
@@ -434,10 +433,10 @@ public class BooleanFilterBoolParserTest {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("false + 5");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getOperand(), false);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.BOOLEAN);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getOperand(), 5);
-        assertEquals(((ArithmeticLeafNode)((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getValue(), false);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.BOOLEAN);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getValue(), 5);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);
         assertEquals(((ArithmeticNode) nodeOptional.get()).getOperator(), Operator.ADD);
     }
 
@@ -448,10 +447,10 @@ public class BooleanFilterBoolParserTest {
         assertEquals(nodeOptional.get().getTokenType(), NodeType.COMPARISON);
         assertEquals((((ComparisonNode) nodeOptional.get()).getField()), "a");
         final ArithmeticNode arithmeticNode = (ArithmeticNode) ((ComparisonNode) nodeOptional.get()).getValue();
-        assertEquals(((ArithmeticLeafNode)(arithmeticNode.getLeft())).getOperand(), 10);
-        assertEquals(((ArithmeticLeafNode)(arithmeticNode.getLeft())).getDataType(), DataType.INTEGER);
-        assertEquals(((ArithmeticLeafNode)(arithmeticNode.getRight())).getOperand(), 20);
-        assertEquals(((ArithmeticLeafNode)(arithmeticNode.getRight())).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) (arithmeticNode.getLeft())).getValue(), 10);
+        assertEquals(((UnaryNode) (arithmeticNode.getLeft())).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) (arithmeticNode.getRight())).getValue(), 20);
+        assertEquals(((UnaryNode) (arithmeticNode.getRight())).getDataType(), DataType.INTEGER);
         assertEquals(arithmeticNode.getOperator(), Operator.ADD);
     }
 
