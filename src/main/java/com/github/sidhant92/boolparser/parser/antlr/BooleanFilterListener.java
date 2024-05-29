@@ -15,7 +15,6 @@ import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.Operator;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticFunctionNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
-import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticUnaryNode;
 import com.github.sidhant92.boolparser.domain.ArrayNode;
 import com.github.sidhant92.boolparser.domain.BooleanNode;
 import com.github.sidhant92.boolparser.domain.InNode;
@@ -113,7 +112,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
         final DataType dataType = getDataType(ctx.exp.getStart());
         final Object operand = ValueUtils.convertValue(ctx.exp.getText(), dataType);
         final UnaryNode leafNode = UnaryNode.builder().value(operand).dataType(dataType).build();
-        currentNodes.add(ArithmeticUnaryNode.builder().operand(leafNode).build());
+        currentNodes.add(ArithmeticNode.builder().left(leafNode).operator(Operator.UNARY).build());
         super.enterUnaryArithmeticExpression(ctx);
     }
 
@@ -170,9 +169,6 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     }
 
     private List<Pair<DataType, Object>> getArrayElements(final List<ParseTree> trees) {
-        trees.forEach(tr -> {
-            System.out.println("**********" + tr.getClass());
-        });
         return trees
                 .stream()
                 .filter(child -> child instanceof BooleanExpressionParser.TypesExpressionContext)
@@ -241,11 +237,11 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
         } else if (this.node == null && this.currentNodes.size() == 2) {
             final Node firstNode = currentNodes.pop();
             final Node secondNode = currentNodes.pop();
-            if (firstNode instanceof ArithmeticNode && secondNode instanceof ArithmeticUnaryNode) {
-                this.node = ArithmeticUnaryNode.builder().operand(firstNode).build();
+            if (firstNode instanceof ArithmeticNode && secondNode instanceof ArithmeticNode && ((ArithmeticNode) secondNode).getRight() == null) {
+                this.node = ArithmeticNode.builder().operator(Operator.UNARY).left(firstNode).build();
             }
-            if (secondNode instanceof ArithmeticNode && firstNode instanceof ArithmeticUnaryNode) {
-                this.node = ArithmeticUnaryNode.builder().operand(secondNode).build();
+            if (secondNode instanceof ArithmeticNode && firstNode instanceof ArithmeticNode && ((ArithmeticNode) firstNode).getRight() == null) {
+                this.node = ArithmeticNode.builder().operator(Operator.UNARY).left(secondNode).build();
             }
         }
         if (this.node == null && tokenCount == 1 && lastToken instanceof CommonToken) {
