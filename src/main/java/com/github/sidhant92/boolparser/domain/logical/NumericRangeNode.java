@@ -1,7 +1,5 @@
-package com.github.sidhant92.boolparser.domain;
+package com.github.sidhant92.boolparser.domain.logical;
 
-import java.util.List;
-import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.NodeType;
 import lombok.AllArgsConstructor;
@@ -9,16 +7,27 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author sidhant.aggarwal
+ * @since 05/03/2023
+ */
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
-public class InNode extends Node {
+public class NumericRangeNode extends Node {
     private final String field;
 
-    private final List<Node> items;
+    private final Object fromValue;
+
+    private final Object toValue;
+
+    private final DataType fromDataType;
+
+    private final DataType toDataType;
+
     @Override
     public NodeType getTokenType() {
-        return NodeType.IN;
+        return NodeType.NUMERIC_RANGE;
     }
 }

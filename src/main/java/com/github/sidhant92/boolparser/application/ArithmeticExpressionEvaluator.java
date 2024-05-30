@@ -1,7 +1,5 @@
 package com.github.sidhant92.boolparser.application;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -9,9 +7,9 @@ import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
 import com.github.sidhant92.boolparser.domain.EvaluatedNode;
-import com.github.sidhant92.boolparser.domain.UnaryNode;
+import com.github.sidhant92.boolparser.domain.arithmetic.UnaryNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
-import com.github.sidhant92.boolparser.domain.Node;
+import com.github.sidhant92.boolparser.domain.logical.Node;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticFunctionNode;
 import com.github.sidhant92.boolparser.exception.UnsupportedToken;
 import com.github.sidhant92.boolparser.function.FunctionEvaluatorService;

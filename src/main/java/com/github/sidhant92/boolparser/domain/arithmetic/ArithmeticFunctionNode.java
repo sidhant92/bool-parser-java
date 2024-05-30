@@ -3,7 +3,7 @@ package com.github.sidhant92.boolparser.domain.arithmetic;
 import java.util.List;
 import com.github.sidhant92.boolparser.constant.FunctionType;
 import com.github.sidhant92.boolparser.constant.NodeType;
-import com.github.sidhant92.boolparser.domain.Node;
+import com.github.sidhant92.boolparser.domain.logical.Node;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

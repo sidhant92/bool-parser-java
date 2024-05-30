@@ -1,6 +1,6 @@
 package com.github.sidhant92.boolparser.domain.arithmetic;
 
-import com.github.sidhant92.boolparser.domain.Node;
+import com.github.sidhant92.boolparser.domain.logical.Node;
 
 /**
  * @author sidhant.aggarwal
