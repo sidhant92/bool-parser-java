@@ -72,24 +72,7 @@ public class ArithmeticExpressionEvaluator {
                 .stream()
                 .map(item -> evaluate(item, data))
                 .collect(Collectors.toList());
-        final List<EvaluatedNode> flattenedValues = new ArrayList<>();
-        resolvedValues.forEach(value -> {
-            if (value instanceof EvaluatedNode) {
-                final EvaluatedNode node = (EvaluatedNode) value;
-                if (node.getValue() instanceof Collection) {
-                    ((Collection<?>) node.getValue()).forEach(
-                            v -> flattenedValues.add(EvaluatedNode.builder().value(v).dataType(ValueUtils.getDataType(v)).build()));
-                } else {
-                    flattenedValues.add(node);
-                }
-            }
-            if (value instanceof Collection) {
-                ((Collection<?>) value).forEach(
-                        v -> flattenedValues.add(EvaluatedNode.builder().value(v).dataType(ValueUtils.getDataType(v)).build()));
-            } else {
-                flattenedValues.add(EvaluatedNode.builder().value(value).dataType(ValueUtils.getDataType(value)).build());
-            }
-        });
+        final List<EvaluatedNode> flattenedValues = ValueUtils.mapToEvaluatedNodes(resolvedValues);
         return functionEvaluatorService.evaluateArithmeticFunction(arithmeticFunctionNode.getFunctionType(), flattenedValues);
     }
 
@@ -97,9 +80,9 @@ public class ArithmeticExpressionEvaluator {
         final Object leftValue = evaluateToken(arithmeticNode.getLeft(), data);
         if (arithmeticNode.getOperator().equals(Operator.UNARY)) {
             if (leftValue instanceof EvaluatedNode) {
-                final EvaluatedNode leftPair = (EvaluatedNode) leftValue;
-                return operatorService.evaluateArithmeticOperator(leftPair.getValue(), leftPair.getDataType(), null, null,
-                                                                  arithmeticNode.getOperator(), ContainerDataType.PRIMITIVE);
+                final EvaluatedNode left = (EvaluatedNode) leftValue;
+                return operatorService.evaluateArithmeticOperator(left.getValue(), left.getDataType(), null, null, arithmeticNode.getOperator(),
+                                                                  ContainerDataType.PRIMITIVE);
             } else {
                 final DataType leftDataType = ValueUtils.getDataType(leftValue);
                 return operatorService.evaluateArithmeticOperator(leftValue, leftDataType, null, null, arithmeticNode.getOperator(),
@@ -108,19 +91,19 @@ public class ArithmeticExpressionEvaluator {
         }
         final Object rightValue = evaluateToken(arithmeticNode.getRight(), data);
         if (leftValue instanceof EvaluatedNode && rightValue instanceof EvaluatedNode) {
-            final EvaluatedNode leftPair = (EvaluatedNode) leftValue;
-            final EvaluatedNode rightPair = (EvaluatedNode) rightValue;
-            return operatorService.evaluateArithmeticOperator(leftPair.getValue(), leftPair.getDataType(), rightPair.getValue(),
-                                                              rightPair.getDataType(), arithmeticNode.getOperator(), ContainerDataType.PRIMITIVE);
+            final EvaluatedNode left = (EvaluatedNode) leftValue;
+            final EvaluatedNode right = (EvaluatedNode) rightValue;
+            return operatorService.evaluateArithmeticOperator(left.getValue(), left.getDataType(), right.getValue(), right.getDataType(),
+                                                              arithmeticNode.getOperator(), ContainerDataType.PRIMITIVE);
         } else if (leftValue instanceof EvaluatedNode) {
-            final EvaluatedNode leftPair = (EvaluatedNode) leftValue;
+            final EvaluatedNode left = (EvaluatedNode) leftValue;
             final DataType rightDataType = ValueUtils.getDataType(rightValue);
-            return operatorService.evaluateArithmeticOperator(leftPair.getValue(), leftPair.getDataType(), rightValue, rightDataType,
+            return operatorService.evaluateArithmeticOperator(left.getValue(), left.getDataType(), rightValue, rightDataType,
                                                               arithmeticNode.getOperator(), ContainerDataType.PRIMITIVE);
         } else if (rightValue instanceof EvaluatedNode) {
-            final EvaluatedNode rightPair = (EvaluatedNode) rightValue;
+            final EvaluatedNode right = (EvaluatedNode) rightValue;
             final DataType leftDataType = ValueUtils.getDataType(leftValue);
-            return operatorService.evaluateArithmeticOperator(leftValue, leftDataType, rightPair.getValue(), rightPair.getDataType(),
+            return operatorService.evaluateArithmeticOperator(leftValue, leftDataType, right.getValue(), right.getDataType(),
                                                               arithmeticNode.getOperator(), ContainerDataType.PRIMITIVE);
         } else {
             final DataType leftDataType = ValueUtils.getDataType(leftValue);

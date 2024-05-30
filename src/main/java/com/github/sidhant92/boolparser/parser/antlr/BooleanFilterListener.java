@@ -132,7 +132,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     public void exitArrayExpression(BooleanExpressionParser.ArrayExpressionContext ctx) {
         validateField(ctx.field, ctx.getText());
         final String field = getField(ctx.field.getText());
-        final List<Pair<DataType, Object>> items = getArrayElements(ctx.data.children);
+        final List<Node> items = getArrayElements(ctx.data.children);
         final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
         currentNodes.add(new ArrayNode(field, operator, items));
         super.exitArrayExpression(ctx);
@@ -148,7 +148,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
             log.error("Error parsing expression for the string {}", ctx.getText());
             return new InvalidExpressionException();
         });
-        final List<Node> items = getArithmeticArrayElements(ctx.data.children);
+        final List<Node> items = getArrayElements(ctx.data.children);
         currentNodes.add(new ArithmeticFunctionNode(functionType, items));
         super.exitArithmeticFunctionExpression(ctx);
     }
@@ -157,7 +157,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     public void exitInExpression(BooleanExpressionParser.InExpressionContext ctx) {
         validateField(ctx.field, ctx.getText());
         final String field = getField(ctx.field.getText());
-        final List<Pair<DataType, Object>> items = getArrayElements(ctx.data.children);
+        final List<Node> items = getArrayElements(ctx.data.children);
         final InNode inNode = new InNode(field, items);
         if (Objects.isNull(ctx.not)) {
             currentNodes.add(inNode);
@@ -168,19 +168,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
         super.exitInExpression(ctx);
     }
 
-    private List<Pair<DataType, Object>> getArrayElements(final List<ParseTree> trees) {
-        return trees
-                .stream()
-                .filter(child -> child instanceof BooleanExpressionParser.TypesExpressionContext)
-                .map(child -> {
-                    final DataType dataType = getDataType(((BooleanExpressionParser.TypesExpressionContext) child).start);
-                    final Object value = ValueUtils.convertValue(child.getText(), dataType);
-                    return Pair.of(dataType, value);
-                })
-                .collect(Collectors.toList());
-    }
-
-    private List<Node> getArithmeticArrayElements(final List<ParseTree> trees) {
+    private List<Node> getArrayElements(final List<ParseTree> trees) {
         return trees
                 .stream()
                 .filter(child -> child instanceof BooleanExpressionParser.TypesExpressionContext)

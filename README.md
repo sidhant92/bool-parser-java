@@ -125,7 +125,7 @@ InNode
 ```
 private final String field;
 
-private final List<Pair<DataType, Object>> items;
+private final List<Node> items;
 ```
 
 

@@ -253,10 +253,10 @@ public class BooleanFilterBoolParserTest {
         final InNode inToken = (InNode) nodeOptional.get();
         assertEquals(inToken.getItems().size(), 2);
         assertEquals(inToken.getField(), "age");
-        assertEquals(inToken.getItems().get(0).getKey(), DataType.INTEGER);
-        assertEquals(inToken.getItems().get(1).getKey(), DataType.INTEGER);
-        assertEquals(inToken.getItems().get(0).getValue(), 12);
-        assertEquals(inToken.getItems().get(1).getValue(), 45);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getValue(), 12);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getValue(), 45);
     }
 
     @Test
@@ -270,10 +270,10 @@ public class BooleanFilterBoolParserTest {
         final InNode inToken = (InNode) ((BooleanNode) nodeOptional.get()).getLeft();
         assertEquals(inToken.getItems().size(), 2);
         assertEquals(inToken.getField(), "age");
-        assertEquals(inToken.getItems().get(0).getKey(), DataType.INTEGER);
-        assertEquals(inToken.getItems().get(1).getKey(), DataType.INTEGER);
-        assertEquals(inToken.getItems().get(0).getValue(), 12);
-        assertEquals(inToken.getItems().get(1).getValue(), 45);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getValue(), 12);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getValue(), 45);
     }
 
     @Test
@@ -284,12 +284,12 @@ public class BooleanFilterBoolParserTest {
         final InNode inToken = (InNode) nodeOptional.get();
         assertEquals(inToken.getItems().size(), 3);
         assertEquals(inToken.getField(), "name");
-        assertEquals(inToken.getItems().get(0).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(1).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(2).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(0).getValue(), "abc");
-        assertEquals(inToken.getItems().get(1).getValue(), "def");
-        assertEquals(inToken.getItems().get(2).getValue(), "abc def");
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(2)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getValue(), "abc");
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getValue(), "def");
+        assertEquals(((UnaryNode)inToken.getItems().get(2)).getValue(), "abc def");
     }
 
     @Test
@@ -300,12 +300,12 @@ public class BooleanFilterBoolParserTest {
         final InNode inToken = (InNode) nodeOptional.get();
         assertEquals(inToken.getItems().size(), 3);
         assertEquals(inToken.getField(), "name");
-        assertEquals(inToken.getItems().get(0).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(1).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(2).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(0).getValue(), "abc");
-        assertEquals(inToken.getItems().get(1).getValue(), "def");
-        assertEquals(inToken.getItems().get(2).getValue(), "abc, def");
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(2)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getValue(), "abc");
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getValue(), "def");
+        assertEquals(((UnaryNode)inToken.getItems().get(2)).getValue(), "abc, def");
     }
 
     @Test
@@ -316,12 +316,12 @@ public class BooleanFilterBoolParserTest {
         final InNode inToken = (InNode) nodeOptional.get();
         assertEquals(inToken.getItems().size(), 3);
         assertEquals(inToken.getField(), "name");
-        assertEquals(inToken.getItems().get(0).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(1).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(2).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(0).getValue(), "abc");
-        assertEquals(inToken.getItems().get(1).getValue(), "def");
-        assertEquals(inToken.getItems().get(2).getValue(), "ab\"c");
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(2)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getValue(), "abc");
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getValue(), "def");
+        assertEquals(((UnaryNode)inToken.getItems().get(2)).getValue(), "ab\"c");
     }
 
     @Test

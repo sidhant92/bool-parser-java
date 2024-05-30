@@ -19,7 +19,7 @@ public class ArrayNode extends Node {
 
     private final Operator operator;
 
-    private final List<Pair<DataType, Object>> items;
+    private final List<Node> items;
     @Override
     public NodeType getTokenType() {
         return NodeType.ARRAY;

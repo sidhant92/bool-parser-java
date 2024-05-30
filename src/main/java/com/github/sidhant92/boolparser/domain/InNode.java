@@ -16,7 +16,7 @@ import lombok.Setter;
 public class InNode extends Node {
     private final String field;
 
-    private final List<Pair<DataType, Object>> items;
+    private final List<Node> items;
     @Override
     public NodeType getTokenType() {
         return NodeType.IN;
