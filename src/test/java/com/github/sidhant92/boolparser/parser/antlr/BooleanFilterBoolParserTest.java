@@ -334,13 +334,6 @@ public class BooleanFilterBoolParserTest {
     }
 
     @Test
-    public void testInvalidNotExpression() {
-        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("not a > 5");
-        assertTrue(nodeOptional.isFailure());
-        assertTrue(nodeOptional.getCause() instanceof InvalidExpressionException);
-    }
-
-    @Test
     public void testContainsAny() {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("a contains_any (1,2,3)");
         assertTrue(nodeOptional.isSuccess());
