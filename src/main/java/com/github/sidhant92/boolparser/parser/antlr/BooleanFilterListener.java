@@ -13,6 +13,7 @@ import com.github.sidhant92.boolparser.constant.FunctionType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.Operator;
+import com.github.sidhant92.boolparser.domain.FieldNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticFunctionNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
 import com.github.sidhant92.boolparser.domain.logical.ArrayNode;
@@ -63,9 +64,8 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     @Override
     public void exitUnaryArithmeticExpression(BooleanExpressionParser.UnaryArithmeticExpressionContext ctx) {
-        final DataType dataType = getDataType(ctx.exp.getStart());
-        final Object operand = ValueUtils.convertValue(ctx.exp.getText(), dataType);
-        final Node leafNode = !currentNodes.isEmpty() ? currentNodes.pop() : UnaryNode.builder().value(operand).dataType(dataType).build();
+        final Node leafNode = !currentNodes.isEmpty() ? currentNodes.pop() : mapTypesExpressionContext(
+                (BooleanExpressionParser.TypesExpressionContext) ctx.exp);
         currentNodes.add(ArithmeticNode.builder().left(leafNode).operator(Operator.UNARY).build());
         super.enterUnaryArithmeticExpression(ctx);
     }
@@ -118,6 +118,8 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
             return mapComparatorExpressionContext((BooleanExpressionParser.ComparatorExpressionContext) ctx);
         } else if (ctx instanceof BooleanExpressionParser.ToExpressionContext) {
             return mapToExpressionContext((BooleanExpressionParser.ToExpressionContext) ctx);
+        } else if (ctx instanceof BooleanExpressionParser.TypesExpressionContext && ((BooleanExpressionParser.TypesExpressionContext) ctx).start.getType() == BooleanExpressionLexer.FIELD) {
+            return mapTypesExpressionContextField((BooleanExpressionParser.TypesExpressionContext) ctx);
         } else if (ctx instanceof BooleanExpressionParser.TypesExpressionContext) {
             return mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx);
         } else {
@@ -126,9 +128,16 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
         }
     }
 
-    private UnaryNode mapTypesExpressionContext(BooleanExpressionParser.TypesExpressionContext ctx) {
+    private FieldNode mapTypesExpressionContextField(BooleanExpressionParser.TypesExpressionContext ctx) {
+        return new FieldNode(ctx.getText());
+    }
+
+    private Node mapTypesExpressionContext(BooleanExpressionParser.TypesExpressionContext ctx) {
+        if (ctx.start.getType() == BooleanExpressionLexer.FIELD) {
+            return mapTypesExpressionContextField(ctx);
+        }
         final DataType dataType = getDataType(ctx.start);
-        final Object value = ValueUtils.convertValue(ctx.getText(), dataType);
+        final Object value = ValueUtils.convertValue(ctx.start.getText(), dataType);
         return new UnaryNode(dataType, value);
     }
 
@@ -153,22 +162,23 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
             return new ComparisonNode(variableName, value, operator, DataType.INTEGER);
         } else {
             final DataType dataType = getDataType(ctx.right.getStart());
-            return new ComparisonNode(variableName, ValueUtils.convertValue(ctx.right.getText(), dataType), operator, dataType);
+            final Node value = mapContextToNode(ctx.right);
+            return new ComparisonNode(variableName, value, operator, dataType);
         }
     }
 
     private ArithmeticNode mapArithmeticExpressionContext(BooleanExpressionParser.ArithmeticExpressionContext ctx) {
         final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
         if (ctx.left instanceof BooleanExpressionParser.TypesExpressionContext && ctx.right instanceof BooleanExpressionParser.TypesExpressionContext) {
-            final UnaryNode left = mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx.left);
-            final UnaryNode right = mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx.right);
+            final Node left = mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx.left);
+            final Node right = mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx.right);
             return ArithmeticNode.builder().left(left).right(right).operator(operator).build();
         } else if (ctx.left instanceof BooleanExpressionParser.TypesExpressionContext) {
-            final UnaryNode left = mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx.left);
+            final Node left = mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx.left);
             final Node right = currentNodes.pop();
             return ArithmeticNode.builder().left(left).right(right).operator(operator).build();
         } else if (ctx.right instanceof BooleanExpressionParser.TypesExpressionContext) {
-            final UnaryNode right = mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx.right);
+            final Node right = mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx.right);
             final Node left = currentNodes.pop();
             return ArithmeticNode.builder().left(left).right(right).operator(operator).build();
         } else {
@@ -248,8 +258,8 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
             this.node = currentNodes.pop();
         }
         if (this.node == null && tokenCount == 1 && lastToken instanceof CommonToken) {
-            this.node = UnaryNode.builder().dataType(DataType.STRING).value(ValueUtils.convertValue(lastToken.getText(), DataType.STRING).toString())
-                                 .build();
+            this.node = lastToken.getType() == BooleanExpressionLexer.FIELD ? FieldNode.builder().field(lastToken.getText()).build() : UnaryNode
+                    .builder().dataType(DataType.STRING).value(ValueUtils.convertValue(lastToken.getText(), DataType.STRING).toString()).build();
         }
         if (this.node == null) {
             log.error("Error parsing expression for the string {}", ctx.getText());

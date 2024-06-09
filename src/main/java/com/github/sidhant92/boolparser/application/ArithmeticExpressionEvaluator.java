@@ -7,10 +7,12 @@ import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
 import com.github.sidhant92.boolparser.domain.EvaluatedNode;
+import com.github.sidhant92.boolparser.domain.FieldNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.UnaryNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
 import com.github.sidhant92.boolparser.domain.logical.Node;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticFunctionNode;
+import com.github.sidhant92.boolparser.exception.DataNotFoundException;
 import com.github.sidhant92.boolparser.exception.UnsupportedToken;
 import com.github.sidhant92.boolparser.function.FunctionEvaluatorService;
 import com.github.sidhant92.boolparser.operator.OperatorService;
@@ -54,15 +56,23 @@ public class ArithmeticExpressionEvaluator {
                 return evaluateArithmeticFunctionToken((ArithmeticFunctionNode) node, data);
             case UNARY:
                 return evaluateUnaryToken((UnaryNode) node, data);
+            case FIELD:
+                return evaluateFieldToken((FieldNode) node, data);
             default:
                 log.error("unsupported token {}", node.getTokenType());
                 throw new UnsupportedToken();
         }
     }
 
+    private Object evaluateFieldToken(final FieldNode fieldNode, final Map<String, Object> data) {
+        if (!data.containsKey(fieldNode.getField())) {
+            throw new DataNotFoundException();
+        }
+        return data.get(fieldNode.getField());
+    }
+
     private Object evaluateUnaryToken(final UnaryNode unaryNode, final Map<String, Object> data) {
-        return unaryNode.getDataType() == DataType.STRING ? ValueUtils.getValueFromMap(unaryNode.getValue().toString(), data)
-                                                                      .orElse(unaryNode.getValue()) : unaryNode.getValue();
+        return unaryNode.getValue();
     }
 
     private Object evaluateArithmeticFunctionToken(final ArithmeticFunctionNode arithmeticFunctionNode, final Map<String, Object> data) {

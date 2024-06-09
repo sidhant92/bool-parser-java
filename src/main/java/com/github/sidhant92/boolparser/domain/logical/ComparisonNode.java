@@ -19,7 +19,7 @@ import lombok.Setter;
 public class ComparisonNode extends Node {
     private final String field;
 
-    private final Object value;
+    private final Node value;
 
     private final Operator operator;
 

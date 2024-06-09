@@ -73,7 +73,7 @@ public class BooleanExpressionEvaluator {
     private boolean evaluateComparisonToken(final ComparisonNode comparisonToken, final Map<String, Object> data) {
         final Object fieldData = ValueUtils.getValueFromMap(comparisonToken.getField(), data).orElseThrow(DataNotFoundException::new);
         final Object value = comparisonToken.getValue() instanceof ArithmeticBaseNode ? arithmeticExpressionEvaluator.evaluate(
-                (Node) comparisonToken.getValue(), data) : comparisonToken.getValue();
+                comparisonToken.getValue(), data) : comparisonToken.getValue();
         return operatorService.evaluateLogicalOperator(comparisonToken.getOperator(), ContainerDataType.PRIMITIVE, comparisonToken.getDataType(),
                                                        fieldData, value);
     }

@@ -11,6 +11,7 @@ public enum NodeType {
     IN,
     ARRAY,
     UNARY,
+    FIELD,
     ARITHMETIC,
     ARITHMETIC_FUNCTION
 }
