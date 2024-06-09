@@ -1,21 +1,18 @@
 package com.github.sidhant92.boolparser.application;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
-import com.github.sidhant92.boolparser.domain.StringNode;
-import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticLeafNode;
+import com.github.sidhant92.boolparser.domain.EvaluatedNode;
+import com.github.sidhant92.boolparser.domain.FieldNode;
+import com.github.sidhant92.boolparser.domain.arithmetic.UnaryNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
-import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticUnaryNode;
-import com.github.sidhant92.boolparser.domain.Node;
+import com.github.sidhant92.boolparser.domain.logical.Node;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticFunctionNode;
+import com.github.sidhant92.boolparser.exception.DataNotFoundException;
 import com.github.sidhant92.boolparser.exception.UnsupportedToken;
 import com.github.sidhant92.boolparser.function.FunctionEvaluatorService;
 import com.github.sidhant92.boolparser.operator.OperatorService;
@@ -55,76 +52,66 @@ public class ArithmeticExpressionEvaluator {
         switch (node.getTokenType()) {
             case ARITHMETIC:
                 return evaluateArithmeticToken((ArithmeticNode) node, data);
-            case ARITHMETIC_LEAF:
-                return evaluateArithmeticLeafToken((ArithmeticLeafNode) node, data);
-            case ARITHMETIC_UNARY:
-                return evaluateUnaryArithmeticToken((ArithmeticUnaryNode) node, data);
             case ARITHMETIC_FUNCTION:
                 return evaluateArithmeticFunctionToken((ArithmeticFunctionNode) node, data);
-            case STRING:
-                return evaluateStringToken((StringNode) node, data);
+            case UNARY:
+                return evaluateUnaryToken((UnaryNode) node, data);
+            case FIELD:
+                return evaluateFieldToken((FieldNode) node, data);
             default:
                 log.error("unsupported token {}", node.getTokenType());
                 throw new UnsupportedToken();
         }
     }
 
-    private Object evaluateStringToken(final StringNode stringNode, final Map<String, Object> data) {
-        return ValueUtils.getValueFromMap(stringNode.getField(), data).orElse(stringNode.getField());
-    }
-
-    private Pair<Object, DataType> evaluateArithmeticLeafToken(final ArithmeticLeafNode arithmeticLeafNode, final Map<String, Object> data) {
-        final Optional<Object> fetchedValue = arithmeticLeafNode.getDataType() != DataType.STRING ? Optional.of(
-                arithmeticLeafNode.getOperand()) : ValueUtils.getValueFromMap(arithmeticLeafNode.getOperand().toString(), data);
-        return fetchedValue
-                .map(o -> Pair.of(o, ValueUtils.getDataType(o)))
-                .orElseGet(() -> Pair.of(arithmeticLeafNode.getOperand(), arithmeticLeafNode.getDataType()));
-    }
-
-    private Object evaluateUnaryArithmeticToken(final ArithmeticUnaryNode arithmeticUnaryNode, final Map<String, Object> data) {
-        final Object resolvedValue = evaluateToken(arithmeticUnaryNode.getOperand(), data);
-        if (resolvedValue instanceof Pair) {
-            final Pair<Object, DataType> pair = (Pair<Object, DataType>) resolvedValue;
-            return operatorService.evaluateArithmeticOperator(pair.getLeft(), pair.getRight(), null, null, Operator.UNARY,
-                                                              ContainerDataType.PRIMITIVE);
+    private Object evaluateFieldToken(final FieldNode fieldNode, final Map<String, Object> data) {
+        if (!data.containsKey(fieldNode.getField())) {
+            throw new DataNotFoundException();
         }
-        final DataType dataType = ValueUtils.getDataType(resolvedValue);
-        return operatorService.evaluateArithmeticOperator(resolvedValue, dataType, null, null, Operator.UNARY, ContainerDataType.PRIMITIVE);
+        return data.get(fieldNode.getField());
+    }
+
+    private Object evaluateUnaryToken(final UnaryNode unaryNode, final Map<String, Object> data) {
+        return unaryNode.getValue();
     }
 
     private Object evaluateArithmeticFunctionToken(final ArithmeticFunctionNode arithmeticFunctionNode, final Map<String, Object> data) {
-        final List<Pair<Object, DataType>> resolvedValues = arithmeticFunctionNode.getItems()
+        final List<Object> resolvedValues = arithmeticFunctionNode.getItems()
                 .stream()
-                .map(item -> evaluateArithmeticLeafToken(item, data))
+                .map(item -> evaluate(item, data))
                 .collect(Collectors.toList());
-        final List<Pair<Object, DataType>> flattenedValues = new ArrayList<>();
-        resolvedValues.forEach(value -> {
-            if (value.getKey() instanceof Collection) {
-                ((Collection<?>) value.getKey()).forEach(v -> flattenedValues.add(Pair.of(v, ValueUtils.getDataType(v))));
-            } else {
-                flattenedValues.add(value);
-            }
-        });
+        final List<EvaluatedNode> flattenedValues = ValueUtils.mapToEvaluatedNodes(resolvedValues);
         return functionEvaluatorService.evaluateArithmeticFunction(arithmeticFunctionNode.getFunctionType(), flattenedValues);
     }
 
     private Object evaluateArithmeticToken(final ArithmeticNode arithmeticNode, final Map<String, Object> data) {
         final Object leftValue = evaluateToken(arithmeticNode.getLeft(), data);
+        if (arithmeticNode.getOperator().equals(Operator.UNARY)) {
+            if (leftValue instanceof EvaluatedNode) {
+                final EvaluatedNode left = (EvaluatedNode) leftValue;
+                return operatorService.evaluateArithmeticOperator(left.getValue(), left.getDataType(), null, null, arithmeticNode.getOperator(),
+                                                                  ContainerDataType.PRIMITIVE);
+            } else {
+                final DataType leftDataType = ValueUtils.getDataType(leftValue);
+                return operatorService.evaluateArithmeticOperator(leftValue, leftDataType, null, null, arithmeticNode.getOperator(),
+                                                                  ContainerDataType.PRIMITIVE);
+            }
+        }
         final Object rightValue = evaluateToken(arithmeticNode.getRight(), data);
-        if (leftValue instanceof Pair && rightValue instanceof Pair) {
-            final Pair<Object, DataType> leftPair = (Pair<Object, DataType>) leftValue;
-            final Pair<Object, DataType> rightPair = (Pair<Object, DataType>) rightValue;
-            return operatorService.evaluateArithmeticOperator(leftPair.getLeft(), leftPair.getRight(), rightPair.getLeft(), rightPair.getRight(),
+        if (leftValue instanceof EvaluatedNode && rightValue instanceof EvaluatedNode) {
+            final EvaluatedNode left = (EvaluatedNode) leftValue;
+            final EvaluatedNode right = (EvaluatedNode) rightValue;
+            return operatorService.evaluateArithmeticOperator(left.getValue(), left.getDataType(), right.getValue(), right.getDataType(),
                                                               arithmeticNode.getOperator(), ContainerDataType.PRIMITIVE);
-        } else if (leftValue instanceof Pair) {
-            final Pair<Object, DataType> leftPair = (Pair<Object, DataType>) leftValue;
+        } else if (leftValue instanceof EvaluatedNode) {
+            final EvaluatedNode left = (EvaluatedNode) leftValue;
             final DataType rightDataType = ValueUtils.getDataType(rightValue);
-            return operatorService.evaluateArithmeticOperator(leftPair.getLeft(), leftPair.getRight(), rightValue, rightDataType,
+            return operatorService.evaluateArithmeticOperator(left.getValue(), left.getDataType(), rightValue, rightDataType,
                                                               arithmeticNode.getOperator(), ContainerDataType.PRIMITIVE);
-        } else if (rightValue instanceof Pair) {
-            final Pair<Object, DataType> rightPair = (Pair<Object, DataType>) rightValue;
+        } else if (rightValue instanceof EvaluatedNode) {
+            final EvaluatedNode right = (EvaluatedNode) rightValue;
             final DataType leftDataType = ValueUtils.getDataType(leftValue);
-            return operatorService.evaluateArithmeticOperator(leftValue, leftDataType, rightPair.getLeft(), rightPair.getRight(),
+            return operatorService.evaluateArithmeticOperator(leftValue, leftDataType, right.getValue(), right.getDataType(),
                                                               arithmeticNode.getOperator(), ContainerDataType.PRIMITIVE);
         } else {
             final DataType leftDataType = ValueUtils.getDataType(leftValue);

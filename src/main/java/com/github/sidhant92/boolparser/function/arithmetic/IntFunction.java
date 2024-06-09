@@ -7,6 +7,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.FunctionType;
+import com.github.sidhant92.boolparser.domain.EvaluatedNode;
 
 /**
  * @author sidhant.aggarwal
@@ -14,15 +15,15 @@ import com.github.sidhant92.boolparser.constant.FunctionType;
  */
 public class IntFunction extends AbstractFunction {
     @Override
-    public Object evaluate(final List<Pair<Object, DataType>> items) {
-        final Pair<Object, DataType> item = items.get(0);
-        if (item.getValue() == DataType.DECIMAL) {
-            return ((Double) item.getKey()).intValue();
+    public Object evaluate(final List<EvaluatedNode> items) {
+        final EvaluatedNode item = items.get(0);
+        if (item.getDataType() == DataType.DECIMAL) {
+            return ((Double) item.getValue()).intValue();
         }
-        if (item.getValue() == DataType.LONG) {
-            return ((Long) item.getKey()).intValue();
+        if (item.getDataType() == DataType.LONG) {
+            return ((Long) item.getValue()).intValue();
         }
-        return item.getKey();
+        return item.getValue();
     }
 
     @Override

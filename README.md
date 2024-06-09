@@ -4,7 +4,7 @@ A Boolean Expression Parser for Java
 The library can help parse complex and nested boolean expressions.
 The expressions are in SQL-like syntax, where you can use boolean operators and parentheses to combine individual expressions.
 
-An expression can be as simple as `name = Sidhant`.
+An expression can be as simple as `name = 'Sidhant'`.
 A Complex expression is formed by combining these small expressions by logical operators and giving precedence using parenthesis
 
 ### Examples
@@ -12,7 +12,7 @@ A Complex expression is formed by combining these small expressions by logical o
 
 Format: `${attributeName} = ${value}`
 
-Example: `name = john`
+Example: `name = 'john'`
 
 #### Numeric Comparisons
 
@@ -34,7 +34,7 @@ Example: `price 5.99 TO 100`
 
 Example:
 
-`price < 10 AND (category:Book OR NOT category:Ebook)`
+`price < 10 AND (category:'Book' OR NOT category:'Ebook')`
 
 Individual filters can be combined via boolean operators. The following operators are supported:
 
@@ -45,6 +45,8 @@ Individual filters can be combined via boolean operators. The following operator
 Parentheses, `(` and `)`, can be used for grouping.
 
 #### Usage Notes
+* String must be enclosed either in single or double quotes.
+* Variables substitution is supported by passing the name of the variable without the quotes.
 * Phrases that includes quotes, like `content = "It's a wonderful day"`
 * Phrases that includes quotes, like `attribute = 'She said "Hello World"'`
 * For nested keys in data map you can use the dot notation, like `person.age`
@@ -72,7 +74,7 @@ dependencies {
 Code
 ```
 final BoolParser boolParser = new BoolParser();
-final Try<Node> nodeOptional = boolParser.parseExpression("name = test");
+final Try<Node> nodeOptional = boolParser.parseExpression("name = 'test'");
 ```
 
 ### Node Types Post Parsing
@@ -121,11 +123,17 @@ private final Object value;
 ```
 
 ####
+FieldNode
+```
+private final String field;
+```
+
+####
 InNode
 ```
 private final String field;
 
-private final List<Pair<DataType, Object>> items;
+private final List<Node> items;
 ```
 
 
@@ -160,7 +168,7 @@ final BooleanExpressionEvaluator booleanExpressionEvaluator = new BooleanExpress
 final Map<String, Object> data = new HashMap<>();
 data.put("age", 25);
 data.put("name", "sid");
-final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("name = sid AND age = 25", data);
+final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("name = 'sid' AND age = 25", data);
 assertTrue(resultOptional.isPresent());
 assertTrue(resultOptional.get());
 ```
@@ -171,7 +179,7 @@ final Map<String, Object> data = new HashMap<>();
 data.put("age", 25);
 data.put("name", "sid");
 data.put("num", 45);
-final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("name:sid AND (age = 25 OR num = 44)", data);
+final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("name = sid AND (age = 25 OR num = 44)", data);
 assertTrue(resultOptional.isPresent());
 assertTrue(resultOptional.get());
 ```
@@ -211,6 +219,22 @@ The following Operators are supported:
 5. Modulus (%)
 6. Exponent (^)
 
+The following functions are supported:
+1. Minimum (min)
+2. Maximum (max)
+3. Average (avg)
+4. Sum (sum)
+5. Mean (mean)
+6. Mode (mode)
+7. Median (median)
+8. Integer (int) - converts the input to integer
+9. Length (len) - Returns length of the give array
+
+Syntax For using functions
+Format: `${FunctionIdentifier} (item1, item2...)`
+
+Example: `min (1,2,3)` or with variable substitution `min (a,b,c)`
+
 Usage examples:
 
 Simple Addition Operation
@@ -231,6 +255,15 @@ data.put("a", 10);
 final Try<Object> resultOptional = evaluator.evaluate("((5 * 2) + a) * 2 + (1 + 3 * (a / 2))", data);
 assertTrue(resultOptional.isPresent());
 assertTrue(resultOptional.get(), 56);
+```
+Function Usage
+```
+final ArithmeticExpressionEvaluator evaluator = new ArithmeticExpressionEvaluator(new Boolparser());
+final Map<String, Object> data = new HashMap<>();
+data.put("a", 10);
+final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("min (1,2,3)", data);
+assertTrue(resultOptional.isSuccess());
+assertEquals(resultOptional.get(), 1);
 ```
 
 [For a complete list of examples please check out the test file](src/test/java/com/github/sidhant92/boolparser/application/ArithmeticExpressionEvaluatorTest.java)

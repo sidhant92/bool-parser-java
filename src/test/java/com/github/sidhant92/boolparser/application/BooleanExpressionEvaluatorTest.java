@@ -53,7 +53,7 @@ public class BooleanExpressionEvaluatorTest {
     public void testSimpleTrueCorrectExpression() {
         final Map<String, Object> data = new HashMap<>();
         data.put("name", "abc");
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = abc", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = 'abc'", data);
         assertTrue(booleanOptional.isSuccess());
         assertTrue(booleanOptional.get());
     }
@@ -80,7 +80,7 @@ public class BooleanExpressionEvaluatorTest {
     public void testSimpleFalseIncorrectExpression() {
         final Map<String, Object> data = new HashMap<>();
         data.put("name", "def");
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = abc", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = 'abc'", data);
         assertTrue(booleanOptional.isSuccess());
         assertFalse(booleanOptional.get());
     }
@@ -108,6 +108,16 @@ public class BooleanExpressionEvaluatorTest {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", 24);
         final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age > 20", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testNumericGreaterThanCorrectExpressionWithField() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("age", 24);
+        data.put("b", 20);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age > b", data);
         assertTrue(booleanOptional.isSuccess());
         assertTrue(booleanOptional.get());
     }
@@ -214,7 +224,7 @@ public class BooleanExpressionEvaluatorTest {
     public void testSimpleNotStringExpression() {
         final Map<String, Object> data = new HashMap<>();
         data.put("name", "abc");
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("NOT (name = abc)", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("NOT (name = 'abc')", data);
         assertTrue(booleanOptional.isSuccess());
         assertFalse(booleanOptional.get());
     }
@@ -233,7 +243,7 @@ public class BooleanExpressionEvaluatorTest {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", 25);
         data.put("name", "sid");
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = sid AND age = 25", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = 'sid' AND age = 25", data);
         assertTrue(booleanOptional.isSuccess());
         assertTrue(booleanOptional.get());
     }
@@ -243,7 +253,7 @@ public class BooleanExpressionEvaluatorTest {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", 25);
         data.put("name", "sid");
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = sid AND age = 23", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = 'sid' AND age = 23", data);
         assertTrue(booleanOptional.isSuccess());
         assertFalse(booleanOptional.get());
     }
@@ -253,7 +263,7 @@ public class BooleanExpressionEvaluatorTest {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", 25);
         data.put("name", "sid");
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = sid OR age = 23", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = 'sid' OR age = 23", data);
         assertTrue(booleanOptional.isSuccess());
         assertTrue(booleanOptional.get());
     }
@@ -263,7 +273,7 @@ public class BooleanExpressionEvaluatorTest {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", 25);
         data.put("name", "sidh");
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = sid OR age = 23", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = 'sid' OR age = 23", data);
         assertTrue(booleanOptional.isSuccess());
         assertFalse(booleanOptional.get());
     }
@@ -274,7 +284,7 @@ public class BooleanExpressionEvaluatorTest {
         data.put("age", 25);
         data.put("name", "sid");
         data.put("num", 45);
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = sid AND (age = 25 OR num = 44)", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = 'sid' AND (age = 25 OR num = 44)", data);
         assertTrue(booleanOptional.isSuccess());
         assertTrue(booleanOptional.get());
     }
@@ -286,6 +296,16 @@ public class BooleanExpressionEvaluatorTest {
         final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age in (26,56,34)", data);
         assertTrue(booleanOptional.isSuccess());
         assertFalse(booleanOptional.get());
+    }
+
+    @Test
+    public void testNegativeInClauseForIntegersWithField() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("age", 25);
+        data.put("a", 25);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age in (26,56,34,a)", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
     }
 
     @Test
@@ -319,7 +339,7 @@ public class BooleanExpressionEvaluatorTest {
     public void testNegativeInClauseForStrings() {
         final Map<String, Object> data = new HashMap<>();
         data.put("name", "test");
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name in (tes, abc)", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name in ('tes', 'abc')", data);
         assertTrue(booleanOptional.isSuccess());
         assertFalse(booleanOptional.get());
     }
@@ -328,7 +348,7 @@ public class BooleanExpressionEvaluatorTest {
     public void testPositiveInClauseForStrings() {
         final Map<String, Object> data = new HashMap<>();
         data.put("name", "test");
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name in (abc, test)", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name in ('abc', 'test')", data);
         assertTrue(booleanOptional.isSuccess());
         assertTrue(booleanOptional.get());
     }
@@ -339,7 +359,7 @@ public class BooleanExpressionEvaluatorTest {
         data.put("age", 25);
         data.put("name", "sid");
         data.put("num", 45);
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = sidh OR (age = 25 AND num = 45)", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = 'sidh' OR (age = 25 AND num = 45)", data);
         assertTrue(booleanOptional.isSuccess());
         assertTrue(booleanOptional.get());
     }
@@ -350,7 +370,7 @@ public class BooleanExpressionEvaluatorTest {
         data.put("age", 25);
         data.put("name", "sid");
         data.put("num", 45);
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = sid AND (age = 23 OR num = 44)", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("name = 'sid' AND (age = 23 OR num = 44)", data);
         assertTrue(booleanOptional.isSuccess());
         assertFalse(booleanOptional.get());
     }
@@ -359,7 +379,7 @@ public class BooleanExpressionEvaluatorTest {
     public void testWrongDataType() {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", 24);
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age = dsf", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age = 'dsf'", data);
         assertTrue(booleanOptional.isSuccess());
         assertFalse(booleanOptional.get());
     }
@@ -543,7 +563,7 @@ public class BooleanExpressionEvaluatorTest {
         numbers.add(30);
         data.put("age", "20");
         data.put("numbers", numbers);
-        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age > max (numbers))", data);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age > max (numbers)", data);
         assertTrue(booleanOptional.isSuccess());
         assertFalse(booleanOptional.get());
     }

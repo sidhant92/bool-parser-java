@@ -2,7 +2,7 @@ package com.github.sidhant92.boolparser.parser.antlr;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.sidhant92.boolparser.domain.Node;
+import com.github.sidhant92.boolparser.domain.logical.Node;
 import com.github.sidhant92.boolparser.operator.OperatorFactory;
 import io.vavr.control.Try;
 

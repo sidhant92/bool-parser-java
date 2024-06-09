@@ -1,11 +1,15 @@
 package com.github.sidhant92.boolparser.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import com.github.sidhant92.boolparser.constant.DataType;
+import com.github.sidhant92.boolparser.domain.EvaluatedNode;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -29,6 +33,28 @@ public class ValueUtils {
         }
         log.error("could not find key {} for the data {}", key, data);
         return Optional.empty();
+    }
+
+    public static List<EvaluatedNode> mapToEvaluatedNodes(final List<Object> items) {
+        final List<EvaluatedNode> flattenedValues = new ArrayList<>();
+        items.forEach(value -> {
+            if (value instanceof EvaluatedNode) {
+                final EvaluatedNode node = (EvaluatedNode) value;
+                if (node.getValue() instanceof Collection) {
+                    ((Collection<?>) node.getValue()).forEach(
+                            v -> flattenedValues.add(EvaluatedNode.builder().value(v).dataType(ValueUtils.getDataType(v)).build()));
+                } else {
+                    flattenedValues.add(node);
+                }
+            }
+            if (value instanceof Collection) {
+                ((Collection<?>) value).forEach(
+                        v -> flattenedValues.add(EvaluatedNode.builder().value(v).dataType(ValueUtils.getDataType(v)).build()));
+            } else {
+                flattenedValues.add(EvaluatedNode.builder().value(value).dataType(ValueUtils.getDataType(value)).build());
+            }
+        });
+        return flattenedValues;
     }
 
     public static Object convertValue(final String value, final DataType dataType) {

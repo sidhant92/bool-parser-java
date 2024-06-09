@@ -15,12 +15,12 @@ expression
  | left=expression op= MODULUS right=expression                      #arithmeticExpression
  | left=expression op= ADD right=expression                          #arithmeticExpression
  | left=expression op= SUBTRACT right=expression                     #arithmeticExpression
- | left=arrayArithmeticFunction data=wordlist                        #arithmeticFunctionExpression
+ | left=arithmeticFunction data=wordlist                             #arithmeticFunctionExpression
  | left=expression op=binary right=expression                        #binaryExpression
  | types                                                             #typesExpression
- | (field=WORD)? lower=numericTypes TO upper=numericTypes            #toExpression
- | (field=WORD)? (not=NOT)? IN data=wordlist                         #inExpression
- | (field=WORD)? op=arrayOperators data=wordlist                     #arrayExpression
+ | (field=FIELD) lower=numericTypes TO upper=numericTypes            #toExpression
+ | (field=FIELD) (not=NOT)? IN data=wordlist                         #inExpression
+ | (field=FIELD) op=arrayOperators data=wordlist                     #arrayExpression
  ;
 
 comparator
@@ -36,7 +36,7 @@ arithmeticOperator
  | EXPONENT
  ;
 
- arrayArithmeticFunction
+arithmeticFunction
   : MIN
   | MAX
   | SUM
@@ -48,9 +48,8 @@ arithmeticOperator
   | INT
   ;
 
-
  wordlist
- : LPAREN WS* first=types WS* (',' WS* rest=types WS*)* RPAREN
+ : LPAREN WS* first=expression WS* (',' WS* rest=expression WS*)* RPAREN
  ;
 
  arrayOperators
@@ -63,7 +62,7 @@ arithmeticOperator
  ;
 
  types
- : INTEGER | DECIMAL | APP_VERSION | bool | WORD |
+ : INTEGER | DECIMAL | APP_VERSION | bool | WORD | FIELD |
  ;
 
 
@@ -112,7 +111,10 @@ DECIMAL      : [0-9]+ '.' [0-9]+;
 APP_VERSION  : [0-9] ('.' INTEGER)+;
 INTEGER      : [0-9]+;
 WS           : [ \r\t\u000C\n]+ -> skip;
-WORD         : ( ((ALPHANUMERIC | SQ | DQ)+ (ALPHANUMERIC | '_' | '.' | SQ | DQ)*) | (SQ | DQ) (ALPHANUMERIC | '_' | '-' | '.' | SQ | DQ)+ (SQ | DQ));
+WORD         : SQSTR | DQSTR;
+SQSTR        : '\'' .*? '\'';
+DQSTR        : '"' .*? '"';
+FIELD        : (ALPHANUMERIC | '_' | '.')+;
 ALPHANUMERIC : [a-zA-Z0-9];
 SQ           : '\''.*? '\'';
 DQ           : '"'.*? '"';

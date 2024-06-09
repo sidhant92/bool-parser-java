@@ -5,6 +5,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.FunctionType;
+import com.github.sidhant92.boolparser.domain.EvaluatedNode;
 import com.github.sidhant92.boolparser.exception.InvalidContainerTypeException;
 import com.github.sidhant92.boolparser.exception.InvalidDataType;
 import com.github.sidhant92.boolparser.exception.InvalidExpressionException;
@@ -21,7 +22,7 @@ public class FunctionEvaluatorService {
         FunctionFactory.initialize();
     }
 
-    public Object evaluateArithmeticFunction(final FunctionType functionType, final List<Pair<Object, DataType>> items) {
+    public Object evaluateArithmeticFunction(final FunctionType functionType, final List<EvaluatedNode> items) {
         final AbstractFunction abstractFunction = FunctionFactory.getArithmeticFunction(functionType);
         if (items.isEmpty()) {
             log.error("Empty items not allowed");
@@ -33,15 +34,15 @@ public class FunctionEvaluatorService {
             throw new InvalidContainerTypeException();
         }
         final boolean validDataType = items
-                .stream().allMatch(item -> abstractFunction.getAllowedDataTypes().contains(item.getValue()));
+                .stream().allMatch(item -> abstractFunction.getAllowedDataTypes().contains(item.getDataType()));
         if (!validDataType) {
             log.error("Invalid data type {} for function {}", items, functionType.name());
             throw new InvalidDataType();
         }
 
         items.forEach(item -> {
-            if (!ContainerDataType.PRIMITIVE.isValid(item.getValue(), item.getKey())) {
-                log.error("Validation failed for the function {} for the operand {}", functionType.name(), item.getKey());
+            if (!ContainerDataType.PRIMITIVE.isValid(item.getDataType(), item.getValue())) {
+                log.error("Validation failed for the function {} for the operand {}", functionType.name(), item.getValue());
                 throw new InvalidDataType();
             }
         });

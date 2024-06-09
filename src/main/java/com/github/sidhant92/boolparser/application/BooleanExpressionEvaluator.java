@@ -1,17 +1,19 @@
 package com.github.sidhant92.boolparser.application;
 
+import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.tuple.Pair;
+import java.util.stream.Collectors;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
-import com.github.sidhant92.boolparser.domain.ArrayNode;
-import com.github.sidhant92.boolparser.domain.BooleanNode;
-import com.github.sidhant92.boolparser.domain.InNode;
-import com.github.sidhant92.boolparser.domain.NumericRangeNode;
-import com.github.sidhant92.boolparser.domain.ComparisonNode;
-import com.github.sidhant92.boolparser.domain.Node;
-import com.github.sidhant92.boolparser.domain.UnaryNode;
+import com.github.sidhant92.boolparser.domain.logical.ArrayNode;
+import com.github.sidhant92.boolparser.domain.logical.BooleanNode;
+import com.github.sidhant92.boolparser.domain.EvaluatedNode;
+import com.github.sidhant92.boolparser.domain.logical.InNode;
+import com.github.sidhant92.boolparser.domain.logical.NumericRangeNode;
+import com.github.sidhant92.boolparser.domain.logical.ComparisonNode;
+import com.github.sidhant92.boolparser.domain.logical.Node;
+import com.github.sidhant92.boolparser.domain.arithmetic.UnaryNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticBaseNode;
 import com.github.sidhant92.boolparser.exception.DataNotFoundException;
 import com.github.sidhant92.boolparser.exception.HeterogeneousArrayException;
@@ -71,7 +73,7 @@ public class BooleanExpressionEvaluator {
     private boolean evaluateComparisonToken(final ComparisonNode comparisonToken, final Map<String, Object> data) {
         final Object fieldData = ValueUtils.getValueFromMap(comparisonToken.getField(), data).orElseThrow(DataNotFoundException::new);
         final Object value = comparisonToken.getValue() instanceof ArithmeticBaseNode ? arithmeticExpressionEvaluator.evaluate(
-                (Node) comparisonToken.getValue(), data) : comparisonToken.getValue();
+                comparisonToken.getValue(), data) : comparisonToken.getValue();
         return operatorService.evaluateLogicalOperator(comparisonToken.getOperator(), ContainerDataType.PRIMITIVE, comparisonToken.getDataType(),
                                                        fieldData, value);
     }
@@ -85,24 +87,39 @@ public class BooleanExpressionEvaluator {
 
     private boolean evaluateInToken(final InNode inToken, final Map<String, Object> data) {
         final Object fieldData = ValueUtils.getValueFromMap(inToken.getField(), data).orElseThrow(DataNotFoundException::new);
+        final List<EvaluatedNode> items = resolveArrayElements(inToken.getItems(), data);
         final DataType dataType = ValueUtils.getDataType(fieldData);
-        final Object[] values = inToken.getItems()
+        final Object[] values = items
                 .stream()
-                .map(Pair::getRight).toArray();
+                .map(EvaluatedNode::getValue).toArray();
         return operatorService.evaluateLogicalOperator(Operator.IN, ContainerDataType.PRIMITIVE, dataType, fieldData, values);
+    }
+
+    private List<EvaluatedNode> resolveArrayElements(final List<Node> items, final Map<String, Object> data) {
+        final List<Object> resolvedValues = items
+                .stream()
+                .map(item -> {
+                    if (item instanceof ArithmeticBaseNode) {
+                        return arithmeticExpressionEvaluator.evaluate(item, data);
+                    }
+                    return evaluateToken(item, data);
+                })
+                .collect(Collectors.toList());
+        return ValueUtils.mapToEvaluatedNodes(resolvedValues);
     }
 
     private boolean evaluateArrayToken(final ArrayNode arrayNode, final Map<String, Object> data) {
         final Object fieldData = ValueUtils.getValueFromMap(arrayNode.getField(), data).orElseThrow(DataNotFoundException::new);
-        if (arrayNode.getItems()
+        final List<EvaluatedNode> items = resolveArrayElements(arrayNode.getItems(), data);
+        if (items
                 .stream()
-                .map(Pair::getLeft).distinct().count() > 1) {
+                .map(EvaluatedNode::getDataType).distinct().count() > 1) {
             throw new HeterogeneousArrayException();
         }
-        final DataType dataType = arrayNode.getItems().get(0).getLeft();
-        final Object[] values = arrayNode.getItems()
+        final DataType dataType = items.get(0).getDataType();
+        final Object[] values = items
                 .stream()
-                .map(Pair::getRight).toArray();
+                .map(EvaluatedNode::getValue).toArray();
         return operatorService.evaluateLogicalOperator(arrayNode.getOperator(), ContainerDataType.LIST, dataType, fieldData, values);
     }
 

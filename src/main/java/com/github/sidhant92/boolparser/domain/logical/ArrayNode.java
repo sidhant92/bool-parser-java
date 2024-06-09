@@ -1,24 +1,25 @@
-package com.github.sidhant92.boolparser.domain;
+package com.github.sidhant92.boolparser.domain.logical;
 
+import java.util.List;
 import com.github.sidhant92.boolparser.constant.NodeType;
+import com.github.sidhant92.boolparser.constant.Operator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * @author sidhant.aggarwal
- * @since 16/03/2024
- */
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
-public class StringNode extends Node {
+public class ArrayNode extends Node {
     private final String field;
 
+    private final Operator operator;
+
+    private final List<Node> items;
     @Override
     public NodeType getTokenType() {
-        return NodeType.STRING;
+        return NodeType.ARRAY;
     }
 }

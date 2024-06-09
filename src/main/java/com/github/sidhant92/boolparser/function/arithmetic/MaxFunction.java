@@ -7,6 +7,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.FunctionType;
+import com.github.sidhant92.boolparser.domain.EvaluatedNode;
 import com.github.sidhant92.boolparser.util.ValueUtils;
 
 /**
@@ -15,19 +16,19 @@ import com.github.sidhant92.boolparser.util.ValueUtils;
  */
 public class MaxFunction extends AbstractFunction {
     @Override
-    public Object evaluate(final List<Pair<Object, DataType>> items) {
+    public Object evaluate(final List<EvaluatedNode> items) {
         if (items
-                .stream().anyMatch(a -> a.getValue().equals(DataType.DECIMAL))) {
+                .stream().anyMatch(a -> a.getDataType().equals(DataType.DECIMAL))) {
             return ValueUtils.caseDouble(items
-                                                 .stream().mapToDouble(a -> Double.parseDouble(a.getKey().toString())).max().getAsDouble());
+                                                 .stream().mapToDouble(a -> Double.parseDouble(a.getValue().toString())).max().getAsDouble());
         }
         if (items
-                .stream().anyMatch(a -> a.getValue().equals(DataType.LONG))) {
+                .stream().anyMatch(a -> a.getDataType().equals(DataType.LONG))) {
             return ValueUtils.caseDouble(items
-                                                 .stream().mapToLong(a -> Long.parseLong(a.getKey().toString())).max().getAsLong());
+                                                 .stream().mapToLong(a -> Long.parseLong(a.getValue().toString())).max().getAsLong());
         }
         return ValueUtils.caseDouble(items
-                                             .stream().mapToInt(a -> Integer.parseInt(a.getKey().toString())).max().getAsInt());
+                                             .stream().mapToInt(a -> Integer.parseInt(a.getValue().toString())).max().getAsInt());
     }
 
     @Override

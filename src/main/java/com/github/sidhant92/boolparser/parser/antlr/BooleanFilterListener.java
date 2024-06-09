@@ -7,24 +7,22 @@ import java.util.stream.Collectors;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.tree.TerminalNodeImpl;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.FunctionType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.Operator;
-import com.github.sidhant92.boolparser.domain.StringNode;
+import com.github.sidhant92.boolparser.domain.FieldNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticFunctionNode;
-import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticLeafNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
-import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticUnaryNode;
-import com.github.sidhant92.boolparser.domain.ArrayNode;
-import com.github.sidhant92.boolparser.domain.BooleanNode;
-import com.github.sidhant92.boolparser.domain.InNode;
-import com.github.sidhant92.boolparser.domain.Node;
-import com.github.sidhant92.boolparser.domain.NumericRangeNode;
-import com.github.sidhant92.boolparser.domain.ComparisonNode;
-import com.github.sidhant92.boolparser.domain.UnaryNode;
+import com.github.sidhant92.boolparser.domain.logical.ArrayNode;
+import com.github.sidhant92.boolparser.domain.logical.BooleanNode;
+import com.github.sidhant92.boolparser.domain.logical.InNode;
+import com.github.sidhant92.boolparser.domain.logical.Node;
+import com.github.sidhant92.boolparser.domain.logical.NumericRangeNode;
+import com.github.sidhant92.boolparser.domain.logical.ComparisonNode;
+import com.github.sidhant92.boolparser.domain.arithmetic.UnaryNode;
 import com.github.sidhant92.boolparser.exception.InvalidExpressionException;
 import com.github.sidhant92.boolparser.util.ValueUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -54,80 +52,27 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     @Override
     public void exitComparatorExpression(BooleanExpressionParser.ComparatorExpressionContext ctx) {
-        final String variableName = getField(ctx.left.getText());
-        final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
-        /*if ((ctx.right instanceof BooleanExpressionParser.ParentExpressionContext || ctx.right instanceof BooleanExpressionParser.ArithmeticFunctionExpressionContext) && !currentNodes.isEmpty()) {
-            final Node value = currentNodes.pop();
-            currentNodes.add(new ComparisonNode(variableName, value, operator, DataType.INTEGER));
-        } else {
-            final DataType dataType = getDataType(ctx.right.getStart());
-            currentNodes.add(new ComparisonNode(variableName, ValueUtils.convertValue(ctx.right.getText(), dataType), operator, dataType));
-        }*/
-        if (!(ctx.right instanceof BooleanExpressionParser.TypesExpressionContext) && !currentNodes.isEmpty()) {
-            final Node value = currentNodes.pop();
-            currentNodes.add(new ComparisonNode(variableName, value, operator, DataType.INTEGER));
-        } else {
-            final DataType dataType = getDataType(ctx.right.getStart());
-            currentNodes.add(new ComparisonNode(variableName, ValueUtils.convertValue(ctx.right.getText(), dataType), operator, dataType));
-        }
+        currentNodes.add(mapComparatorExpressionContext(ctx));
         super.enterComparatorExpression(ctx);
-    }
-
-    private ArithmeticLeafNode getArithmeticLeafNode(final BooleanExpressionParser.TypesExpressionContext ctx) {
-        final DataType dataType = getDataType(ctx.getStart());
-        final Object operand = ValueUtils.convertValue(ctx.getText(), dataType);
-        return ArithmeticLeafNode.builder().operand(operand).dataType(dataType).build();
     }
 
     @Override
     public void exitArithmeticExpression(BooleanExpressionParser.ArithmeticExpressionContext ctx) {
-        final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
-        if (ctx.left instanceof BooleanExpressionParser.TypesExpressionContext && ctx.right instanceof BooleanExpressionParser.TypesExpressionContext) {
-            final ArithmeticLeafNode left = getArithmeticLeafNode((BooleanExpressionParser.TypesExpressionContext) ctx.left);
-            final ArithmeticLeafNode right = getArithmeticLeafNode((BooleanExpressionParser.TypesExpressionContext) ctx.right);
-            final ArithmeticNode node = ArithmeticNode.builder().left(left).right(right).operator(operator).build();
-            currentNodes.add(node);
-        } else if (ctx.left instanceof BooleanExpressionParser.TypesExpressionContext) {
-            final ArithmeticLeafNode left = getArithmeticLeafNode((BooleanExpressionParser.TypesExpressionContext) ctx.left);
-            final Node right = currentNodes.pop();
-            final ArithmeticNode node = ArithmeticNode.builder().left(left).right(right).operator(operator).build();
-            currentNodes.add(node);
-        } else if (ctx.right instanceof BooleanExpressionParser.TypesExpressionContext) {
-            final ArithmeticLeafNode right = getArithmeticLeafNode((BooleanExpressionParser.TypesExpressionContext) ctx.right);
-            final Node left = currentNodes.pop();
-            final ArithmeticNode node = ArithmeticNode.builder().left(left).right(right).operator(operator).build();
-            currentNodes.add(node);
-        } else {
-            if (currentNodes.size() < 2) {
-                log.error("Error parsing expression for the string {}", ctx.getText());
-                throw new InvalidExpressionException();
-            }
-            final Node right = currentNodes.pop();
-            final Node left = currentNodes.pop();
-            final ArithmeticNode node = ArithmeticNode.builder().left(left).right(right).operator(operator).build();
-            currentNodes.add(node);
-        }
+        currentNodes.add(mapArithmeticExpressionContext(ctx));
         super.exitArithmeticExpression(ctx);
     }
 
     @Override
     public void exitUnaryArithmeticExpression(BooleanExpressionParser.UnaryArithmeticExpressionContext ctx) {
-        final DataType dataType = getDataType(ctx.exp.getStart());
-        final Object operand = ValueUtils.convertValue(ctx.exp.getText(), dataType);
-        final ArithmeticLeafNode leafNode = ArithmeticLeafNode.builder().operand(operand).dataType(dataType).build();
-        currentNodes.add(ArithmeticUnaryNode.builder().operand(leafNode).build());
+        final Node leafNode = !currentNodes.isEmpty() ? currentNodes.pop() : mapTypesExpressionContext(
+                (BooleanExpressionParser.TypesExpressionContext) ctx.exp);
+        currentNodes.add(ArithmeticNode.builder().left(leafNode).operator(Operator.UNARY).build());
         super.enterUnaryArithmeticExpression(ctx);
     }
 
     @Override
     public void exitToExpression(BooleanExpressionParser.ToExpressionContext ctx) {
-        validateField(ctx.field, ctx.getText());
-        final String field = getField(ctx.field.getText());
-        final DataType lowerDataType = getDataType(ctx.lower.start);
-        final Object lowerValue = ValueUtils.convertValue(ctx.lower.start.getText(), lowerDataType);
-        final DataType upperDataType = getDataType(ctx.upper.start);
-        final Object upperValue = ValueUtils.convertValue(ctx.upper.getText(), upperDataType);
-        currentNodes.add(new NumericRangeNode(field, lowerValue, upperValue, lowerDataType, upperDataType));
+        currentNodes.add(mapToExpressionContext(ctx));
         super.exitToExpression(ctx);
     }
 
@@ -135,7 +80,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     public void exitArrayExpression(BooleanExpressionParser.ArrayExpressionContext ctx) {
         validateField(ctx.field, ctx.getText());
         final String field = getField(ctx.field.getText());
-        final List<Pair<DataType, Object>> items = getArrayElements(ctx.data.children);
+        final List<Node> items = getArrayElements(ctx.data.children);
         final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
         currentNodes.add(new ArrayNode(field, operator, items));
         super.exitArrayExpression(ctx);
@@ -143,6 +88,60 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     @Override
     public void exitArithmeticFunctionExpression(BooleanExpressionParser.ArithmeticFunctionExpressionContext ctx) {
+        final Node node = mapArithmeticFunctionExpressionContext(ctx);
+        currentNodes.add(node);
+        super.exitArithmeticFunctionExpression(ctx);
+    }
+
+    @Override
+    public void exitInExpression(BooleanExpressionParser.InExpressionContext ctx) {
+        currentNodes.add(mapInExpressionContext(ctx));
+        super.exitInExpression(ctx);
+    }
+
+    private List<Node> getArrayElements(final List<ParseTree> trees) {
+        return trees
+                .stream()
+                .filter(child -> !(child instanceof TerminalNodeImpl))
+                .map(this::mapContextToNode)
+                .collect(Collectors.toList());
+    }
+
+    private Node mapContextToNode(final ParseTree ctx) {
+        if (ctx instanceof BooleanExpressionParser.ArithmeticExpressionContext) {
+            return mapArithmeticExpressionContext((BooleanExpressionParser.ArithmeticExpressionContext) ctx);
+        } else if (ctx instanceof BooleanExpressionParser.InExpressionContext) {
+            return mapInExpressionContext((BooleanExpressionParser.InExpressionContext) ctx);
+        } else if (ctx instanceof BooleanExpressionParser.ArithmeticFunctionExpressionContext) {
+            return mapArithmeticFunctionExpressionContext((BooleanExpressionParser.ArithmeticFunctionExpressionContext) ctx);
+        } else if (ctx instanceof BooleanExpressionParser.ComparatorExpressionContext) {
+            return mapComparatorExpressionContext((BooleanExpressionParser.ComparatorExpressionContext) ctx);
+        } else if (ctx instanceof BooleanExpressionParser.ToExpressionContext) {
+            return mapToExpressionContext((BooleanExpressionParser.ToExpressionContext) ctx);
+        } else if (ctx instanceof BooleanExpressionParser.TypesExpressionContext && ((BooleanExpressionParser.TypesExpressionContext) ctx).start.getType() == BooleanExpressionLexer.FIELD) {
+            return mapTypesExpressionContextField((BooleanExpressionParser.TypesExpressionContext) ctx);
+        } else if (ctx instanceof BooleanExpressionParser.TypesExpressionContext) {
+            return mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx);
+        } else {
+            log.error("Array does not support this expression {}", ctx.getText());
+            throw new InvalidExpressionException();
+        }
+    }
+
+    private FieldNode mapTypesExpressionContextField(BooleanExpressionParser.TypesExpressionContext ctx) {
+        return new FieldNode(ctx.getText());
+    }
+
+    private Node mapTypesExpressionContext(BooleanExpressionParser.TypesExpressionContext ctx) {
+        if (ctx.start.getType() == BooleanExpressionLexer.FIELD) {
+            return mapTypesExpressionContextField(ctx);
+        }
+        final DataType dataType = getDataType(ctx.start);
+        final Object value = ValueUtils.convertValue(ctx.start.getText(), dataType);
+        return new UnaryNode(dataType, value);
+    }
+
+    private ArithmeticFunctionNode mapArithmeticFunctionExpressionContext(BooleanExpressionParser.ArithmeticFunctionExpressionContext ctx) {
         if (ctx.data.exception != null) {
             log.error("Error parsing expression for the string {}", ctx.getText());
             throw new InvalidExpressionException();
@@ -151,48 +150,68 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
             log.error("Error parsing expression for the string {}", ctx.getText());
             return new InvalidExpressionException();
         });
-        final List<ArithmeticLeafNode> items = getArithmeticArrayElements(ctx.data.children);
-        currentNodes.add(new ArithmeticFunctionNode(functionType, items));
-        super.exitArithmeticFunctionExpression(ctx);
+        final List<Node> items = getArrayElements(ctx.data.children);
+        return new ArithmeticFunctionNode(functionType, items);
     }
 
-    @Override
-    public void exitInExpression(BooleanExpressionParser.InExpressionContext ctx) {
+    private ComparisonNode mapComparatorExpressionContext(BooleanExpressionParser.ComparatorExpressionContext ctx) {
+        final String variableName = getField(ctx.left.getText());
+        final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
+        if (!(ctx.right instanceof BooleanExpressionParser.TypesExpressionContext) && !currentNodes.isEmpty()) {
+            final Node value = currentNodes.pop();
+            return new ComparisonNode(variableName, value, operator, DataType.INTEGER);
+        } else {
+            final DataType dataType = getDataType(ctx.right.getStart());
+            final Node value = mapContextToNode(ctx.right);
+            return new ComparisonNode(variableName, value, operator, dataType);
+        }
+    }
+
+    private ArithmeticNode mapArithmeticExpressionContext(BooleanExpressionParser.ArithmeticExpressionContext ctx) {
+        final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
+        if (ctx.left instanceof BooleanExpressionParser.TypesExpressionContext && ctx.right instanceof BooleanExpressionParser.TypesExpressionContext) {
+            final Node left = mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx.left);
+            final Node right = mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx.right);
+            return ArithmeticNode.builder().left(left).right(right).operator(operator).build();
+        } else if (ctx.left instanceof BooleanExpressionParser.TypesExpressionContext) {
+            final Node left = mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx.left);
+            final Node right = currentNodes.pop();
+            return ArithmeticNode.builder().left(left).right(right).operator(operator).build();
+        } else if (ctx.right instanceof BooleanExpressionParser.TypesExpressionContext) {
+            final Node right = mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx.right);
+            final Node left = currentNodes.pop();
+            return ArithmeticNode.builder().left(left).right(right).operator(operator).build();
+        } else {
+            if (currentNodes.size() < 2) {
+                log.error("Error parsing expression for the string {}", ctx.getText());
+                throw new InvalidExpressionException();
+            }
+            final Node right = currentNodes.pop();
+            final Node left = currentNodes.pop();
+            return ArithmeticNode.builder().left(left).right(right).operator(operator).build();
+        }
+    }
+
+    private Node mapInExpressionContext(BooleanExpressionParser.InExpressionContext ctx) {
         validateField(ctx.field, ctx.getText());
         final String field = getField(ctx.field.getText());
-        final List<Pair<DataType, Object>> items = getArrayElements(ctx.data.children);
+        final List<Node> items = getArrayElements(ctx.data.children);
         final InNode inNode = new InNode(field, items);
         if (Objects.isNull(ctx.not)) {
-            currentNodes.add(inNode);
+            return inNode;
         } else {
-            final BooleanNode booleanNode = new BooleanNode(inNode, null, LogicalOperationType.NOT);
-            currentNodes.add(booleanNode);
+            return new BooleanNode(inNode, null, LogicalOperationType.NOT);
         }
-        super.exitInExpression(ctx);
     }
 
-    private List<Pair<DataType, Object>> getArrayElements(final List<ParseTree> trees) {
-        return trees
-                .stream()
-                .filter(child -> child instanceof BooleanExpressionParser.TypesContext)
-                .map(child -> {
-                    final DataType dataType = getDataType(((BooleanExpressionParser.TypesContext) child).start);
-                    final Object value = ValueUtils.convertValue(child.getText(), dataType);
-                    return Pair.of(dataType, value);
-                })
-                .collect(Collectors.toList());
-    }
-
-    private List<ArithmeticLeafNode> getArithmeticArrayElements(final List<ParseTree> trees) {
-        return trees
-                .stream()
-                .filter(child -> child instanceof BooleanExpressionParser.TypesContext)
-                .map(child -> {
-                    final DataType dataType = getDataType(((BooleanExpressionParser.TypesContext) child).start);
-                    final Object value = ValueUtils.convertValue(child.getText(), dataType);
-                    return new ArithmeticLeafNode(value, dataType);
-                })
-                .collect(Collectors.toList());
+    private NumericRangeNode mapToExpressionContext(BooleanExpressionParser.ToExpressionContext ctx) {
+        validateField(ctx.field, ctx.getText());
+        final String field = getField(ctx.field.getText());
+        final DataType lowerDataType = getDataType(ctx.lower.start);
+        final Object lowerValue = ValueUtils.convertValue(ctx.lower.start.getText(), lowerDataType);
+        final DataType upperDataType = getDataType(ctx.upper.start);
+        final Object upperValue = ValueUtils.convertValue(ctx.upper.getText(), upperDataType);
+        return new NumericRangeNode(field, lowerValue, upperValue, lowerDataType, upperDataType);
     }
 
     private void validateField(final Token token, final String text) {
@@ -235,20 +254,12 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     @Override
     public void exitParse(BooleanExpressionParser.ParseContext ctx) {
-        if (this.node == null && this.currentNodes.size() == 1) {
+        if (this.node == null && !this.currentNodes.isEmpty()) {
             this.node = currentNodes.pop();
-        } else if (this.node == null && this.currentNodes.size() == 2) {
-            final Node firstNode = currentNodes.pop();
-            final Node secondNode = currentNodes.pop();
-            if (firstNode instanceof ArithmeticNode && secondNode instanceof ArithmeticUnaryNode) {
-                this.node = ArithmeticUnaryNode.builder().operand(firstNode).build();
-            }
-            if (secondNode instanceof ArithmeticNode && firstNode instanceof ArithmeticUnaryNode) {
-                this.node = ArithmeticUnaryNode.builder().operand(secondNode).build();
-            }
         }
         if (this.node == null && tokenCount == 1 && lastToken instanceof CommonToken) {
-            this.node = StringNode.builder().field(ValueUtils.convertValue(lastToken.getText(), DataType.STRING).toString()).build();
+            this.node = lastToken.getType() == BooleanExpressionLexer.FIELD ? FieldNode.builder().field(lastToken.getText()).build() : UnaryNode
+                    .builder().dataType(DataType.STRING).value(ValueUtils.convertValue(lastToken.getText(), DataType.STRING).toString()).build();
         }
         if (this.node == null) {
             log.error("Error parsing expression for the string {}", ctx.getText());

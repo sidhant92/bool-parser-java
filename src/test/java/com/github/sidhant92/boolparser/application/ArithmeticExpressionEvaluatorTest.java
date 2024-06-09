@@ -397,4 +397,22 @@ public class ArithmeticExpressionEvaluatorTest {
         assertTrue(resultOptional.isSuccess());
         assertEquals(resultOptional.get(), 4);
     }
+
+    @Test
+    public void testNestedFunctions() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 2.7);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("max(1,2,min(5,7,87))", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 5);
+    }
+
+    @Test
+    public void testNestedFunctions1() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 2.7);
+        final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("max(1,2,min(5,7,87,min(1,2)))", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), 2);
+    }
 }

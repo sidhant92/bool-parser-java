@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import com.github.sidhant92.boolparser.domain.Node;
+import com.github.sidhant92.boolparser.domain.logical.Node;
 import com.github.sidhant92.boolparser.operator.OperatorFactory;
 import com.github.sidhant92.boolparser.parser.BoolExpressionParser;
 import io.vavr.control.Try;

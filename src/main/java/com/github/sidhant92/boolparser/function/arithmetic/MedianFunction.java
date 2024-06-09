@@ -8,6 +8,7 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.FunctionType;
+import com.github.sidhant92.boolparser.domain.EvaluatedNode;
 import com.github.sidhant92.boolparser.util.ValueUtils;
 
 /**
@@ -22,9 +23,9 @@ public class MedianFunction extends AbstractFunction {
     }
 
     @Override
-    public Object evaluate(final List<Pair<Object, DataType>> items) {
+    public Object evaluate(final List<EvaluatedNode> items) {
         final double res = median.evaluate(items
-                                                   .stream().mapToDouble(a -> Double.parseDouble(a.getKey().toString())).toArray());
+                                                   .stream().mapToDouble(a -> Double.parseDouble(a.getValue().toString())).toArray());
         return ValueUtils.caseDouble(res);
     }
 
