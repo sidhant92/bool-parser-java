@@ -1,5 +1,6 @@
 package com.github.sidhant92.boolparser.datatype;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import com.github.sidhant92.boolparser.constant.DataType;
 
@@ -22,7 +23,8 @@ public class LongDataType extends AbstractDataType<Long> {
         boolean isValid = super.defaultIsValid(value);
         if (!isValid) {
             try {
-                Long.parseLong(value.toString());
+                BigDecimal number = new BigDecimal(value.toString());
+                Long.parseLong(number.stripTrailingZeros().toPlainString());
                 return true;
             } catch (Exception ex) {
                 return false;
@@ -46,7 +48,8 @@ public class LongDataType extends AbstractDataType<Long> {
             return result;
         }
         try {
-            return Optional.of(Long.parseLong(value.toString()));
+            BigDecimal number = new BigDecimal(value.toString());
+            return Optional.of(Long.parseLong(number.stripTrailingZeros().toPlainString()));
         } catch (final Exception ignored) {
         }
         return Optional.empty();
