@@ -19,13 +19,11 @@ import com.github.sidhant92.boolparser.operator.OperatorService;
 import com.github.sidhant92.boolparser.parser.BoolExpressionParser;
 import com.github.sidhant92.boolparser.util.ValueUtils;
 import io.vavr.control.Try;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sidhant.aggarwal
  * @since 15/03/2024
  */
-@Slf4j
 public class ArithmeticExpressionEvaluator {
     private final BoolExpressionParser boolExpressionParser;
 
@@ -59,14 +57,13 @@ public class ArithmeticExpressionEvaluator {
             case FIELD:
                 return evaluateFieldToken((FieldNode) node, data);
             default:
-                log.error("unsupported token {}", node.getTokenType());
-                throw new UnsupportedToken();
+                throw new UnsupportedToken(node.getTokenType().name());
         }
     }
 
     private Object evaluateFieldToken(final FieldNode fieldNode, final Map<String, Object> data) {
         if (!data.containsKey(fieldNode.getField())) {
-            throw new DataNotFoundException();
+            throw new DataNotFoundException(fieldNode.getField());
         }
         return data.get(fieldNode.getField());
     }

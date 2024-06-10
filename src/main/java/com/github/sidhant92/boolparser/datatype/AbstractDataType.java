@@ -2,13 +2,11 @@ package com.github.sidhant92.boolparser.datatype;
 
 import java.util.Optional;
 import com.github.sidhant92.boolparser.constant.DataType;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sidhant.aggarwal
  * @since 05/03/2023
  */
-@Slf4j
 public abstract class AbstractDataType<T extends Comparable<? super T>> {
     private final Class<T> clazz;
 

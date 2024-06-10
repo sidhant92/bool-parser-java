@@ -10,9 +10,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.domain.EvaluatedNode;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class ValueUtils {
     public static Optional<Object> getValueFromMap(final String key, final Map<String, Object> data) {
         final String[] keys = key.split("\\.");
@@ -31,7 +29,6 @@ public class ValueUtils {
                 return Optional.empty();
             }
         }
-        log.error("could not find key {} for the data {}", key, data);
         return Optional.empty();
     }
 
