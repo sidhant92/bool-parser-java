@@ -22,13 +22,11 @@ import com.github.sidhant92.boolparser.operator.OperatorService;
 import com.github.sidhant92.boolparser.parser.BoolExpressionParser;
 import com.github.sidhant92.boolparser.util.ValueUtils;
 import io.vavr.control.Try;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sidhant.aggarwal
  * @since 07/02/2023
  */
-@Slf4j
 public class BooleanExpressionEvaluator {
     private final BoolExpressionParser boolExpressionParser;
 
@@ -71,7 +69,8 @@ public class BooleanExpressionEvaluator {
     }
 
     private boolean evaluateComparisonToken(final ComparisonNode comparisonToken, final Map<String, Object> data) {
-        final Object fieldData = ValueUtils.getValueFromMap(comparisonToken.getField(), data).orElseThrow(DataNotFoundException::new);
+        final Object fieldData = ValueUtils.getValueFromMap(comparisonToken.getField(), data)
+                                           .orElseThrow(() -> new DataNotFoundException(comparisonToken.getField()));
         final Object value = comparisonToken.getValue() instanceof ArithmeticBaseNode ? arithmeticExpressionEvaluator.evaluate(
                 comparisonToken.getValue(), data) : comparisonToken.getValue();
         return operatorService.evaluateLogicalOperator(comparisonToken.getOperator(), ContainerDataType.PRIMITIVE, comparisonToken.getDataType(),
@@ -79,14 +78,16 @@ public class BooleanExpressionEvaluator {
     }
 
     private boolean evaluateNumericRangeToken(final NumericRangeNode numericRangeToken, final Map<String, Object> data) {
-        final Object fieldData = ValueUtils.getValueFromMap(numericRangeToken.getField(), data).orElseThrow(DataNotFoundException::new);
+        final Object fieldData = ValueUtils.getValueFromMap(numericRangeToken.getField(), data)
+                                           .orElseThrow(() -> new DataNotFoundException(numericRangeToken.getField()));
         return operatorService.evaluateLogicalOperator(Operator.GREATER_THAN_EQUAL, ContainerDataType.PRIMITIVE, numericRangeToken.getFromDataType(),
                                                        fieldData, numericRangeToken.getFromValue()) && operatorService.evaluateLogicalOperator(
                 Operator.LESS_THAN_EQUAL, ContainerDataType.PRIMITIVE, numericRangeToken.getToDataType(), fieldData, numericRangeToken.getToValue());
     }
 
     private boolean evaluateInToken(final InNode inToken, final Map<String, Object> data) {
-        final Object fieldData = ValueUtils.getValueFromMap(inToken.getField(), data).orElseThrow(DataNotFoundException::new);
+        final Object fieldData = ValueUtils.getValueFromMap(inToken.getField(), data)
+                                           .orElseThrow(() -> new DataNotFoundException(inToken.getField()));
         final List<EvaluatedNode> items = resolveArrayElements(inToken.getItems(), data);
         final DataType dataType = ValueUtils.getDataType(fieldData);
         final Object[] values = items
@@ -109,7 +110,8 @@ public class BooleanExpressionEvaluator {
     }
 
     private boolean evaluateArrayToken(final ArrayNode arrayNode, final Map<String, Object> data) {
-        final Object fieldData = ValueUtils.getValueFromMap(arrayNode.getField(), data).orElseThrow(DataNotFoundException::new);
+        final Object fieldData = ValueUtils.getValueFromMap(arrayNode.getField(), data)
+                                           .orElseThrow(() -> new DataNotFoundException(arrayNode.getField()));
         final List<EvaluatedNode> items = resolveArrayElements(arrayNode.getItems(), data);
         if (items
                 .stream()
@@ -127,7 +129,8 @@ public class BooleanExpressionEvaluator {
         if (unaryToken.getDataType().equals(DataType.BOOLEAN)) {
             return (boolean) unaryToken.getValue();
         }
-        final Object fieldData = ValueUtils.getValueFromMap(unaryToken.getValue().toString(), data).orElseThrow(DataNotFoundException::new);
+        final Object fieldData = ValueUtils.getValueFromMap(unaryToken.getValue().toString(), data)
+                                           .orElseThrow(() -> new DataNotFoundException(unaryToken.getValue().toString()));
         if (!(fieldData instanceof Boolean)) {
             throw new InvalidUnaryOperand();
         }

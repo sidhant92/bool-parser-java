@@ -25,9 +25,7 @@ import com.github.sidhant92.boolparser.domain.logical.ComparisonNode;
 import com.github.sidhant92.boolparser.domain.arithmetic.UnaryNode;
 import com.github.sidhant92.boolparser.exception.InvalidExpressionException;
 import com.github.sidhant92.boolparser.util.ValueUtils;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 public class BooleanFilterListener extends BooleanExpressionBaseListener {
     private Node node;
 
@@ -37,7 +35,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     private int tokenCount;
 
-    private String defaultField;
+    private final String defaultField;
 
     public BooleanFilterListener(final String defaultField) {
         this.defaultField = defaultField;
@@ -123,8 +121,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
         } else if (ctx instanceof BooleanExpressionParser.TypesExpressionContext) {
             return mapTypesExpressionContext((BooleanExpressionParser.TypesExpressionContext) ctx);
         } else {
-            log.error("Array does not support this expression {}", ctx.getText());
-            throw new InvalidExpressionException();
+            throw new InvalidExpressionException(String.format("Array does not support this expression %s", ctx.getText()));
         }
     }
 
@@ -143,12 +140,10 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     private ArithmeticFunctionNode mapArithmeticFunctionExpressionContext(BooleanExpressionParser.ArithmeticFunctionExpressionContext ctx) {
         if (ctx.data.exception != null) {
-            log.error("Error parsing expression for the string {}", ctx.getText());
-            throw new InvalidExpressionException();
+            throw new InvalidExpressionException(String.format("Error parsing expression for the string %s", ctx.getText()));
         }
         final FunctionType functionType = FunctionType.getArrayFunctionFromSymbol(ctx.left.getText()).orElseThrow(() -> {
-            log.error("Error parsing expression for the string {}", ctx.getText());
-            return new InvalidExpressionException();
+            return new InvalidExpressionException(String.format("Error parsing expression for the string %s", ctx.getText()));
         });
         final List<Node> items = getArrayElements(ctx.data.children);
         return new ArithmeticFunctionNode(functionType, items);
@@ -183,8 +178,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
             return ArithmeticNode.builder().left(left).right(right).operator(operator).build();
         } else {
             if (currentNodes.size() < 2) {
-                log.error("Error parsing expression for the string {}", ctx.getText());
-                throw new InvalidExpressionException();
+                throw new InvalidExpressionException(String.format("Error parsing expression for the string %s", ctx.getText()));
             }
             final Node right = currentNodes.pop();
             final Node left = currentNodes.pop();
@@ -216,8 +210,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     private void validateField(final Token token, final String text) {
         if (Objects.isNull(token) || (StringUtils.isBlank(token.getText()) && StringUtils.isBlank(this.defaultField))) {
-            log.error("Error parsing expression (missing field) for the string {}", text);
-            throw new InvalidExpressionException();
+            throw new InvalidExpressionException(String.format("Error parsing expression (missing field) for the string %s", text));
         }
     }
 
@@ -262,8 +255,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
                     .builder().dataType(DataType.STRING).value(ValueUtils.convertValue(lastToken.getText(), DataType.STRING).toString()).build();
         }
         if (this.node == null) {
-            log.error("Error parsing expression for the string {}", ctx.getText());
-            throw new InvalidExpressionException();
+            throw new InvalidExpressionException(String.format("Error parsing expression for the string %s", ctx.getText()));
         }
         super.exitParse(ctx);
     }
@@ -272,8 +264,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     public void exitNotExpression(BooleanExpressionParser.NotExpressionContext ctx) {
         if (currentNodes.isEmpty()) {
             if (lastToken == null) {
-                log.error("Error parsing not expression for the string {}", ctx.getText());
-                throw new InvalidExpressionException();
+                throw new InvalidExpressionException(String.format("Error parsing not expression for the string %s", ctx.getText()));
             }
             final DataType dataType = getDataType(lastToken);
             final Object value = ValueUtils.convertValue(lastToken.getText(), dataType);
@@ -293,8 +284,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     @Override
     public void exitBinaryExpression(BooleanExpressionParser.BinaryExpressionContext ctx) {
         if (currentNodes.size() < 2) {
-            log.error("Error parsing binary expression for the string {}", ctx.getText());
-            throw new InvalidExpressionException();
+            throw new InvalidExpressionException(String.format("Error parsing binary expression for the string %s", ctx.getText()));
         }
         final Node firstNode = currentNodes.pop();
         final Node secondNode = currentNodes.pop();

@@ -10,13 +10,11 @@ import com.github.sidhant92.boolparser.exception.InvalidContainerTypeException;
 import com.github.sidhant92.boolparser.exception.InvalidDataType;
 import com.github.sidhant92.boolparser.exception.InvalidExpressionException;
 import com.github.sidhant92.boolparser.function.arithmetic.AbstractFunction;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author sidhant.aggarwal
  * @since 21/05/2024
  */
-@Slf4j
 public class FunctionEvaluatorService {
     public FunctionEvaluatorService() {
         FunctionFactory.initialize();
@@ -25,25 +23,23 @@ public class FunctionEvaluatorService {
     public Object evaluateArithmeticFunction(final FunctionType functionType, final List<EvaluatedNode> items) {
         final AbstractFunction abstractFunction = FunctionFactory.getArithmeticFunction(functionType);
         if (items.isEmpty()) {
-            log.error("Empty items not allowed");
-            throw new InvalidExpressionException();
+            throw new InvalidExpressionException("Empty items not allowed");
         }
         final ContainerDataType containerDataType = items.size() > 1 ? ContainerDataType.LIST : ContainerDataType.PRIMITIVE;
         if (!abstractFunction.getAllowedContainerTypes().contains(containerDataType)) {
-            log.error("Invalid container type {} for function {}", containerDataType, functionType.name());
-            throw new InvalidContainerTypeException();
+            throw new InvalidContainerTypeException(
+                    String.format("Invalid container type %s for function %s", containerDataType, functionType.name()));
         }
         final boolean validDataType = items
                 .stream().allMatch(item -> abstractFunction.getAllowedDataTypes().contains(item.getDataType()));
         if (!validDataType) {
-            log.error("Invalid data type {} for function {}", items, functionType.name());
-            throw new InvalidDataType();
+            throw new InvalidDataType(String.format("Invalid data type for function %s", functionType.name()));
         }
 
         items.forEach(item -> {
             if (!ContainerDataType.PRIMITIVE.isValid(item.getDataType(), item.getValue())) {
-                log.error("Validation failed for the function {} for the operand {}", functionType.name(), item.getValue());
-                throw new InvalidDataType();
+                throw new InvalidDataType(
+                        String.format("Validation failed for the function %s for the operand %s", functionType.name(), item.getValue()));
             }
         });
         return abstractFunction.evaluate(items);

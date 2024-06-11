@@ -1,8 +1,10 @@
 package com.github.sidhant92.boolparser.exception;
 
 public class UnsupportedToken extends RuntimeException {
-    public UnsupportedToken(final String message) {
-        super(message);
+    private static final String MESSAGE = "Unsupported Token";
+
+    public UnsupportedToken(final String token) {
+        super(String.format(MESSAGE + " %s", token));
     }
 
     public UnsupportedToken() {
@@ -11,6 +13,6 @@ public class UnsupportedToken extends RuntimeException {
 
     @Override
     public String getMessage() {
-        return "Unsupported Token";
+        return MESSAGE;
     }
 }
