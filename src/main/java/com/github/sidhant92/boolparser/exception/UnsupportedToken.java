@@ -10,9 +10,4 @@ public class UnsupportedToken extends RuntimeException {
     public UnsupportedToken() {
         super();
     }
-
-    @Override
-    public String getMessage() {
-        return MESSAGE;
-    }
 }

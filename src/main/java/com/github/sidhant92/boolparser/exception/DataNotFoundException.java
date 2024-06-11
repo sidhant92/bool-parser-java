@@ -6,9 +6,4 @@ public class DataNotFoundException extends RuntimeException {
     public DataNotFoundException(final String key) {
         super(String.format(MESSAGE + " for the key %s", key));
     }
-
-    @Override
-    public String getMessage() {
-        return MESSAGE;
-    }
 }
