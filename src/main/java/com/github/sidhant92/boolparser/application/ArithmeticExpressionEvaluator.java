@@ -2,6 +2,7 @@ package com.github.sidhant92.boolparser.application;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
@@ -62,10 +63,11 @@ public class ArithmeticExpressionEvaluator {
     }
 
     private Object evaluateFieldToken(final FieldNode fieldNode, final Map<String, Object> data) {
-        if (!data.containsKey(fieldNode.getField())) {
+        final Optional<Object> value = ValueUtils.getValueFromMap(fieldNode.getField(), data);
+        if (!value.isPresent()) {
             throw new DataNotFoundException(fieldNode.getField());
         }
-        return data.get(fieldNode.getField());
+        return value.get();
     }
 
     private Object evaluateUnaryToken(final UnaryNode unaryNode, final Map<String, Object> data) {
