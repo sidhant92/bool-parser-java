@@ -2,10 +2,12 @@ package com.github.sidhant92.boolparser.application;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
+import com.github.sidhant92.boolparser.domain.FieldNode;
 import com.github.sidhant92.boolparser.domain.logical.ArrayNode;
 import com.github.sidhant92.boolparser.domain.logical.BooleanNode;
 import com.github.sidhant92.boolparser.domain.EvaluatedNode;
@@ -69,9 +71,11 @@ public class BooleanExpressionEvaluator {
     }
 
     private boolean evaluateComparisonToken(final ComparisonNode comparisonToken, final Map<String, Object> data) {
-        final Object fieldData = ValueUtils.getValueFromMap(comparisonToken.getField(), data)
-                                           .orElseThrow(() -> new DataNotFoundException(comparisonToken.getField()));
-        final Object value = comparisonToken.getValue() instanceof ArithmeticBaseNode ? arithmeticExpressionEvaluator.evaluate(
+        final Optional<Object> fieldDataOptional = ValueUtils.getValueFromMap(comparisonToken.getField(), data);
+
+        final Object fieldData = comparisonToken.isNullCheck() ? fieldDataOptional.orElse("null") : fieldDataOptional.orElseThrow(
+                () -> new DataNotFoundException(comparisonToken.getField()));
+        final Object value = comparisonToken.isNullCheck() ? "null" : comparisonToken.getValue() instanceof ArithmeticBaseNode ? arithmeticExpressionEvaluator.evaluate(
                 comparisonToken.getValue(), data) : comparisonToken.getValue();
         return operatorService.evaluateLogicalOperator(comparisonToken.getOperator(), ContainerDataType.PRIMITIVE, comparisonToken.getDataType(),
                                                        fieldData, value);

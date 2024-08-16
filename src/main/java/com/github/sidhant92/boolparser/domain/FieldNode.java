@@ -18,4 +18,8 @@ public class FieldNode extends ArithmeticBaseNode {
     public NodeType getTokenType() {
         return NodeType.FIELD;
     }
+
+    public boolean isNull() {
+        return this.field.equalsIgnoreCase("null");
+    }
 }

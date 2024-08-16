@@ -586,4 +586,40 @@ public class BooleanExpressionEvaluatorTest {
         assertTrue(booleanOptional.isSuccess());
         assertFalse(booleanOptional.get());
     }
+
+    @Test
+    public void testNullCheck() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 2.7);
+        final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("b = null", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), true);
+    }
+
+    @Test
+    public void testNullCheck1() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 2.7);
+        final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("a = null", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), false);
+    }
+
+    @Test
+    public void testNotNullCheck() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 2.7);
+        final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("a != null", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), true);
+    }
+
+    @Test
+    public void testBooleanNullCheck() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 3);
+        final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("b = null && a > 2", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), true);
+    }
 }

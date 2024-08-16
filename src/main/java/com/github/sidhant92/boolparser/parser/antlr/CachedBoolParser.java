@@ -1,5 +1,6 @@
 package com.github.sidhant92.boolparser.parser.antlr;
 
+import java.util.Optional;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.sidhant92.boolparser.domain.logical.Node;
@@ -25,6 +26,7 @@ public class CachedBoolParser extends BoolParser {
     }
 
     private Node getNode(final String expression, final String defaultField) {
-        return cache.get(expression, ex -> super.parse(ex, defaultField));
+        final String cacheKey = expression + "_" + Optional.ofNullable(defaultField).orElse("");
+        return cache.get(cacheKey, ex -> super.parse(ex, defaultField));
     }
 }
