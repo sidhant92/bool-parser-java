@@ -27,6 +27,6 @@ public class CachedBoolParser extends BoolParser {
 
     private Node getNode(final String expression, final String defaultField) {
         final String cacheKey = expression + "_" + Optional.ofNullable(defaultField).orElse("");
-        return cache.get(cacheKey, ex -> super.parse(ex, defaultField));
+        return cache.get(cacheKey, ex -> super.parse(expression, defaultField));
     }
 }
