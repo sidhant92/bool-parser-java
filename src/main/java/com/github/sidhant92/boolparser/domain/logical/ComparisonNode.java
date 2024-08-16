@@ -3,6 +3,7 @@ package com.github.sidhant92.boolparser.domain.logical;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.NodeType;
 import com.github.sidhant92.boolparser.constant.Operator;
+import com.github.sidhant92.boolparser.domain.FieldNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,5 +29,9 @@ public class ComparisonNode extends Node {
     @Override
     public NodeType getTokenType() {
         return NodeType.COMPARISON;
+    }
+
+    public boolean isNullCheck() {
+        return Operator.getEqualityOperators().contains(this.operator) && this.value instanceof FieldNode && ((FieldNode) this.value).isNull();
     }
 }

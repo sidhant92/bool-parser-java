@@ -1,5 +1,7 @@
 package com.github.sidhant92.boolparser.constant;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import com.github.sidhant92.boolparser.operator.logical.AbstractOperator;
 import com.github.sidhant92.boolparser.operator.OperatorFactory;
@@ -48,5 +50,9 @@ public enum Operator {
                 .filter(op -> op.getSymbol().toLowerCase().equals(symbolLowerCase))
                 .map(com.github.sidhant92.boolparser.operator.arithmetic.AbstractOperator::getOperator)
                 .findFirst();
+    }
+
+    public static List<Operator> getEqualityOperators() {
+        return Arrays.asList(EQUALS, NOT_EQUAL);
     }
 }
