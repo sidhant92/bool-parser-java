@@ -62,7 +62,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     @Override
     public void exitUnaryArithmeticExpression(BooleanExpressionParser.UnaryArithmeticExpressionContext ctx) {
-        final Node leafNode = !currentNodes.isEmpty() ? currentNodes.pop() : mapTypesExpressionContext(
+        final Node leafNode = !currentNodes.isEmpty() && currentNodes.peek() instanceof ArithmeticNode ? currentNodes.pop() : mapTypesExpressionContext(
                 (BooleanExpressionParser.TypesExpressionContext) ctx.exp);
         currentNodes.add(ArithmeticNode.builder().left(leafNode).operator(Operator.UNARY).build());
         super.enterUnaryArithmeticExpression(ctx);

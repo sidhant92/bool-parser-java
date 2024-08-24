@@ -588,6 +588,15 @@ public class BooleanExpressionEvaluatorTest {
     }
 
     @Test
+    public void testNegativeComparison() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", -6);
+        final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("a > -10 AND a < -2", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), true);
+    }
+
+    @Test
     public void testNullCheck() {
         final Map<String, Object> data = new HashMap<>();
         data.put("a", 2.7);
