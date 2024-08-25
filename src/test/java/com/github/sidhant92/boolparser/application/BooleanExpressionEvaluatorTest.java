@@ -167,6 +167,15 @@ public class BooleanExpressionEvaluatorTest {
     }
 
     @Test
+    public void testDifferentDataTypesComparison() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("age", 26.6);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age > 20", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
     public void testNumericGreaterThanEqualCorrectExpression() {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", 24);
