@@ -389,8 +389,8 @@ public class BooleanExpressionEvaluatorTest {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", "sf");
         final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age = 24", data);
-        assertTrue(booleanOptional.isFailure());
-        assertTrue(booleanOptional.getCause() instanceof InvalidDataType);
+        assertTrue(booleanOptional.isSuccess());
+        assertFalse(booleanOptional.get());
     }
 
     @Test

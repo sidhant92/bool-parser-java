@@ -65,7 +65,7 @@ public class ValueUtils {
             case BOOLEAN:
                 return Boolean.parseBoolean(value);
             case VERSION:
-                new ComparableVersion(value);
+                return new ComparableVersion(value);
             default:
                 if (value.startsWith("'") && value.endsWith("'")) {
                     return value.substring(1, value.length() - 1);
@@ -109,6 +109,9 @@ public class ValueUtils {
         }
         if (value instanceof Long) {
             return DataType.LONG;
+        }
+        if (value instanceof ComparableVersion) {
+            return DataType.VERSION;
         }
         return DataType.STRING;
     }

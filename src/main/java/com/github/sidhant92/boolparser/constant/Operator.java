@@ -3,7 +3,7 @@ package com.github.sidhant92.boolparser.constant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import com.github.sidhant92.boolparser.operator.logical.AbstractOperator;
+import com.github.sidhant92.boolparser.operator.comparison.AbstractOperator;
 import com.github.sidhant92.boolparser.operator.OperatorFactory;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
