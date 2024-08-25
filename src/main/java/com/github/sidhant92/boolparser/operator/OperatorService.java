@@ -33,6 +33,11 @@ public class OperatorService {
         if (!containerDataType.isValid(leftOperandDataType, leftOperand)) {
             throw new InvalidDataType(String.format("Validation failed for the operator %s for the operand %s", operator, leftOperand));
         }
+        rightOperands.forEach(rightOperand -> {
+            if (!abstractOperator.getAllowedDataTypes().contains(rightOperand.getRight())) {
+                throw new InvalidDataType(String.format("Invalid right operand data type %s for operator %s", rightOperand.getRight(), operator));
+            }
+        });
         return OperatorFactory.getLogicalOperator(operator).evaluate(containerDataType, leftOperand, leftOperandDataType, rightOperands);
     }
 
