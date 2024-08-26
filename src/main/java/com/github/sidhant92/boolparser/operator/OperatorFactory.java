@@ -12,16 +12,16 @@ import com.github.sidhant92.boolparser.operator.arithmetic.ModulusOperator;
 import com.github.sidhant92.boolparser.operator.arithmetic.MultiplyOperator;
 import com.github.sidhant92.boolparser.operator.arithmetic.SubtractOperator;
 import com.github.sidhant92.boolparser.operator.arithmetic.UnaryOperator;
-import com.github.sidhant92.boolparser.operator.logical.AbstractOperator;
-import com.github.sidhant92.boolparser.operator.logical.ContainsAllOperator;
-import com.github.sidhant92.boolparser.operator.logical.ContainsAnyOperator;
-import com.github.sidhant92.boolparser.operator.logical.EqualsOperator;
-import com.github.sidhant92.boolparser.operator.logical.GreaterThanEqualOperator;
-import com.github.sidhant92.boolparser.operator.logical.GreaterThanOperator;
-import com.github.sidhant92.boolparser.operator.logical.InOperator;
-import com.github.sidhant92.boolparser.operator.logical.LessThanEqualOperator;
-import com.github.sidhant92.boolparser.operator.logical.LessThanOperator;
-import com.github.sidhant92.boolparser.operator.logical.NotEqualsOperator;
+import com.github.sidhant92.boolparser.operator.comparison.AbstractOperator;
+import com.github.sidhant92.boolparser.operator.comparison.ContainsAllOperator;
+import com.github.sidhant92.boolparser.operator.comparison.ContainsAnyOperator;
+import com.github.sidhant92.boolparser.operator.comparison.EqualsOperator;
+import com.github.sidhant92.boolparser.operator.comparison.GreaterThanEqualOperator;
+import com.github.sidhant92.boolparser.operator.comparison.GreaterThanOperator;
+import com.github.sidhant92.boolparser.operator.comparison.InOperator;
+import com.github.sidhant92.boolparser.operator.comparison.LessThanEqualOperator;
+import com.github.sidhant92.boolparser.operator.comparison.LessThanOperator;
+import com.github.sidhant92.boolparser.operator.comparison.NotEqualsOperator;
 
 /**
  * @author sidhant.aggarwal

@@ -1,13 +1,15 @@
 package com.github.sidhant92.boolparser.operator;
 
+import java.util.List;
 import java.util.Objects;
+import org.apache.commons.lang3.tuple.Pair;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
 import com.github.sidhant92.boolparser.datatype.DataTypeFactory;
 import com.github.sidhant92.boolparser.exception.InvalidContainerTypeException;
 import com.github.sidhant92.boolparser.exception.InvalidDataType;
-import com.github.sidhant92.boolparser.operator.logical.AbstractOperator;
+import com.github.sidhant92.boolparser.operator.comparison.AbstractOperator;
 
 /**
  * @author sidhant.aggarwal
@@ -19,19 +21,24 @@ public class OperatorService {
         OperatorFactory.initialize();
     }
 
-    public boolean evaluateLogicalOperator(final Operator operator, final ContainerDataType containerDataType, final DataType dataType,
-                                           final Object leftOperand, final Object... rightOperands) {
+    public boolean evaluateLogicalOperator(final Operator operator, final ContainerDataType containerDataType, final Object leftOperand,
+                                           final DataType leftOperandDataType, final List<Pair<Object, DataType>> rightOperands) {
         final AbstractOperator abstractOperator = OperatorFactory.getLogicalOperator(operator);
         if (!abstractOperator.getAllowedContainerTypes().contains(containerDataType)) {
             throw new InvalidContainerTypeException(String.format("Invalid left container type %s for operator %s", containerDataType, operator));
         }
-        if (!abstractOperator.getAllowedDataTypes().contains(dataType)) {
-            throw new InvalidDataType(String.format("Invalid left operand data type %s for operator %s", dataType, operator));
+        if (!abstractOperator.getAllowedDataTypes().contains(leftOperandDataType)) {
+            throw new InvalidDataType(String.format("Invalid left operand data type %s for operator %s", leftOperandDataType, operator));
         }
-        if (!containerDataType.isValid(dataType, leftOperand)) {
+        if (!containerDataType.isValid(leftOperandDataType, leftOperand)) {
             throw new InvalidDataType(String.format("Validation failed for the operator %s for the operand %s", operator, leftOperand));
         }
-        return OperatorFactory.getLogicalOperator(operator).evaluate(containerDataType, dataType, leftOperand, rightOperands);
+        rightOperands.forEach(rightOperand -> {
+            if (!abstractOperator.getAllowedDataTypes().contains(rightOperand.getRight())) {
+                throw new InvalidDataType(String.format("Invalid right operand data type %s for operator %s", rightOperand.getRight(), operator));
+            }
+        });
+        return OperatorFactory.getLogicalOperator(operator).evaluate(containerDataType, leftOperand, leftOperandDataType, rightOperands);
     }
 
     public Object evaluateArithmeticOperator(final Object leftOperand, final DataType leftDataType, final Object rightOperand,
