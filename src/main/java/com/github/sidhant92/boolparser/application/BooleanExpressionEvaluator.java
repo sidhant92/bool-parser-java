@@ -81,18 +81,23 @@ public class BooleanExpressionEvaluator {
                 comparisonToken.getValue(), data) : comparisonToken.getValue();
         final DataType dataType = ValueUtils.getDataType(value);
         final DataType fieldDataType = ValueUtils.getDataType(fieldData);
-        return operatorService.evaluateLogicalOperator(comparisonToken.getOperator(), ContainerDataType.PRIMITIVE, fieldData,
-                                                       fieldDataType, Collections.singletonList(Pair.of(value, dataType)));
+        return operatorService.evaluateLogicalOperator(comparisonToken.getOperator(), ContainerDataType.PRIMITIVE, fieldData, fieldDataType,
+                                                       Collections.singletonList(Pair.of(value, dataType)));
     }
 
     private boolean evaluateNumericRangeToken(final NumericRangeNode numericRangeToken, final Map<String, Object> data) {
         final Object fieldData = ValueUtils.getValueFromMap(numericRangeToken.getField(), data)
                                            .orElseThrow(() -> new DataNotFoundException(numericRangeToken.getField()));
-        return operatorService.evaluateLogicalOperator(Operator.GREATER_THAN_EQUAL, ContainerDataType.PRIMITIVE, fieldData,
-                                                       numericRangeToken.getFromDataType(), Collections.singletonList(
-                        Pair.of(numericRangeToken.getFromValue(), numericRangeToken.getFromDataType()))) && operatorService.evaluateLogicalOperator(
-                Operator.LESS_THAN_EQUAL, ContainerDataType.PRIMITIVE, fieldData, numericRangeToken.getToDataType(),
-                Collections.singletonList(Pair.of(numericRangeToken.getToValue(), numericRangeToken.getToDataType())));
+        final DataType fieldDataType = ValueUtils.getDataType(fieldData);
+        final List<Pair<Object, DataType>> fromValues = Collections.singletonList(
+                Pair.of(numericRangeToken.getFromValue(), numericRangeToken.getFromDataType()));
+        final List<Pair<Object, DataType>> toValues = Collections.singletonList(
+                Pair.of(numericRangeToken.getToValue(), numericRangeToken.getToDataType()));
+        final boolean leftResult = operatorService.evaluateLogicalOperator(Operator.GREATER_THAN_EQUAL, ContainerDataType.PRIMITIVE, fieldData,
+                                                                           fieldDataType, fromValues);
+        final boolean rightResult = operatorService.evaluateLogicalOperator(Operator.LESS_THAN_EQUAL, ContainerDataType.PRIMITIVE, fieldData,
+                                                                            fieldDataType, toValues);
+        return leftResult && rightResult;
     }
 
     private boolean evaluateInToken(final InNode inToken, final Map<String, Object> data) {
@@ -123,18 +128,18 @@ public class BooleanExpressionEvaluator {
     private boolean evaluateArrayToken(final ArrayNode arrayNode, final Map<String, Object> data) {
         final Object fieldData = ValueUtils.getValueFromMap(arrayNode.getField(), data)
                                            .orElseThrow(() -> new DataNotFoundException(arrayNode.getField()));
+        final DataType fieldDataType = ValueUtils.getDataType(fieldData);
         final List<EvaluatedNode> items = resolveArrayElements(arrayNode.getItems(), data);
         if (items
                 .stream()
                 .map(EvaluatedNode::getDataType).distinct().count() > 1) {
             throw new HeterogeneousArrayException();
         }
-        final DataType dataType = items.get(0).getDataType();
         final List<Pair<Object, DataType>> values = items
                 .stream()
                 .map(item -> Pair.of(item.getValue(), item.getDataType()))
                 .collect(Collectors.toList());
-        return operatorService.evaluateLogicalOperator(arrayNode.getOperator(), ContainerDataType.LIST, fieldData, dataType, values);
+        return operatorService.evaluateLogicalOperator(arrayNode.getOperator(), ContainerDataType.LIST, fieldData, fieldDataType, values);
     }
 
     private boolean evaluateUnaryToken(final UnaryNode unaryToken, final Map<String, Object> data) {
