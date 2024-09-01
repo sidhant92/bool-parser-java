@@ -1,5 +1,6 @@
 package com.github.sidhant92.boolparser.util;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -61,7 +62,7 @@ public class ValueUtils {
             case LONG:
                 return Long.parseLong(value);
             case DECIMAL:
-                return Double.parseDouble(value);
+                return new BigDecimal(value);
             case BOOLEAN:
                 return Boolean.parseBoolean(value);
             case VERSION:
@@ -77,9 +78,23 @@ public class ValueUtils {
         }
     }
 
-    public static Object caseDouble(final double value) {
+    public static Object castDecimal(final double value) {
         if ((int) value == value) {
             return (int) value;
+        }
+        return new BigDecimal(value);
+    }
+
+    public static Object castLong(final long value) {
+        if ((int) value == value) {
+            return (int) value;
+        }
+        return value;
+    }
+
+    public static Object castDecimal(final BigDecimal value) {
+        if (value.signum() == 0 || value.scale() <= 0 || value.stripTrailingZeros().scale() <= 0) {
+            return value.intValueExact();
         }
         return value;
     }
@@ -101,7 +116,7 @@ public class ValueUtils {
         if (value instanceof Boolean) {
             return DataType.BOOLEAN;
         }
-        if (value instanceof Float || value instanceof Double) {
+        if (value instanceof Float || value instanceof Double || value instanceof BigDecimal) {
             return DataType.DECIMAL;
         }
         if (value instanceof Integer) {

@@ -1,13 +1,16 @@
 package com.github.sidhant92.boolparser.function.arithmetic;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.math3.stat.descriptive.rank.Median;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.FunctionType;
+import com.github.sidhant92.boolparser.datatype.DataTypeFactory;
+import com.github.sidhant92.boolparser.datatype.DecimalDataType;
 import com.github.sidhant92.boolparser.domain.EvaluatedNode;
 import com.github.sidhant92.boolparser.util.ValueUtils;
 
@@ -16,17 +19,25 @@ import com.github.sidhant92.boolparser.util.ValueUtils;
  * @since 21/05/2024
  */
 public class MedianFunction extends AbstractFunction {
-    private final Median median;
-
     public MedianFunction() {
-        this.median = new Median();
     }
 
     @Override
     public Object evaluate(final List<EvaluatedNode> items) {
-        final double res = median.evaluate(items
-                                                   .stream().mapToDouble(a -> Double.parseDouble(a.getValue().toString())).toArray());
-        return ValueUtils.caseDouble(res);
+        final DecimalDataType decimalDataType = (DecimalDataType) DataTypeFactory.getDataType(DataType.DECIMAL);
+        final List<BigDecimal> itemsConverted = items
+                .stream()
+                .map(item -> decimalDataType.getValue(item.getValue()))
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        Collections.sort(itemsConverted);
+        if (items.size() % 2 == 0) {
+            final BigDecimal res = itemsConverted.get(items.size() / 2).add(itemsConverted.get(items.size() / 2 - 1))
+                                                 .divide(new BigDecimal("2"), 2, BigDecimal.ROUND_DOWN);
+            return ValueUtils.castDecimal(res);
+        } else {
+            return ValueUtils.castDecimal(itemsConverted.get(items.size() / 2));
+        }
     }
 
     @Override

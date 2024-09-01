@@ -3,6 +3,7 @@ package com.github.sidhant92.boolparser.application;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +61,7 @@ public class ArithmeticExpressionEvaluatorTest {
         final Map<String, Object> data = new HashMap<>();
         final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("5 / 4", data);
         assertTrue(resultOptional.isSuccess());
-        assertEquals(resultOptional.get(), 1.25);
+        assertTrue(((BigDecimal)resultOptional.get()).compareTo(new BigDecimal("1.25")) == 0);
     }
 
     @Test
@@ -268,7 +269,7 @@ public class ArithmeticExpressionEvaluatorTest {
         data.put("a", 10);
         final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("max (1,2,3,4.5)", data);
         assertTrue(resultOptional.isSuccess());
-        assertEquals(resultOptional.get(), 4.5d);
+        assertTrue(((BigDecimal)resultOptional.get()).compareTo(new BigDecimal("4.5")) == 0);
     }
 
     @Test
@@ -286,7 +287,7 @@ public class ArithmeticExpressionEvaluatorTest {
         data.put("a", 10);
         final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("avg (1,2,3,4.5)", data);
         assertTrue(resultOptional.isSuccess());
-        assertEquals(resultOptional.get(), 2.625);
+        assertTrue(((BigDecimal) resultOptional.get()).compareTo(new BigDecimal("2.625")) == 0);
     }
 
     @Test
@@ -304,7 +305,7 @@ public class ArithmeticExpressionEvaluatorTest {
         data.put("a", 10);
         final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("sum (1,2,3,4.5)", data);
         assertTrue(resultOptional.isSuccess());
-        assertEquals(resultOptional.get(), 10.5);
+        assertTrue(((BigDecimal)resultOptional.get()).compareTo(new BigDecimal("10.5")) == 0);
     }
 
     @Test
@@ -322,7 +323,7 @@ public class ArithmeticExpressionEvaluatorTest {
         data.put("a", 10);
         final Try<Object> resultOptional = arithmeticExpressionEvaluator.evaluate("mean (1,2,3,4.5)", data);
         assertTrue(resultOptional.isSuccess());
-        assertEquals(resultOptional.get(), 2.625);
+        assertTrue(((BigDecimal)resultOptional.get()).compareTo(new BigDecimal("2.625")) == 0);
     }
 
     @Test

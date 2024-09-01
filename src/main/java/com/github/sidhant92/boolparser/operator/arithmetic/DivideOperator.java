@@ -1,12 +1,16 @@
 package com.github.sidhant92.boolparser.operator.arithmetic;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
+import com.github.sidhant92.boolparser.datatype.DataTypeFactory;
+import com.github.sidhant92.boolparser.datatype.DecimalDataType;
 import com.github.sidhant92.boolparser.exception.InvalidDataType;
+import com.github.sidhant92.boolparser.util.ValueUtils;
 
 /**
  * @author sidhant.aggarwal
@@ -16,11 +20,9 @@ public class DivideOperator extends AbstractOperator {
     @Override
     public Object evaluate(final Object leftOperand, final DataType leftOperandDataType, final Object rightOperand,
                            final DataType rightOperandDataType) {
-        final double res = Double.parseDouble(leftOperand.toString()) / Double.parseDouble(rightOperand.toString());
-        if ((int) res == res) {
-            return (int) res;
-        }
-        return res;
+        final DecimalDataType decimalDataType = (DecimalDataType) DataTypeFactory.getDataType(DataType.DECIMAL);
+        return ValueUtils.castDecimal(
+                decimalDataType.getValue(leftOperand).get().divide(decimalDataType.getValue(rightOperand).get(), 3, BigDecimal.ROUND_DOWN));
     }
 
     @Override
