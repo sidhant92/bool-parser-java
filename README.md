@@ -151,6 +151,13 @@ The following Data Types are supported:
 5. Boolean
 6. Semantic Version
 
+---
+**NOTE**
+
+Decimal will internally use BigDecimal for storage.
+
+---
+
 Usage examples:
 
 Simple Numerical Comparison

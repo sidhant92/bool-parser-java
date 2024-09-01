@@ -1,12 +1,17 @@
 package com.github.sidhant92.boolparser.function.arithmetic;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.apache.commons.lang3.tuple.Pair;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.FunctionType;
+import com.github.sidhant92.boolparser.datatype.DataTypeFactory;
+import com.github.sidhant92.boolparser.datatype.DecimalDataType;
+import com.github.sidhant92.boolparser.datatype.LongDataType;
 import com.github.sidhant92.boolparser.domain.EvaluatedNode;
 import com.github.sidhant92.boolparser.util.ValueUtils;
 
@@ -19,16 +24,20 @@ public class SumFunction extends AbstractFunction {
     public Object evaluate(final List<EvaluatedNode> items) {
         if (items
                 .stream().anyMatch(a -> a.getDataType().equals(DataType.DECIMAL))) {
-            return ValueUtils.caseDouble(items
-                                                 .stream().mapToDouble(a -> Double.parseDouble(a.getValue().toString())).sum());
+            final DecimalDataType decimalDataType = (DecimalDataType) DataTypeFactory.getDataType(DataType.DECIMAL);
+            final List<BigDecimal> itemsConverted = items
+                    .stream()
+                    .map(item -> decimalDataType.getValue(item.getValue()))
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
+            final BigDecimal sum = itemsConverted
+                    .stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+            return ValueUtils.castDecimal(sum);
         }
-        if (items
-                .stream().anyMatch(a -> a.getDataType().equals(DataType.LONG))) {
-            return ValueUtils.caseDouble(items
-                                                 .stream().mapToLong(a -> Long.parseLong(a.getValue().toString())).sum());
-        }
-        return ValueUtils.caseDouble(items
-                                             .stream().mapToInt(a -> Integer.parseInt(a.getValue().toString())).sum());
+        final LongDataType longDataType = (LongDataType) DataTypeFactory.getDataType(DataType.LONG);
+        final long sum = items
+                .stream().mapToLong(a -> longDataType.getValue(a.getValue()).get()).sum();
+        return ValueUtils.castDecimal(sum);
     }
 
     @Override

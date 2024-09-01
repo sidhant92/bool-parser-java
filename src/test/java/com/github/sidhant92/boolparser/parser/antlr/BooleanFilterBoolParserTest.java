@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
@@ -101,7 +102,7 @@ public class BooleanFilterBoolParserTest {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("age=44.34");
         assertTrue(nodeOptional.isSuccess());
         verifyComparisonToken(nodeOptional.get(), "age", Operator.EQUALS);
-        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getValue(), 44.34, DataType.DECIMAL);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getValue(), new BigDecimal("44.34"), DataType.DECIMAL);
     }
 
     @Test
@@ -133,7 +134,7 @@ public class BooleanFilterBoolParserTest {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("age 18.4 TO 44.2");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), NodeType.NUMERIC_RANGE.name());
-        verifyNumericRangeToken((NumericRangeNode) nodeOptional.get(), "age", 18.4, 44.2);
+        verifyNumericRangeToken((NumericRangeNode) nodeOptional.get(), "age", new BigDecimal("18.4"), new BigDecimal("44.2"));
     }
 
     @Test
@@ -401,7 +402,7 @@ public class BooleanFilterBoolParserTest {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("20.5 + 5");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC);
-        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getValue(), 20.5);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getValue(), new BigDecimal("20.5"));
         assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.DECIMAL);
         assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getValue(), 5);
         assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);

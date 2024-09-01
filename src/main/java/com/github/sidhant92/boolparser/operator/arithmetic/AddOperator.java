@@ -1,13 +1,15 @@
 package com.github.sidhant92.boolparser.operator.arithmetic;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
-import com.github.sidhant92.boolparser.exception.InvalidDataType;
+import com.github.sidhant92.boolparser.datatype.DataTypeFactory;
+import com.github.sidhant92.boolparser.datatype.DecimalDataType;
+import com.github.sidhant92.boolparser.datatype.LongDataType;
+import com.github.sidhant92.boolparser.util.ValueUtils;
 
 /**
  * @author sidhant.aggarwal
@@ -22,15 +24,11 @@ public class AddOperator extends AbstractOperator {
             return leftOperand + String.valueOf(rightOperand);
         }
         if (leftOperandDataType.equals(DataType.DECIMAL) || rightOperandDataType.equals(DataType.DECIMAL)) {
-            return Double.parseDouble(leftOperand.toString()) + Double.parseDouble(rightOperand.toString());
+            final DecimalDataType decimalDataType = (DecimalDataType) DataTypeFactory.getDataType(DataType.DECIMAL);
+            return decimalDataType.getValue(leftOperand).get().add(decimalDataType.getValue(rightOperand).get());
         }
-        if (leftOperandDataType.equals(DataType.LONG) || rightOperandDataType.equals(DataType.LONG)) {
-            return Long.parseLong(leftOperand.toString()) + Long.parseLong(rightOperand.toString());
-        }
-        if (leftOperandDataType.equals(DataType.INTEGER) || rightOperandDataType.equals(DataType.INTEGER)) {
-            return Integer.parseInt(leftOperand.toString()) + Integer.parseInt(rightOperand.toString());
-        }
-        return leftOperand + String.valueOf(rightOperand);
+        final LongDataType longDataType = (LongDataType) DataTypeFactory.getDataType(DataType.LONG);
+        return ValueUtils.castLong(longDataType.getValue(leftOperand).get() + longDataType.getValue(rightOperand).get());
     }
 
     @Override

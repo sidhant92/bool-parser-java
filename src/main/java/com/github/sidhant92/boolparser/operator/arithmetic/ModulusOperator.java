@@ -6,6 +6,9 @@ import java.util.List;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.Operator;
+import com.github.sidhant92.boolparser.datatype.DataTypeFactory;
+import com.github.sidhant92.boolparser.datatype.IntegerDataType;
+import com.github.sidhant92.boolparser.datatype.LongDataType;
 import com.github.sidhant92.boolparser.exception.InvalidDataType;
 
 /**
@@ -17,12 +20,11 @@ public class ModulusOperator extends AbstractOperator {
     public Object evaluate(final Object leftOperand, final DataType leftOperandDataType, final Object rightOperand,
                            final DataType rightOperandDataType) {
         if (leftOperandDataType.equals(DataType.LONG) || rightOperandDataType.equals(DataType.LONG)) {
-            return Long.parseLong(leftOperand.toString()) % Long.parseLong(rightOperand.toString());
+            final LongDataType longDataType = (LongDataType) DataTypeFactory.getDataType(DataType.LONG);
+            return longDataType.getValue(leftOperand).get() % longDataType.getValue(rightOperand).get();
         }
-        if (leftOperandDataType.equals(DataType.INTEGER) || rightOperandDataType.equals(DataType.INTEGER)) {
-            return Integer.parseInt(leftOperand.toString()) % Integer.parseInt(rightOperand.toString());
-        }
-        throw new InvalidDataType();
+        final IntegerDataType integerDataType = (IntegerDataType) DataTypeFactory.getDataType(DataType.INTEGER);
+        return integerDataType.getValue(leftOperand).get() % integerDataType.getValue(rightOperand).get();
     }
 
     @Override

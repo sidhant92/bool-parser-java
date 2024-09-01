@@ -1,5 +1,6 @@
 package com.github.sidhant92.boolparser.operator.arithmetic;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +17,7 @@ public class UnaryOperator extends AbstractOperator {
     public Object evaluate(final Object leftOperand, final DataType leftOperandDataType, final Object rightOperand,
                            final DataType rightOperandDataType) {
         if (leftOperandDataType.equals(DataType.DECIMAL)) {
-            return -(double) leftOperand;
+            return ((BigDecimal) leftOperand).negate();
         }
         if (leftOperandDataType.equals(DataType.LONG)) {
             return -(long) leftOperand;

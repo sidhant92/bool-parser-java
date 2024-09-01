@@ -1,11 +1,11 @@
 package com.github.sidhant92.boolparser.function.arithmetic;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.math3.stat.StatUtils;
-import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import java.util.Map;
 import com.github.sidhant92.boolparser.constant.ContainerDataType;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.FunctionType;
@@ -19,9 +19,34 @@ import com.github.sidhant92.boolparser.util.ValueUtils;
 public class ModeFunction extends AbstractFunction {
     @Override
     public Object evaluate(final List<EvaluatedNode> items) {
-        final double mode = StatUtils.mode(items
-                                                   .stream().mapToDouble(a -> Double.parseDouble(a.getValue().toString())).toArray())[0];
-        return ValueUtils.caseDouble(mode);
+        Map<Object, Integer> hm = new HashMap<Object, Integer>();
+        int max = 1;
+        Object temp = items.get(0).getValue();
+
+        for (int i = 0; i < items.size(); i++) {
+            final Object value = items.get(i).getValue();
+
+            if (hm.get(value) != null) {
+
+                int count = hm.get(value);
+                count++;
+                hm.put(value, count);
+
+                if (count > max) {
+                    max = count;
+                    temp = value;
+                }
+            } else {
+                hm.put(value, 1);
+            }
+        }
+        if (temp instanceof BigDecimal) {
+            return ValueUtils.castDecimal((BigDecimal) temp);
+        }
+        if (temp instanceof Long) {
+            return ValueUtils.castLong((Long) temp);
+        }
+        return temp;
     }
 
     @Override
