@@ -615,6 +615,16 @@ public class BooleanExpressionEvaluatorTest {
     }
 
     @Test
+    public void testBooleanComparison() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("age", true);
+        data.put("a", 20);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("age = (5 > 3)", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
     public void testNegativeComparison() {
         final Map<String, Object> data = new HashMap<>();
         data.put("a", -6);
