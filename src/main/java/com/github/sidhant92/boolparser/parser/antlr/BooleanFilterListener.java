@@ -155,19 +155,22 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     private ComparisonNode mapComparatorExpressionContext(BooleanExpressionParser.ComparatorExpressionContext ctx) {
         final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
-        if (!(ctx.right instanceof BooleanExpressionParser.TypesExpressionContext) && !currentNodes.isEmpty()) {
-            final Node value = currentNodes.pop();
-            return new ComparisonNode(mapContextToNode(ctx.left), value, operator, DataType.INTEGER);
-        } else {
-            if (ctx.left instanceof BooleanExpressionParser.ParentExpressionContext && !currentNodes.isEmpty()) {
+
+        if (!currentNodes.isEmpty() && ((ctx.right instanceof BooleanExpressionParser.ParentExpressionContext || ctx.left instanceof BooleanExpressionParser.ParentExpressionContext) || !(currentNodes.peek() instanceof ComparisonNode || currentNodes.peek() instanceof BooleanNode))) {
+            if (ctx.left instanceof BooleanExpressionParser.TypesExpressionContext) {
+                final DataType dataType = getDataType(ctx.left.getStart());
+                final Node value = mapContextToNode(ctx.left);
+                return new ComparisonNode(value, currentNodes.pop(), operator, dataType);
+            } else if (ctx.right instanceof BooleanExpressionParser.TypesExpressionContext) {
                 final DataType dataType = getDataType(ctx.right.getStart());
                 final Node value = mapContextToNode(ctx.right);
                 return new ComparisonNode(currentNodes.pop(), value, operator, dataType);
             }
-            final DataType dataType = getDataType(ctx.right.getStart());
-            final Node value = mapContextToNode(ctx.right);
-            return new ComparisonNode(mapContextToNode(ctx.left), value, operator, dataType);
         }
+
+        final DataType dataType = getDataType(ctx.right.getStart());
+        final Node value = mapContextToNode(ctx.right);
+        return new ComparisonNode(mapContextToNode(ctx.left), value, operator, dataType);
     }
 
     private ArithmeticNode mapArithmeticExpressionContext(BooleanExpressionParser.ArithmeticExpressionContext ctx) {
