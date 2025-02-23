@@ -126,11 +126,15 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     }
 
     private FieldNode mapTypesExpressionContextField(BooleanExpressionParser.TypesExpressionContext ctx) {
-        return new FieldNode(ctx.getText());
+        final String value = StringUtils.isBlank(ctx.getText()) ? defaultField : ctx.getText();
+        return new FieldNode(value);
     }
 
     private Node mapTypesExpressionContext(BooleanExpressionParser.TypesExpressionContext ctx) {
         if (ctx.start.getType() == BooleanExpressionLexer.FIELD) {
+            return mapTypesExpressionContextField(ctx);
+        }
+        if (StringUtils.isBlank(ctx.getText())) {
             return mapTypesExpressionContextField(ctx);
         }
         final DataType dataType = getDataType(ctx.start);
@@ -150,15 +154,19 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     }
 
     private ComparisonNode mapComparatorExpressionContext(BooleanExpressionParser.ComparatorExpressionContext ctx) {
-        final String variableName = getField(ctx.left.getText());
         final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
         if (!(ctx.right instanceof BooleanExpressionParser.TypesExpressionContext) && !currentNodes.isEmpty()) {
             final Node value = currentNodes.pop();
-            return new ComparisonNode(variableName, value, operator, DataType.INTEGER);
+            return new ComparisonNode(mapContextToNode(ctx.left), value, operator, DataType.INTEGER);
         } else {
+            if (ctx.left instanceof BooleanExpressionParser.ParentExpressionContext && !currentNodes.isEmpty()) {
+                final DataType dataType = getDataType(ctx.right.getStart());
+                final Node value = mapContextToNode(ctx.right);
+                return new ComparisonNode(currentNodes.pop(), value, operator, dataType);
+            }
             final DataType dataType = getDataType(ctx.right.getStart());
             final Node value = mapContextToNode(ctx.right);
-            return new ComparisonNode(variableName, value, operator, dataType);
+            return new ComparisonNode(mapContextToNode(ctx.left), value, operator, dataType);
         }
     }
 

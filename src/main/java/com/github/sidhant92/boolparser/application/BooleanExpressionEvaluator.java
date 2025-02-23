@@ -1,5 +1,6 @@
 package com.github.sidhant92.boolparser.application;
 
+import static com.github.sidhant92.boolparser.constant.NodeType.UNARY;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -72,17 +73,31 @@ public class BooleanExpressionEvaluator {
         }
     }
 
-    private boolean evaluateComparisonToken(final ComparisonNode comparisonToken, final Map<String, Object> data) {
-        final Optional<Object> fieldDataOptional = ValueUtils.getValueFromMap(comparisonToken.getField(), data);
+    private Optional<Object> getValue(final Node node, final Map<String, Object> data) {
+        switch (node.getTokenType()) {
+            case FIELD:
+                return ValueUtils.getValueFromMap(((FieldNode) node).getField(), data);
+            case UNARY:
+                final UnaryNode unaryNode = (UnaryNode) node;
+                return Optional.of(unaryNode.getValue());
+            default:
+                if (node instanceof ArithmeticBaseNode) {
+                    return Optional.of(arithmeticExpressionEvaluator.evaluate(node, data));
+                }
+                return Optional.of(evaluateToken(node, data));
+        }
+    }
 
-        final Object fieldData = comparisonToken.isNullCheck() ? fieldDataOptional.orElse("null") : fieldDataOptional.orElseThrow(
-                () -> new DataNotFoundException(comparisonToken.getField()));
-        final Object value = comparisonToken.isNullCheck() ? "null" : comparisonToken.getValue() instanceof ArithmeticBaseNode ? arithmeticExpressionEvaluator.evaluate(
-                comparisonToken.getValue(), data) : comparisonToken.getValue();
-        final DataType dataType = ValueUtils.getDataType(value);
-        final DataType fieldDataType = ValueUtils.getDataType(fieldData);
-        return operatorService.evaluateLogicalOperator(comparisonToken.getOperator(), ContainerDataType.PRIMITIVE, fieldData, fieldDataType,
-                                                       Collections.singletonList(Pair.of(value, dataType)));
+    private boolean evaluateComparisonToken(final ComparisonNode comparisonToken, final Map<String, Object> data) {
+        final Optional<Object> leftValueOptional = getValue(comparisonToken.getLeft(), data);
+
+        final Object leftData = comparisonToken.isNullCheck() ? leftValueOptional.orElse("null") : leftValueOptional.orElseThrow(
+                () -> new DataNotFoundException(((FieldNode) comparisonToken.getLeft()).getField()));
+        final Object rightData = comparisonToken.isNullCheck() ? "null" : getValue(comparisonToken.getRight(), data).get();
+        final DataType rightDataType = ValueUtils.getDataType(rightData);
+        final DataType leftDataType = ValueUtils.getDataType(leftData);
+        return operatorService.evaluateLogicalOperator(comparisonToken.getOperator(), ContainerDataType.PRIMITIVE, leftData, leftDataType,
+                                                       Collections.singletonList(Pair.of(rightData, rightDataType)));
     }
 
     private boolean evaluateNumericRangeToken(final NumericRangeNode numericRangeToken, final Map<String, Object> data) {

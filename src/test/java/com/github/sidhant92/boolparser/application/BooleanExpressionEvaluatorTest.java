@@ -113,6 +113,15 @@ public class BooleanExpressionEvaluatorTest {
     }
 
     @Test
+    public void testNumericGreaterThanCorrectExpressionInverted() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("age", 24);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("20 < age", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
     public void testNumericGreaterThanCorrectExpressionWithField() {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", 24);
@@ -554,6 +563,15 @@ public class BooleanExpressionEvaluatorTest {
     }
 
     @Test
+    public void testComparisonWithArithmeticTrueConditionInverted() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("age", "20");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("(5 + 10) < age", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
     public void testComparisonWithArithmeticFunction() {
         final Map<String, Object> data = new HashMap<>();
         data.put("age", "20");
@@ -615,6 +633,15 @@ public class BooleanExpressionEvaluatorTest {
     }
 
     @Test
+    public void testNullCheckInverted() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", 2.7);
+        final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("null = b", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), true);
+    }
+
+    @Test
     public void testNullCheck1() {
         final Map<String, Object> data = new HashMap<>();
         data.put("a", 2.7);
@@ -637,6 +664,15 @@ public class BooleanExpressionEvaluatorTest {
         final Map<String, Object> data = new HashMap<>();
         data.put("a", 3);
         final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("b = null && a > 2", data);
+        assertTrue(resultOptional.isSuccess());
+        assertEquals(resultOptional.get(), true);
+    }
+
+    @Test
+    public void testArithmeticFunctionAndComparison() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("a", "test");
+        final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("len(a) = 4", data);
         assertTrue(resultOptional.isSuccess());
         assertEquals(resultOptional.get(), true);
     }
