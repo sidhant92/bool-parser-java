@@ -18,9 +18,9 @@ import lombok.Setter;
 @Setter
 @Builder
 public class ComparisonNode extends Node {
-    private final String field;
+    private final Node left;
 
-    private final Node value;
+    private final Node right;
 
     private final Operator operator;
 
@@ -32,6 +32,6 @@ public class ComparisonNode extends Node {
     }
 
     public boolean isNullCheck() {
-        return Operator.getEqualityOperators().contains(this.operator) && this.value instanceof FieldNode && ((FieldNode) this.value).isNull();
+        return Operator.getEqualityOperators().contains(this.operator) && (this.right instanceof FieldNode && ((FieldNode) this.right).isNull() || this.left instanceof FieldNode && ((FieldNode) this.left).isNull());
     }
 }
