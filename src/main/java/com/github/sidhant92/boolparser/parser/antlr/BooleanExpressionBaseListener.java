@@ -1,4 +1,5 @@
-package com.github.sidhant92.boolparser.parser.antlr;// Generated from /Users/sid/Desktop/filter1/BooleanExpression.g4 by ANTLR 4.13.1
+// Generated from /Users/sidhantaggarwal/bool-parser-java/src/main/java/resources/BooleanExpression.g4 by ANTLR 4.13.2
+package com.github.sidhant92.boolparser.parser.antlr;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -23,6 +24,18 @@ public class BooleanExpressionBaseListener implements BooleanExpressionListener 
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitParse(BooleanExpressionParser.ParseContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterUnaryArithmeticExpression(BooleanExpressionParser.UnaryArithmeticExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitUnaryArithmeticExpression(BooleanExpressionParser.UnaryArithmeticExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -88,6 +101,18 @@ public class BooleanExpressionBaseListener implements BooleanExpressionListener 
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterArithmeticFunctionExpression(BooleanExpressionParser.ArithmeticFunctionExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArithmeticFunctionExpression(BooleanExpressionParser.ArithmeticFunctionExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterNotExpression(BooleanExpressionParser.NotExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -95,6 +120,18 @@ public class BooleanExpressionBaseListener implements BooleanExpressionListener 
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitNotExpression(BooleanExpressionParser.NotExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterArithmeticExpression(BooleanExpressionParser.ArithmeticExpressionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArithmeticExpression(BooleanExpressionParser.ArithmeticExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -131,6 +168,30 @@ public class BooleanExpressionBaseListener implements BooleanExpressionListener 
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitComparator(BooleanExpressionParser.ComparatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterArithmeticOperator(BooleanExpressionParser.ArithmeticOperatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArithmeticOperator(BooleanExpressionParser.ArithmeticOperatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterArithmeticFunction(BooleanExpressionParser.ArithmeticFunctionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitArithmeticFunction(BooleanExpressionParser.ArithmeticFunctionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

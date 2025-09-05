@@ -4,19 +4,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
 import com.github.sidhant92.boolparser.constant.NodeType;
 import com.github.sidhant92.boolparser.constant.Operator;
-import com.github.sidhant92.boolparser.domain.ArrayNode;
-import com.github.sidhant92.boolparser.domain.BooleanNode;
-import com.github.sidhant92.boolparser.domain.InNode;
-import com.github.sidhant92.boolparser.domain.Node;
-import com.github.sidhant92.boolparser.domain.NumericRangeNode;
-import com.github.sidhant92.boolparser.domain.ComparisonNode;
-import com.github.sidhant92.boolparser.domain.UnaryNode;
-import com.github.sidhant92.boolparser.exception.InvalidExpressionException;
+import com.github.sidhant92.boolparser.domain.FieldNode;
+import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticFunctionNode;
+import com.github.sidhant92.boolparser.domain.arithmetic.ArithmeticNode;
+import com.github.sidhant92.boolparser.domain.logical.ArrayNode;
+import com.github.sidhant92.boolparser.domain.logical.BooleanNode;
+import com.github.sidhant92.boolparser.domain.logical.InNode;
+import com.github.sidhant92.boolparser.domain.logical.Node;
+import com.github.sidhant92.boolparser.domain.logical.NumericRangeNode;
+import com.github.sidhant92.boolparser.domain.logical.ComparisonNode;
+import com.github.sidhant92.boolparser.domain.arithmetic.UnaryNode;
 import io.vavr.control.Try;
 
 /**
@@ -48,58 +53,58 @@ public class BooleanFilterBoolParserTest {
 
     @Test
     public void testSingleStringToken() {
-        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name = test");
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name = 'test'");
         assertTrue(nodeOptional.isSuccess());
-        assertEquals(nodeOptional.get().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyStringToken((ComparisonNode) nodeOptional.get(), "name", "test");
+        verifyComparisonToken(nodeOptional.get(), "name", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), "test", DataType.STRING);
     }
 
     @Test
     public void testSingleStringTokenWithSingleQuotes() {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name = \"te\'st\"");
         assertTrue(nodeOptional.isSuccess());
-        assertEquals(nodeOptional.get().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyStringToken((ComparisonNode) nodeOptional.get(), "name", "te\'st");
+        verifyComparisonToken(nodeOptional.get(), "name", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), "te'st", DataType.STRING);
     }
 
     @Test
     public void testSingleStringTokenWithDoubleQuotes() {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name = 'te\"st'");
         assertTrue(nodeOptional.isSuccess());
-        assertEquals(nodeOptional.get().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyStringToken((ComparisonNode) nodeOptional.get(), "name", "te\"st");
+        verifyComparisonToken(nodeOptional.get(), "name", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), "te\"st", DataType.STRING);
     }
 
     @Test
     public void testSingleStringTokenWithSpace() {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name = \"first second\"");
         assertTrue(nodeOptional.isSuccess());
-        assertEquals(nodeOptional.get().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyStringToken((ComparisonNode) nodeOptional.get(), "name", "first second");
+        verifyComparisonToken(nodeOptional.get(), "name", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), "first second", DataType.STRING);
     }
 
     @Test
     public void testSingleIntToken() {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("age=44");
         assertTrue(nodeOptional.isSuccess());
-        assertEquals(nodeOptional.get().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyNumericToken((ComparisonNode) nodeOptional.get(), "age", 44, Operator.EQUALS);
+        verifyComparisonToken(nodeOptional.get(), "age", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), 44, DataType.INTEGER);
     }
 
     @Test
     public void testSingleLongToken() {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("age=1611473334114");
         assertTrue(nodeOptional.isSuccess());
-        assertEquals(nodeOptional.get().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyNumericToken((ComparisonNode) nodeOptional.get(), "age", 1611473334114L, Operator.EQUALS);
+        verifyComparisonToken(nodeOptional.get(), "age", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), 1611473334114L, DataType.LONG);
     }
 
     @Test
     public void testSingleDecimalToken() {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("age=44.34");
         assertTrue(nodeOptional.isSuccess());
-        assertEquals(nodeOptional.get().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyNumericToken((ComparisonNode) nodeOptional.get(), "age", 44.34, Operator.EQUALS);
+        verifyComparisonToken(nodeOptional.get(), "age", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), new BigDecimal("44.34"), DataType.DECIMAL);
     }
 
     @Test
@@ -114,8 +119,16 @@ public class BooleanFilterBoolParserTest {
     public void testGreaterThan() {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("age > 18");
         assertTrue(nodeOptional.isSuccess());
-        assertEquals(nodeOptional.get().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyNumericToken((ComparisonNode) nodeOptional.get(), "age", 18, Operator.GREATER_THAN);
+        verifyComparisonToken(nodeOptional.get(), "age", Operator.GREATER_THAN);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), 18, DataType.INTEGER);
+    }
+
+    @Test
+    public void testGreaterThanWithField() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("age > a");
+        assertTrue(nodeOptional.isSuccess());
+        verifyComparisonToken(nodeOptional.get(), "age", Operator.GREATER_THAN);
+        verifyFieldToken(((ComparisonNode) nodeOptional.get()).getRight(), "a");
     }
 
     @Test
@@ -123,12 +136,12 @@ public class BooleanFilterBoolParserTest {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("age 18.4 TO 44.2");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), NodeType.NUMERIC_RANGE.name());
-        verifyNumericRangeToken((NumericRangeNode) nodeOptional.get(), "age", 18.4, 44.2);
+        verifyNumericRangeToken((NumericRangeNode) nodeOptional.get(), "age", new BigDecimal("18.4"), new BigDecimal("44.2"));
     }
 
     @Test
     public void testSimpleOrCondition() {
-        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name = test OR age=33");
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name = 'test' OR age=33");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), NodeType.BOOLEAN.name());
         final BooleanNode booleanToken = (BooleanNode) nodeOptional.get();
@@ -137,13 +150,15 @@ public class BooleanFilterBoolParserTest {
         assertEquals(booleanToken.getOperator(), LogicalOperationType.OR);
         assertEquals(booleanToken.getLeft().getTokenType().name(), NodeType.COMPARISON.name());
         assertEquals(booleanToken.getRight().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyStringToken((ComparisonNode) booleanToken.getLeft(), "name", "test");
-        verifyNumericToken((ComparisonNode) booleanToken.getRight(), "age", 33, Operator.EQUALS);
+        verifyComparisonToken(((BooleanNode) nodeOptional.get()).getLeft(), "name", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode)((BooleanNode) nodeOptional.get()).getLeft()).getRight(), "test", DataType.STRING);
+        verifyComparisonToken(((BooleanNode) nodeOptional.get()).getRight(), "age", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode)((BooleanNode) nodeOptional.get()).getRight()).getRight(), 33, DataType.INTEGER);
     }
 
     @Test
     public void testSimpleAndCondition() {
-        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name = test AND age=33");
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name = 'test' AND age=33");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), NodeType.BOOLEAN.name());
         final BooleanNode booleanToken = (BooleanNode) nodeOptional.get();
@@ -152,13 +167,15 @@ public class BooleanFilterBoolParserTest {
         assertEquals(booleanToken.getOperator(), LogicalOperationType.AND);
         assertEquals(booleanToken.getLeft().getTokenType().name(), NodeType.COMPARISON.name());
         assertEquals(booleanToken.getRight().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyStringToken((ComparisonNode) booleanToken.getLeft(), "name", "test");
-        verifyNumericToken((ComparisonNode) booleanToken.getRight(), "age", 33, Operator.EQUALS);
+        verifyComparisonToken(((BooleanNode) nodeOptional.get()).getLeft(), "name", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode)((BooleanNode) nodeOptional.get()).getLeft()).getRight(), "test", DataType.STRING);
+        verifyComparisonToken(((BooleanNode) nodeOptional.get()).getRight(), "age", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode)((BooleanNode) nodeOptional.get()).getRight()).getRight(), 33, DataType.INTEGER);
     }
 
     @Test
     public void testSimpleNotCondition() {
-        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("NOT (name = test)");
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("NOT (name = 'test')");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), NodeType.BOOLEAN.name());
         final BooleanNode booleanToken = (BooleanNode) nodeOptional.get();
@@ -166,12 +183,13 @@ public class BooleanFilterBoolParserTest {
         assertNull(booleanToken.getRight());
         assertEquals(booleanToken.getOperator(), LogicalOperationType.NOT);
         assertEquals(booleanToken.getLeft().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyStringToken((ComparisonNode) booleanToken.getLeft(), "name", "test");
+        verifyComparisonToken(((BooleanNode) nodeOptional.get()).getLeft(), "name", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode)((BooleanNode) nodeOptional.get()).getLeft()).getRight(), "test", DataType.STRING);
     }
 
     @Test
     public void testNestedAndCondition() {
-        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name = test OR (age=33 AND city = dummy)");
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name = 'test' OR (age=33 AND city = 'dummy')");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), NodeType.BOOLEAN.name());
         final BooleanNode booleanToken = (BooleanNode) nodeOptional.get();
@@ -180,20 +198,23 @@ public class BooleanFilterBoolParserTest {
         assertEquals(booleanToken.getOperator(), LogicalOperationType.OR);
         assertEquals(booleanToken.getLeft().getTokenType().name(), NodeType.COMPARISON.name());
         assertEquals(booleanToken.getRight().getTokenType().name(), NodeType.BOOLEAN.name());
-        verifyStringToken((ComparisonNode) booleanToken.getLeft(), "name", "test");
+        verifyComparisonToken(booleanToken.getLeft(), "name", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode)((BooleanNode) nodeOptional.get()).getLeft()).getRight(), "test", DataType.STRING);
         final BooleanNode nestedBooleanExpression = (BooleanNode) booleanToken.getRight();
         assertNotNull(nestedBooleanExpression.getLeft());
         assertNotNull(nestedBooleanExpression.getRight());
         assertEquals(nestedBooleanExpression.getOperator(), LogicalOperationType.AND);
         assertEquals(nestedBooleanExpression.getLeft().getTokenType().name(), NodeType.COMPARISON.name());
         assertEquals(nestedBooleanExpression.getRight().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyNumericToken((ComparisonNode) nestedBooleanExpression.getLeft(), "age", 33, Operator.EQUALS);
-        verifyStringToken((ComparisonNode) nestedBooleanExpression.getRight(), "city", "dummy");
+        verifyComparisonToken(nestedBooleanExpression.getLeft(), "age", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode) nestedBooleanExpression.getLeft()).getRight(), 33, DataType.INTEGER);
+        verifyComparisonToken(nestedBooleanExpression.getRight(), "city", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode) nestedBooleanExpression.getRight()).getRight(), "dummy", DataType.STRING);
     }
 
     @Test
     public void testNestedAndCondition1() {
-        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("(agel=44 AND cityl = abc) OR (ager=33 AND cityr = dummy)");
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("(agel=44 AND cityl = 'abc') OR (ager=33 AND cityr = 'dummy')");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), NodeType.BOOLEAN.name());
         final BooleanNode booleanToken = (BooleanNode) nodeOptional.get();
@@ -208,21 +229,25 @@ public class BooleanFilterBoolParserTest {
         assertEquals(nestedLeftBooleanExpression.getOperator(), LogicalOperationType.AND);
         assertEquals(nestedLeftBooleanExpression.getLeft().getTokenType().name(), NodeType.COMPARISON.name());
         assertEquals(nestedLeftBooleanExpression.getRight().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyNumericToken((ComparisonNode) nestedLeftBooleanExpression.getLeft(), "agel", 44, Operator.EQUALS);
-        verifyStringToken((ComparisonNode) nestedLeftBooleanExpression.getRight(), "cityl", "abc");
+        verifyComparisonToken(nestedLeftBooleanExpression.getLeft(), "agel", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode)nestedLeftBooleanExpression.getLeft()).getRight(), 44, DataType.INTEGER);
+        verifyComparisonToken(nestedLeftBooleanExpression.getRight(), "cityl", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode)nestedLeftBooleanExpression.getRight()).getRight(), "abc", DataType.STRING);
         final BooleanNode nestedRightBooleanExpression = (BooleanNode) booleanToken.getRight();
         assertNotNull(nestedRightBooleanExpression.getLeft());
         assertNotNull(nestedRightBooleanExpression.getRight());
         assertEquals(nestedRightBooleanExpression.getOperator(), LogicalOperationType.AND);
         assertEquals(nestedRightBooleanExpression.getLeft().getTokenType().name(), NodeType.COMPARISON.name());
         assertEquals(nestedRightBooleanExpression.getRight().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyNumericToken((ComparisonNode) nestedRightBooleanExpression.getLeft(), "ager", 33, Operator.EQUALS);
-        verifyStringToken((ComparisonNode) nestedRightBooleanExpression.getRight(), "cityr", "dummy");
+        verifyComparisonToken(nestedRightBooleanExpression.getLeft(), "ager", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode)nestedRightBooleanExpression.getLeft()).getRight(), 33, DataType.INTEGER);
+        verifyComparisonToken(nestedRightBooleanExpression.getRight(), "cityr", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode)nestedRightBooleanExpression.getRight()).getRight(), "dummy", DataType.STRING);
     }
 
     @Test
     public void testNestedOrCondition() {
-        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name = test AND (age=33 OR city = dummy)");
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name = 'test' AND (age=33 OR city = 'dummy')");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), NodeType.BOOLEAN.name());
         final BooleanNode booleanToken = (BooleanNode) nodeOptional.get();
@@ -231,15 +256,18 @@ public class BooleanFilterBoolParserTest {
         assertEquals(booleanToken.getOperator(), LogicalOperationType.AND);
         assertEquals(booleanToken.getLeft().getTokenType().name(), NodeType.COMPARISON.name());
         assertEquals(booleanToken.getRight().getTokenType().name(), NodeType.BOOLEAN.name());
-        verifyStringToken((ComparisonNode) booleanToken.getLeft(), "name", "test");
+        verifyComparisonToken(booleanToken.getLeft(), "name", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode)booleanToken.getLeft()).getRight(), "test", DataType.STRING);
         final BooleanNode nestedBooleanExpression = (BooleanNode) booleanToken.getRight();
         assertNotNull(nestedBooleanExpression.getLeft());
         assertNotNull(nestedBooleanExpression.getRight());
         assertEquals(nestedBooleanExpression.getOperator(), LogicalOperationType.OR);
         assertEquals(nestedBooleanExpression.getLeft().getTokenType().name(), NodeType.COMPARISON.name());
         assertEquals(nestedBooleanExpression.getRight().getTokenType().name(), NodeType.COMPARISON.name());
-        verifyNumericToken((ComparisonNode) nestedBooleanExpression.getLeft(), "age", 33, Operator.EQUALS);
-        verifyStringToken((ComparisonNode) nestedBooleanExpression.getRight(), "city", "dummy");
+        verifyComparisonToken(nestedBooleanExpression.getLeft(), "age", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode)nestedBooleanExpression.getLeft()).getRight(), 33, DataType.INTEGER);
+        verifyComparisonToken(nestedBooleanExpression.getRight(), "city", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode)nestedBooleanExpression.getRight()).getRight(), "dummy", DataType.STRING);
     }
 
     @Test
@@ -250,10 +278,10 @@ public class BooleanFilterBoolParserTest {
         final InNode inToken = (InNode) nodeOptional.get();
         assertEquals(inToken.getItems().size(), 2);
         assertEquals(inToken.getField(), "age");
-        assertEquals(inToken.getItems().get(0).getKey(), DataType.INTEGER);
-        assertEquals(inToken.getItems().get(1).getKey(), DataType.INTEGER);
-        assertEquals(inToken.getItems().get(0).getValue(), 12);
-        assertEquals(inToken.getItems().get(1).getValue(), 45);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getValue(), 12);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getValue(), 45);
     }
 
     @Test
@@ -261,78 +289,72 @@ public class BooleanFilterBoolParserTest {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("age not IN (12,45)");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), NodeType.BOOLEAN.name());
-        assertNotNull(((BooleanNode)nodeOptional.get()).getLeft());
-        assertNull(((BooleanNode)nodeOptional.get()).getRight());
-        assertEquals(((BooleanNode)nodeOptional.get()).getOperator(), LogicalOperationType.NOT);
-        final InNode inToken = (InNode) ((BooleanNode)nodeOptional.get()).getLeft();
+        assertNotNull(((BooleanNode) nodeOptional.get()).getLeft());
+        assertNull(((BooleanNode) nodeOptional.get()).getRight());
+        assertEquals(((BooleanNode) nodeOptional.get()).getOperator(), LogicalOperationType.NOT);
+        final InNode inToken = (InNode) ((BooleanNode) nodeOptional.get()).getLeft();
         assertEquals(inToken.getItems().size(), 2);
         assertEquals(inToken.getField(), "age");
-        assertEquals(inToken.getItems().get(0).getKey(), DataType.INTEGER);
-        assertEquals(inToken.getItems().get(1).getKey(), DataType.INTEGER);
-        assertEquals(inToken.getItems().get(0).getValue(), 12);
-        assertEquals(inToken.getItems().get(1).getValue(), 45);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getValue(), 12);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getValue(), 45);
     }
 
     @Test
     public void testStringList() {
-        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name IN (abc, def, 'abc def')");
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name IN ('abc', 'def', 'abc def')");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), NodeType.IN.name());
         final InNode inToken = (InNode) nodeOptional.get();
         assertEquals(inToken.getItems().size(), 3);
         assertEquals(inToken.getField(), "name");
-        assertEquals(inToken.getItems().get(0).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(1).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(2).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(0).getValue(), "abc");
-        assertEquals(inToken.getItems().get(1).getValue(), "def");
-        assertEquals(inToken.getItems().get(2).getValue(), "abc def");
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(2)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getValue(), "abc");
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getValue(), "def");
+        assertEquals(((UnaryNode)inToken.getItems().get(2)).getValue(), "abc def");
     }
 
     @Test
     public void testStringList1() {
-        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name IN (abc, def, 'abc, def')");
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name IN ('abc', 'def', 'abc, def')");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), NodeType.IN.name());
         final InNode inToken = (InNode) nodeOptional.get();
         assertEquals(inToken.getItems().size(), 3);
         assertEquals(inToken.getField(), "name");
-        assertEquals(inToken.getItems().get(0).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(1).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(2).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(0).getValue(), "abc");
-        assertEquals(inToken.getItems().get(1).getValue(), "def");
-        assertEquals(inToken.getItems().get(2).getValue(), "abc, def");
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(2)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getValue(), "abc");
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getValue(), "def");
+        assertEquals(((UnaryNode)inToken.getItems().get(2)).getValue(), "abc, def");
     }
 
     @Test
     public void testStringList2() {
-        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name IN (abc, def, 'ab\"c')");
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("name IN ('abc', 'def', 'ab\"c')");
         assertTrue(nodeOptional.isSuccess());
         assertEquals(nodeOptional.get().getTokenType().name(), NodeType.IN.name());
         final InNode inToken = (InNode) nodeOptional.get();
         assertEquals(inToken.getItems().size(), 3);
         assertEquals(inToken.getField(), "name");
-        assertEquals(inToken.getItems().get(0).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(1).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(2).getKey(), DataType.STRING);
-        assertEquals(inToken.getItems().get(0).getValue(), "abc");
-        assertEquals(inToken.getItems().get(1).getValue(), "def");
-        assertEquals(inToken.getItems().get(2).getValue(), "ab\"c");
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(2)).getDataType(), DataType.STRING);
+        assertEquals(((UnaryNode)inToken.getItems().get(0)).getValue(), "abc");
+        assertEquals(((UnaryNode)inToken.getItems().get(1)).getValue(), "def");
+        assertEquals(((UnaryNode)inToken.getItems().get(2)).getValue(), "ab\"c");
     }
 
     @Test
-    public void testInvalidExpression() {
+    public void testSingleToken() {
         final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("a");
-        assertTrue(nodeOptional.isFailure());
-        assertTrue(nodeOptional.getCause() instanceof InvalidExpressionException);
-    }
-
-    @Test
-    public void testInvalidNotExpression() {
-        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("not a > 5");
-        assertTrue(nodeOptional.isFailure());
-        assertTrue(nodeOptional.getCause() instanceof InvalidExpressionException);
+        assertTrue(nodeOptional.isSuccess());
+        assertTrue(nodeOptional.get() instanceof FieldNode);
+        assertEquals(((FieldNode) nodeOptional.get()).getField(), "a");
     }
 
     @Test
@@ -355,17 +377,144 @@ public class BooleanFilterBoolParserTest {
         assertEquals(((ArrayNode) nodeOptional.get()).getItems().size(), 2);
     }
 
-    private void verifyStringToken(final ComparisonNode stringToken, final String field, final String value) {
-        assertEquals(stringToken.getTokenType().name(), NodeType.COMPARISON.name());
-        assertEquals(stringToken.getField(), field);
-        assertEquals(stringToken.getValue(), value);
+    @Test
+    public void testAddOperatorString() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("a + b");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC);
+        assertEquals(((FieldNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getField(), "a");
+        assertEquals(((FieldNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getField(), "b");
+        assertEquals(((ArithmeticNode) nodeOptional.get()).getOperator(), Operator.ADD);
     }
 
-    private void verifyNumericToken(final ComparisonNode comparisonToken, final String field, final Object value, final Operator operator) {
-        assertEquals(comparisonToken.getTokenType().name(), NodeType.COMPARISON.name());
-        assertEquals(comparisonToken.getField(), field);
-        assertEquals(comparisonToken.getValue(), value);
-        assertEquals(comparisonToken.getOperator().name(), operator.name());
+    @Test
+    public void testAddOperatorInt() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("20 + 5");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getValue(), 20);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getValue(), 5);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);
+        assertEquals(((ArithmeticNode) nodeOptional.get()).getOperator(), Operator.ADD);
+    }
+
+    @Test
+    public void testAddOperatorDecimal() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("20.5 + 5");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getValue(), new BigDecimal("20.5"));
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.DECIMAL);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getValue(), 5);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);
+        assertEquals(((ArithmeticNode) nodeOptional.get()).getOperator(), Operator.ADD);
+    }
+
+    @Test
+    public void testArithmeticArrayFunction() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("min (1,2,3)");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC_FUNCTION);
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getFunctionType().name(), "MIN");
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().size(), 3);
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0)).getValue(), 1);
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(1)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(1)).getValue(), 2);
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(2)).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(2)).getValue(), 3);
+    }
+
+    @Test
+    public void testArithmeticArrayFunctionWithSubstitution() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("min(abc)");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC_FUNCTION);
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getFunctionType().name(), "MIN");
+        assertEquals(((ArithmeticFunctionNode) nodeOptional.get()).getItems().size(), 1);
+        assertEquals(((FieldNode) ((ArithmeticFunctionNode) nodeOptional.get()).getItems().get(0)).getField(), "abc");
+    }
+
+    @Test
+    public void testArithmeticArrayFunctionWithError() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("min abc");
+        assertTrue(nodeOptional.isFailure());
+    }
+
+    @Test
+    public void testAddOperatorBool() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("false + 5");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.ARITHMETIC);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getValue(), false);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getLeft()).getDataType(), DataType.BOOLEAN);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getValue(), 5);
+        assertEquals(((UnaryNode) ((ArithmeticNode) nodeOptional.get()).getRight()).getDataType(), DataType.INTEGER);
+        assertEquals(((ArithmeticNode) nodeOptional.get()).getOperator(), Operator.ADD);
+    }
+
+    @Test
+    public void testComparisonWithArithmetic() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("a > (10 + 20)");
+        assertTrue(nodeOptional.isSuccess());
+        assertEquals(nodeOptional.get().getTokenType(), NodeType.COMPARISON);
+        assertEquals(((FieldNode)(((ComparisonNode) nodeOptional.get()).getLeft())).getField(), "a");
+        final ArithmeticNode arithmeticNode = (ArithmeticNode) ((ComparisonNode) nodeOptional.get()).getRight();
+        assertEquals(((UnaryNode) (arithmeticNode.getLeft())).getValue(), 10);
+        assertEquals(((UnaryNode) (arithmeticNode.getLeft())).getDataType(), DataType.INTEGER);
+        assertEquals(((UnaryNode) (arithmeticNode.getRight())).getValue(), 20);
+        assertEquals(((UnaryNode) (arithmeticNode.getRight())).getDataType(), DataType.INTEGER);
+        assertEquals(arithmeticNode.getOperator(), Operator.ADD);
+    }
+
+    @Test
+    public void testSingleDateToken() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("created_date = 2023-03-05");
+        assertTrue(nodeOptional.isSuccess());
+        verifyComparisonToken(nodeOptional.get(), "created_date", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), LocalDate.of(2023, 3, 5), DataType.DATE);
+    }
+
+    @Test
+    public void testSingleDateTimeToken() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("timestamp = 2023-03-05 14:30:00");
+        assertTrue(nodeOptional.isSuccess());
+        verifyComparisonToken(nodeOptional.get(), "timestamp", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), LocalDateTime.of(2023, 3, 5, 14, 30, 0), DataType.DATETIME);
+    }
+
+    @Test
+    public void testDateComparison() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("start_date > 2023-01-01");
+        assertTrue(nodeOptional.isSuccess());
+        verifyComparisonToken(nodeOptional.get(), "start_date", Operator.GREATER_THAN);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), LocalDate.of(2023, 1, 1), DataType.DATE);
+    }
+
+    @Test
+    public void testDateTimeComparison() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("last_login < 2023-12-31 23:59:59");
+        assertTrue(nodeOptional.isSuccess());
+        verifyComparisonToken(nodeOptional.get(), "last_login", Operator.LESS_THAN);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), LocalDateTime.of(2023, 12, 31, 23, 59, 59), DataType.DATETIME);
+    }
+
+    private void verifyUnaryToken(final Node node, final Object value, final DataType dataType) {
+        assertEquals(node.getTokenType().name(), NodeType.UNARY.name());
+        assertEquals(((UnaryNode)node).getValue(), value);
+        assertEquals(((UnaryNode)node).getDataType(), dataType);
+    }
+
+    private void verifyFieldToken(final Node node, final Object value) {
+        assertEquals(node.getTokenType().name(), NodeType.FIELD.name());
+        assertEquals(((FieldNode)node).getField(), value);
+    }
+
+    private void verifyComparisonToken(final Node node, final String field, final Operator operator) {
+        assertEquals(node.getTokenType().name(), NodeType.COMPARISON.name());
+        assertEquals(((FieldNode)((ComparisonNode)node).getLeft()).getField(), field);
+        assertEquals(((ComparisonNode)node).getOperator(), operator);
     }
 
     private void verifyNumericRangeToken(final NumericRangeNode numericRangeToken, final String field, final Object fromValue, final Object toValue) {

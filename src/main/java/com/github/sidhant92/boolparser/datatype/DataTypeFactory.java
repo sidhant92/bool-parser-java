@@ -2,7 +2,6 @@ package com.github.sidhant92.boolparser.datatype;
 
 import java.util.EnumMap;
 import java.util.Map;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sidhant92.boolparser.constant.DataType;
 
 /**
@@ -17,13 +16,14 @@ public class DataTypeFactory {
     }
 
     public static void initialize() {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        abstractDataTypeMap.put(DataType.STRING, new StringDataType(objectMapper));
-        abstractDataTypeMap.put(DataType.INTEGER, new IntegerDataType(objectMapper));
-        abstractDataTypeMap.put(DataType.DECIMAL, new DecimalDataType(objectMapper));
-        abstractDataTypeMap.put(DataType.LONG, new LongDataType(objectMapper));
-        abstractDataTypeMap.put(DataType.VERSION, new VersionDataType(objectMapper));
-        abstractDataTypeMap.put(DataType.BOOLEAN, new BooleanDataType(objectMapper));
+        abstractDataTypeMap.put(DataType.STRING, new StringDataType());
+        abstractDataTypeMap.put(DataType.INTEGER, new IntegerDataType());
+        abstractDataTypeMap.put(DataType.DECIMAL, new DecimalDataType());
+        abstractDataTypeMap.put(DataType.LONG, new LongDataType());
+        abstractDataTypeMap.put(DataType.VERSION, new VersionDataType());
+        abstractDataTypeMap.put(DataType.BOOLEAN, new BooleanDataType());
+        abstractDataTypeMap.put(DataType.DATE, new DateDataType());
+        abstractDataTypeMap.put(DataType.DATETIME, new DateTimeDataType());
     }
 
     public static AbstractDataType getDataType(final DataType dataType) {

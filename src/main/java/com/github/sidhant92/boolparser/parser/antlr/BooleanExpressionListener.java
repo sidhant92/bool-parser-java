@@ -1,4 +1,5 @@
-package com.github.sidhant92.boolparser.parser.antlr;// Generated from /Users/sid/Desktop/filter1/BooleanExpression.g4 by ANTLR 4.13.1
+// Generated from /Users/sidhantaggarwal/bool-parser-java/src/main/java/resources/BooleanExpression.g4 by ANTLR 4.13.2
+package com.github.sidhant92.boolparser.parser.antlr;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -16,6 +17,18 @@ public interface BooleanExpressionListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitParse(BooleanExpressionParser.ParseContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code unaryArithmeticExpression}
+	 * labeled alternative in {@link BooleanExpressionParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterUnaryArithmeticExpression(BooleanExpressionParser.UnaryArithmeticExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code unaryArithmeticExpression}
+	 * labeled alternative in {@link BooleanExpressionParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitUnaryArithmeticExpression(BooleanExpressionParser.UnaryArithmeticExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code binaryExpression}
 	 * labeled alternative in {@link BooleanExpressionParser#expression}.
@@ -77,6 +90,18 @@ public interface BooleanExpressionListener extends ParseTreeListener {
 	 */
 	void exitToExpression(BooleanExpressionParser.ToExpressionContext ctx);
 	/**
+	 * Enter a parse tree produced by the {@code arithmeticFunctionExpression}
+	 * labeled alternative in {@link BooleanExpressionParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterArithmeticFunctionExpression(BooleanExpressionParser.ArithmeticFunctionExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code arithmeticFunctionExpression}
+	 * labeled alternative in {@link BooleanExpressionParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitArithmeticFunctionExpression(BooleanExpressionParser.ArithmeticFunctionExpressionContext ctx);
+	/**
 	 * Enter a parse tree produced by the {@code notExpression}
 	 * labeled alternative in {@link BooleanExpressionParser#expression}.
 	 * @param ctx the parse tree
@@ -88,6 +113,18 @@ public interface BooleanExpressionListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNotExpression(BooleanExpressionParser.NotExpressionContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code arithmeticExpression}
+	 * labeled alternative in {@link BooleanExpressionParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void enterArithmeticExpression(BooleanExpressionParser.ArithmeticExpressionContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code arithmeticExpression}
+	 * labeled alternative in {@link BooleanExpressionParser#expression}.
+	 * @param ctx the parse tree
+	 */
+	void exitArithmeticExpression(BooleanExpressionParser.ArithmeticExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code comparatorExpression}
 	 * labeled alternative in {@link BooleanExpressionParser#expression}.
@@ -122,6 +159,26 @@ public interface BooleanExpressionListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitComparator(BooleanExpressionParser.ComparatorContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BooleanExpressionParser#arithmeticOperator}.
+	 * @param ctx the parse tree
+	 */
+	void enterArithmeticOperator(BooleanExpressionParser.ArithmeticOperatorContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BooleanExpressionParser#arithmeticOperator}.
+	 * @param ctx the parse tree
+	 */
+	void exitArithmeticOperator(BooleanExpressionParser.ArithmeticOperatorContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BooleanExpressionParser#arithmeticFunction}.
+	 * @param ctx the parse tree
+	 */
+	void enterArithmeticFunction(BooleanExpressionParser.ArithmeticFunctionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BooleanExpressionParser#arithmeticFunction}.
+	 * @param ctx the parse tree
+	 */
+	void exitArithmeticFunction(BooleanExpressionParser.ArithmeticFunctionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link BooleanExpressionParser#wordlist}.
 	 * @param ctx the parse tree

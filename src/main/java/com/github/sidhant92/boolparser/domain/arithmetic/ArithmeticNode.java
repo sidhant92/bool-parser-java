@@ -1,8 +1,8 @@
-package com.github.sidhant92.boolparser.domain;
+package com.github.sidhant92.boolparser.domain.arithmetic;
 
-import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.NodeType;
 import com.github.sidhant92.boolparser.constant.Operator;
+import com.github.sidhant92.boolparser.domain.logical.Node;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,23 +10,21 @@ import lombok.Setter;
 
 /**
  * @author sidhant.aggarwal
- * @since 05/03/2023
+ * @since 15/03/2024
  */
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
-public class ComparisonNode extends Node {
-    private final String field;
+public class ArithmeticNode extends ArithmeticBaseNode {
+    private Node left;
 
-    private final Object value;
+    private Node right;
 
     private final Operator operator;
 
-    private final DataType dataType;
-
     @Override
     public NodeType getTokenType() {
-        return NodeType.COMPARISON;
+        return NodeType.ARITHMETIC;
     }
 }

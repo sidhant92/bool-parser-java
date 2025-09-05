@@ -8,9 +8,4 @@ public class InvalidDataType extends RuntimeException {
     public InvalidDataType() {
         super();
     }
-
-    @Override
-    public String getMessage() {
-        return "Invalid Data Type";
-    }
 }

@@ -1,4 +1,4 @@
-package com.github.sidhant92.boolparser.domain;
+package com.github.sidhant92.boolparser.domain.logical;
 
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.NodeType;

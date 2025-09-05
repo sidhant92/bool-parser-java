@@ -8,9 +8,4 @@ public class InvalidContainerTypeException extends RuntimeException {
     public InvalidContainerTypeException() {
         super();
     }
-
-    @Override
-    public String getMessage() {
-        return "Invalid Container Type";
-    }
 }
