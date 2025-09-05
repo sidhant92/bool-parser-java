@@ -4,7 +4,7 @@ plugins {
     id 'java'
     id 'maven-publish'
     id 'signing'
-    id 'com.gradleup.nmcp' version '0.0.8'
+    id 'com.gradleup.nmcp.aggregation' version '1.1.0'
 }
 
 group 'com.github.sidhant92'
@@ -103,13 +103,14 @@ signing {
 }
 
 // Configure New Maven Central Portal publishing
-nmcp {
-    publishAggregation {
-        project(":") 
+nmcpAggregation {
+    centralPortal {
         username = System.getenv("MAVEN_USERNAME") ?: findProperty("mavenCentralUsername")
         password = System.getenv("MAVEN_PASSWORD") ?: findProperty("mavenCentralPassword")
-        publicationType = "AUTOMATIC"
+        publishingType = "AUTOMATIC"
     }
+    
+    publishAllProjectsProbablyBreakingProjectIsolation()
 }
 
 ext.genOutputDir = file("${layout.buildDirectory.get()}/generated-resources")
