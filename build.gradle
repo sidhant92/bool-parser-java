@@ -104,7 +104,8 @@ signing {
 
 // Configure New Maven Central Portal publishing
 nmcp {
-    publishAllPublications {
+    publishAggregation {
+        project(":") 
         username = System.getenv("MAVEN_USERNAME") ?: findProperty("mavenCentralUsername")
         password = System.getenv("MAVEN_PASSWORD") ?: findProperty("mavenCentralPassword")
         publicationType = "AUTOMATIC"
