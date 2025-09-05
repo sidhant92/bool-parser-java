@@ -8,12 +8,14 @@ import lombok.AllArgsConstructor;
  */
 @AllArgsConstructor
 public enum DataType {
-    STRING(6, false),
+    STRING(8, false),
     INTEGER(3, true),
     LONG(4, true),
     DECIMAL(5, true),
     VERSION(2, true),
-    BOOLEAN(1, false);
+    BOOLEAN(1, false),
+    DATE(6, false),
+    DATETIME(7, false);
 
     public final int priority;
 

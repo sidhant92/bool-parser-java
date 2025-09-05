@@ -46,6 +46,7 @@ arithmeticFunction
   | LEN
   | MEDIAN
   | INT
+  | DAYS_ELAPSED
   ;
 
  wordlist
@@ -62,7 +63,7 @@ arithmeticFunction
  ;
 
  types
- : INTEGER | DECIMAL | APP_VERSION | bool | WORD | FIELD |
+ : INTEGER | DECIMAL | APP_VERSION | bool | WORD | FIELD | DATE | DATETIME |
  ;
 
 
@@ -93,6 +94,7 @@ MODE         : 'MODE' | 'mode';
 MEDIAN       : 'MEDIAN' | 'median';
 LEN          : 'LEN' | 'len';
 INT          : 'INT' | 'int';
+DAYS_ELAPSED : 'DAYS_ELAPSED' | 'days_elapsed';
 ADD          : '+';
 SUBTRACT     : '-' ;
 MULTIPLY     : '*' ;
@@ -110,6 +112,8 @@ RPAREN       : ')' ;
 DECIMAL      : [0-9]+ '.' [0-9]+;
 APP_VERSION  : [0-9] ('.' INTEGER)+;
 INTEGER      : [0-9]+;
+DATE         : DATE_PATTERN;
+DATETIME     : DATETIME_PATTERN;
 WS           : [ \r\t\u000C\n]+ -> skip;
 WORD         : SQSTR | DQSTR;
 SQSTR        : '\'' .*? '\'';
@@ -118,3 +122,11 @@ FIELD        : (ALPHANUMERIC | '_' | '.')+;
 ALPHANUMERIC : [a-zA-Z0-9];
 SQ           : '\''.*? '\'';
 DQ           : '"'.*? '"';
+
+fragment DATE_PATTERN
+    : [0-9][0-9][0-9][0-9]'-'[0-9][0-9]'-'[0-9][0-9]                     // YYYY-MM-DD
+    ;
+
+fragment DATETIME_PATTERN
+    : [0-9][0-9][0-9][0-9]'-'[0-9][0-9]'-'[0-9][0-9]' '[0-9][0-9]':'[0-9][0-9]':'[0-9][0-9] // YYYY-MM-DD HH:MM:SS
+    ;

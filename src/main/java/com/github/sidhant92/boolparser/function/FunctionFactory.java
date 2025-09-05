@@ -5,6 +5,7 @@ import java.util.Map;
 import com.github.sidhant92.boolparser.constant.FunctionType;
 import com.github.sidhant92.boolparser.function.arithmetic.AbstractFunction;
 import com.github.sidhant92.boolparser.function.arithmetic.AvgFunction;
+import com.github.sidhant92.boolparser.function.arithmetic.DaysElapsedFunction;
 import com.github.sidhant92.boolparser.function.arithmetic.IntFunction;
 import com.github.sidhant92.boolparser.function.arithmetic.LenFunction;
 import com.github.sidhant92.boolparser.function.arithmetic.MaxFunction;
@@ -35,6 +36,7 @@ public class FunctionFactory {
         arithmeticFunctionrMap.put(FunctionType.MODE, new ModeFunction());
         arithmeticFunctionrMap.put(FunctionType.INT, new IntFunction());
         arithmeticFunctionrMap.put(FunctionType.LEN, new LenFunction());
+        arithmeticFunctionrMap.put(FunctionType.DAYS_ELAPSED, new DaysElapsedFunction());
     }
 
     public static AbstractFunction getArithmeticFunction(final FunctionType functionType) {

@@ -44,6 +44,6 @@ public class LessThanEqualOperator extends AbstractOperator implements NumericOp
 
     @Override
     public List<DataType> getAllowedDataTypes() {
-        return Arrays.asList(DataType.INTEGER, DataType.LONG, DataType.DECIMAL, DataType.STRING, DataType.VERSION);
+        return Arrays.asList(DataType.INTEGER, DataType.LONG, DataType.DECIMAL, DataType.STRING, DataType.VERSION, DataType.DATE, DataType.DATETIME);
     }
 }

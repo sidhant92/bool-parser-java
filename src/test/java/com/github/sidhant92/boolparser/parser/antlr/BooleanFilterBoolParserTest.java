@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import com.github.sidhant92.boolparser.constant.DataType;
 import com.github.sidhant92.boolparser.constant.LogicalOperationType;
@@ -464,6 +466,38 @@ public class BooleanFilterBoolParserTest {
         assertEquals(((UnaryNode) (arithmeticNode.getRight())).getValue(), 20);
         assertEquals(((UnaryNode) (arithmeticNode.getRight())).getDataType(), DataType.INTEGER);
         assertEquals(arithmeticNode.getOperator(), Operator.ADD);
+    }
+
+    @Test
+    public void testSingleDateToken() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("created_date = 2023-03-05");
+        assertTrue(nodeOptional.isSuccess());
+        verifyComparisonToken(nodeOptional.get(), "created_date", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), LocalDate.of(2023, 3, 5), DataType.DATE);
+    }
+
+    @Test
+    public void testSingleDateTimeToken() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("timestamp = 2023-03-05 14:30:00");
+        assertTrue(nodeOptional.isSuccess());
+        verifyComparisonToken(nodeOptional.get(), "timestamp", Operator.EQUALS);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), LocalDateTime.of(2023, 3, 5, 14, 30, 0), DataType.DATETIME);
+    }
+
+    @Test
+    public void testDateComparison() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("start_date > 2023-01-01");
+        assertTrue(nodeOptional.isSuccess());
+        verifyComparisonToken(nodeOptional.get(), "start_date", Operator.GREATER_THAN);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), LocalDate.of(2023, 1, 1), DataType.DATE);
+    }
+
+    @Test
+    public void testDateTimeComparison() {
+        final Try<Node> nodeOptional = boolExpressionBoolParser.parseExpression("last_login < 2023-12-31 23:59:59");
+        assertTrue(nodeOptional.isSuccess());
+        verifyComparisonToken(nodeOptional.get(), "last_login", Operator.LESS_THAN);
+        verifyUnaryToken(((ComparisonNode) nodeOptional.get()).getRight(), LocalDateTime.of(2023, 12, 31, 23, 59, 59), DataType.DATETIME);
     }
 
     private void verifyUnaryToken(final Node node, final Object value, final DataType dataType) {

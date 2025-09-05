@@ -16,7 +16,8 @@ public enum FunctionType {
     MODE,
     MEDIAN,
     INT,
-    LEN;
+    LEN,
+    DAYS_ELAPSED;
 
     public static Optional<FunctionType> getArrayFunctionFromSymbol(final String symbol) {
         final String symbolUpperCase = symbol.toUpperCase();
