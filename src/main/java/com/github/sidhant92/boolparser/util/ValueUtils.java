@@ -1,6 +1,10 @@
 package com.github.sidhant92.boolparser.util;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -67,6 +71,10 @@ public class ValueUtils {
                 return Boolean.parseBoolean(value);
             case VERSION:
                 return new ComparableVersion(value);
+            case DATE:
+                return parseDate(value).orElse(null);
+            case DATETIME:
+                return parseDateTime(value).orElse(null);
             default:
                 if (value.startsWith("'") && value.endsWith("'")) {
                     return value.substring(1, value.length() - 1);
@@ -128,6 +136,42 @@ public class ValueUtils {
         if (value instanceof ComparableVersion) {
             return DataType.VERSION;
         }
+        if (value instanceof LocalDate) {
+            return DataType.DATE;
+        }
+        if (value instanceof LocalDateTime) {
+            return DataType.DATETIME;
+        }
+        if (value instanceof String) {
+            String stringValue = (String) value;
+            // Check if string represents a datetime first (more specific)
+            if (parseDateTime(stringValue).isPresent()) {
+                return DataType.DATETIME;
+            }
+            // Then check if it's a date
+            if (parseDate(stringValue).isPresent()) {
+                return DataType.DATE;
+            }
+        }
         return DataType.STRING;
+    }
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    private static Optional<LocalDate> parseDate(String dateString) {
+        try {
+            return Optional.of(LocalDate.parse(dateString, DATE_FORMATTER));
+        } catch (DateTimeParseException ignored) {
+            return Optional.empty();
+        }
+    }
+
+    private static Optional<LocalDateTime> parseDateTime(String dateTimeString) {
+        try {
+            return Optional.of(LocalDateTime.parse(dateTimeString, DATETIME_FORMATTER));
+        } catch (DateTimeParseException ignored) {
+            return Optional.empty();
+        }
     }
 }

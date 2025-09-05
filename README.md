@@ -68,7 +68,9 @@ The language supports the following data types:
 4. **Decimal**: Numbers with decimal points (stored as BigDecimal). Examples: `3.14`, `-2.5`
 5. **Boolean**: `true` or `false` (case-insensitive)
 6. **Version**: Semantic version numbers. Examples: `1.0.6`, `2.3.1.5`
-7. **Null**: Represented as `null`
+7. **Date**: Date values in YYYY-MM-DD format. Examples: `2023-12-25`, `2024-01-15`
+8. **DateTime**: Date and time values in YYYY-MM-DD HH:MM:SS format. Examples: `2023-12-25 14:30:00`, `2024-01-15 09:15:30`
+9. **Null**: Represented as `null`
 
 ### Field References
 
@@ -174,6 +176,7 @@ permissions CONTAINS_ALL ('read', 'write')
 | `MODE` | Mode of values | `MODE(1, 1, 2, 3)` or `MODE(numbers)` |
 | `LEN` | Length of string or array | `LEN('hello')` or `LEN(items)` |
 | `INT` | Convert to integer | `INT(2.7)` or `INT(value)` |
+| `DAYS_ELAPSED` | Number of days elapsed since a date | `DAYS_ELAPSED(2023-01-01)` or `DAYS_ELAPSED(startDate)` |
 
 Functions can be used in both boolean and arithmetic contexts:
 
@@ -231,6 +234,24 @@ permissions CONTAINS_ALL ('read', 'write', 'delete')
 
 // Get the length of an array
 LEN(items) > 0
+```
+
+#### Working with Dates
+
+Date and DateTime values can be used in comparisons and with the DAYS_ELAPSED function:
+
+```
+// Date comparisons
+startDate > 2023-01-01
+endDate <= 2024-12-31
+
+// DateTime comparisons
+lastLogin >= 2023-06-15 09:30:00
+createdAt < 2024-01-01 00:00:00
+
+// Using DAYS_ELAPSED function
+DAYS_ELAPSED(startDate) > 30
+DAYS_ELAPSED(2023-01-01) < 365
 ```
 
 #### String Handling

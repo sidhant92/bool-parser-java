@@ -240,6 +240,10 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
             case BooleanExpressionLexer.TRUE:
             case BooleanExpressionLexer.FALSE:
                 return DataType.BOOLEAN;
+            case BooleanExpressionLexer.DATE:
+                return DataType.DATE;
+            case BooleanExpressionLexer.DATETIME:
+                return DataType.DATETIME;
             default:
                 return DataType.STRING;
         }

@@ -22,6 +22,8 @@ public class DataTypeFactory {
         abstractDataTypeMap.put(DataType.LONG, new LongDataType());
         abstractDataTypeMap.put(DataType.VERSION, new VersionDataType());
         abstractDataTypeMap.put(DataType.BOOLEAN, new BooleanDataType());
+        abstractDataTypeMap.put(DataType.DATE, new DateDataType());
+        abstractDataTypeMap.put(DataType.DATETIME, new DateTimeDataType());
     }
 
     public static AbstractDataType getDataType(final DataType dataType) {

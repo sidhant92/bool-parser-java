@@ -3,6 +3,8 @@ package com.github.sidhant92.boolparser.application;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -685,5 +687,247 @@ public class BooleanExpressionEvaluatorTest {
         final Try<Boolean> resultOptional = booleanExpressionEvaluator.evaluate("len(a) = 4", data);
         assertTrue(resultOptional.isSuccess());
         assertEquals(resultOptional.get(), true);
+    }
+
+    @Test
+    public void testDateEqualityCorrectExpression() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("created_date", LocalDate.of(2023, 3, 5));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("created_date = 2023-03-05", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDateEqualityIncorrectExpression() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("created_date", LocalDate.of(2023, 3, 5));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("created_date = 2023-03-06", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertFalse(booleanOptional.get());
+    }
+
+    @Test
+    public void testDateGreaterThanCorrectExpression() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("event_date", LocalDate.of(2023, 6, 15));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("event_date > 2023-03-05", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDateLessThanCorrectExpression() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("birth_date", LocalDate.of(1990, 1, 1));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("birth_date < 2000-01-01", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDateTimeEqualityCorrectExpression() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("timestamp", LocalDateTime.of(2023, 3, 5, 14, 30, 0));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("timestamp = 2023-03-05 14:30:00", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDateTimeEqualityIncorrectExpression() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("timestamp", LocalDateTime.of(2023, 3, 5, 14, 30, 0));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("timestamp = 2023-03-05 14:31:00", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertFalse(booleanOptional.get());
+    }
+
+    @Test
+    public void testDateTimeGreaterThanCorrectExpression() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("last_modified", LocalDateTime.of(2023, 6, 15, 10, 30, 0));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("last_modified > 2023-03-05 14:30:00", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDateTimeLessThanCorrectExpression() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("created_at", LocalDateTime.of(2023, 1, 1, 9, 0, 0));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("created_at < 2023-03-05 14:30:00", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDateInClause() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("holiday", LocalDate.of(2023, 12, 25));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("holiday in (2023-12-24, 2023-12-25, 2023-12-26)", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDateTimeInClause() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("meeting_time", LocalDateTime.of(2023, 3, 5, 14, 30, 0));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("meeting_time in (2023-03-05 13:30:00, 2023-03-05 14:30:00, 2023-03-05 15:30:00)", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testComplexDateTimeExpression() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("start_date", LocalDate.of(2023, 1, 1));
+        data.put("end_date", LocalDate.of(2023, 12, 31));
+        data.put("current_date", LocalDate.of(2023, 6, 15));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("current_date >= start_date AND current_date <= end_date", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDateEqualityWithStringData() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("created_date", "2023-03-05");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("created_date = 2023-03-05", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDateComparisonWithStringData() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("event_date", "2023-06-15");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("event_date > 2023-03-05", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDateTimeEqualityWithStringData() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("timestamp", "2023-03-05 14:30:00");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("timestamp = 2023-03-05 14:30:00", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDateTimeComparisonWithStringData() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("last_modified", "2023-06-15 10:30:00");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("last_modified > 2023-03-05 14:30:00", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testMixedDateTypesComparison() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("string_date", "2023-06-15");
+        data.put("object_date", LocalDate.of(2023, 3, 5));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("string_date > object_date", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testMixedDateTimeTypesComparison() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("string_datetime", "2023-06-15 10:30:00");
+        data.put("object_datetime", LocalDateTime.of(2023, 3, 5, 14, 30, 0));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("string_datetime > object_datetime", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testInvalidDateStringFormat() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("bad_date", "03/05/2023");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("bad_date = 2023-03-05", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertFalse(booleanOptional.get());
+    }
+
+    @Test
+    public void testInvalidDateTimeStringFormat() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("bad_datetime", "2023-03-05T14:30:00");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("bad_datetime = 2023-03-05 14:30:00", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertFalse(booleanOptional.get());
+    }
+
+    @Test
+    public void testStringDateAutoDetection() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("date_string", "2023-03-05");
+        data.put("regular_string", "hello world");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("date_string > 2023-01-01", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testStringDateTimeAutoDetection() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("datetime_string", "2023-03-05 14:30:00");
+        data.put("regular_string", "hello world");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("datetime_string > 2023-01-01 10:00:00", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testAutoDetectionInComplexExpressions() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("start_date_str", "2023-01-01");
+        data.put("end_date_str", "2023-12-31");
+        data.put("current_date_str", "2023-06-15");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("current_date_str >= start_date_str AND current_date_str <= end_date_str", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDaysElapsedFunction() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("created_date", LocalDate.of(2023, 1, 1));
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("days_elapsed(created_date) > 0", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDaysElapsedFunctionWithStringDate() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("created_date", "2023-01-01");
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("days_elapsed(created_date) > 300", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDaysElapsedFunctionWithDirectDate() {
+        final Map<String, Object> data = new HashMap<>();
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("days_elapsed(2023-01-01) > 300", data);
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
+    public void testDaysElapsedFunctionInComparison() {
+        final Map<String, Object> data = new HashMap<>();
+        data.put("event_date", LocalDate.of(2023, 6, 15));
+        data.put("threshold_days", 100);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("days_elapsed(event_date) <= threshold_days", data);
+        assertTrue(booleanOptional.isSuccess());
+        // This will depend on current date, so we just check it executes successfully
     }
 }
