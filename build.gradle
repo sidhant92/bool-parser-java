@@ -1,30 +1,21 @@
 import java.time.LocalDateTime
 
-apply plugin: 'java'
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
-apply plugin: "io.github.gradle-nexus.publish-plugin"
-
-buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {
-        classpath "io.github.gradle-nexus:publish-plugin:1.1.0"
-        classpath "com.dipien:semantic-version-gradle-plugin:1.4.1"
-    }
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'signing'
+    id 'com.gradleup.nmcp' version '0.0.8'
 }
-
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 group 'com.github.sidhant92'
 version = "2.0.0"
 
-apply plugin: "com.dipien.semantic-version"
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+    withJavadocJar()
+    withSourcesJar()
+}
 
 repositories {
     mavenCentral()
@@ -35,9 +26,9 @@ dependencies {
     implementation 'org.antlr:antlr4-runtime:4.13.2'
     implementation 'io.vavr:vavr:0.10.4'
     implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
-    implementation 'org.projectlombok:lombok:1.18.26'
+    implementation 'org.projectlombok:lombok:1.18.34'
 
-    annotationProcessor 'org.projectlombok:lombok:1.18.26'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
 
     testImplementation 'org.openjdk.jmh:jmh-core:1.35'
@@ -55,70 +46,74 @@ test {
     }
     useJUnitPlatform()
     reports {
-        junitXml.enabled = true
-        html.enabled = false
+        junitXml.required = true
+        html.required = false
     }
-}
-
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
-
-artifacts {
-    archives javadocJar, sourcesJar
-}
-
-/*signing {
-    sign configurations.archives
-}*/
-
-signing {
-    def signingKey = findProperty("signingKey")
-    def signingPassword = findProperty("signingPassword")
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign publishing.publications
 }
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            from(components.java)
+        maven(MavenPublication) {
+            from components.java
+            
             pom {
                 name = 'bool-parser'
                 description = 'Java parser for boolean expressions'
                 url = 'https://github.com/sidhant92/bool-parser-java'
+                
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
+                
                 developers {
                     developer {
                         id = 'sidhant92'
                         name = 'Sidhant Aggarwal'
+                        url = 'https://github.com/sidhant92'
                     }
                 }
+                
                 scm {
+                    connection = 'scm:git:git://github.com/sidhant92/bool-parser-java.git'
+                    developerConnection = 'scm:git:ssh://git@github.com/sidhant92/bool-parser-java.git'
                     url = 'https://github.com/sidhant92/bool-parser-java'
-                    connection = 'scm:git://github.com/sidhant92/bool-parser-java.git'
-                    developerConnection = 'scm:git://github.com/sidhant92/bool-parser-java.git'
                 }
             }
         }
     }
+    
+    // Remove the old repository configuration - NMCP plugin handles this
 }
 
-nexusPublishing {
-    repositories {
-        sonatype()
+// Configure signing - only required for Maven Central, not for local publishing  
+signing {
+    def signingKey = System.getenv("signingInMemoryKey") ?: findProperty("signingInMemoryKey")
+    def signingPassword = System.getenv("signingInMemoryKeyPassword") ?: findProperty("signingInMemoryKeyPassword")
+    
+    // Only enable signing if keys are provided
+    required { signingKey != null && signingPassword != null }
+    
+    if (signingKey && signingPassword) {
+        useInMemoryPgpKeys(signingKey as String, signingPassword as String)
+        sign publishing.publications
     }
 }
 
-ext.genOutputDir = file("$buildDir/generated-resources")
+// Configure New Maven Central Portal publishing
+nmcp {
+    publishAllPublications {
+        username = System.getenv("MAVEN_USERNAME") ?: findProperty("mavenCentralUsername")
+        password = System.getenv("MAVEN_PASSWORD") ?: findProperty("mavenCentralPassword")
+        publicationType = "AUTOMATIC"
+    }
+}
 
-task generateVersionTxt() {
+ext.genOutputDir = file("${layout.buildDirectory.get()}/generated-resources")
+
+tasks.register('generateVersionTxt') {
     ext.outputFile = file("$genOutputDir/version.txt")
     outputs.file(outputFile)
     doLast {
