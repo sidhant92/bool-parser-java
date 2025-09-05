@@ -32,7 +32,7 @@ repositories {
 
 dependencies {
     implementation 'org.apache.maven:maven-artifact:3.5.2'
-    implementation 'org.antlr:antlr4-runtime:4.13.1'
+    implementation 'org.antlr:antlr4-runtime:4.13.2'
     implementation 'io.vavr:vavr:0.10.4'
     implementation 'com.github.ben-manes.caffeine:caffeine:2.9.3'
     implementation 'org.projectlombok:lombok:1.18.26'
