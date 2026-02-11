@@ -77,7 +77,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     @Override
     public void exitArrayExpression(BooleanExpressionParser.ArrayExpressionContext ctx) {
         validateField(ctx.field, ctx.getText());
-        final String field = getField(ctx.field.getText());
+        final String field = getField(ctx.field != null ? ctx.field.getText() : null);
         final List<Node> items = getArrayElements(ctx.data.children);
         final Operator operator = Operator.getOperatorFromSymbol(ctx.op.getText()).orElse(Operator.EQUALS);
         currentNodes.add(new ArrayNode(field, operator, items));
@@ -199,7 +199,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     private Node mapInExpressionContext(BooleanExpressionParser.InExpressionContext ctx) {
         validateField(ctx.field, ctx.getText());
-        final String field = getField(ctx.field.getText());
+        final String field = getField(ctx.field != null ? ctx.field.getText() : null);
         final List<Node> items = getArrayElements(ctx.data.children);
         final InNode inNode = new InNode(field, items);
         if (Objects.isNull(ctx.not)) {
@@ -211,7 +211,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
 
     private NumericRangeNode mapToExpressionContext(BooleanExpressionParser.ToExpressionContext ctx) {
         validateField(ctx.field, ctx.getText());
-        final String field = getField(ctx.field.getText());
+        final String field = getField(ctx.field != null ? ctx.field.getText() : null);
         final DataType lowerDataType = getDataType(ctx.lower.start);
         final Object lowerValue = ValueUtils.convertValue(ctx.lower.start.getText(), lowerDataType);
         final DataType upperDataType = getDataType(ctx.upper.start);
@@ -220,7 +220,7 @@ public class BooleanFilterListener extends BooleanExpressionBaseListener {
     }
 
     private void validateField(final Token token, final String text) {
-        if (Objects.isNull(token) || (StringUtils.isBlank(token.getText()) && StringUtils.isBlank(this.defaultField))) {
+        if ((Objects.isNull(token) || StringUtils.isBlank(token.getText())) && StringUtils.isBlank(this.defaultField)) {
             throw new InvalidExpressionException(String.format("Error parsing expression (missing field) for the string %s", text));
         }
     }

@@ -1,4 +1,4 @@
-// Generated from /Users/sidhantaggarwal/bool-parser-java/src/main/java/resources/BooleanExpression.g4 by ANTLR 4.13.2
+// Generated from BooleanExpression.g4 by ANTLR 4.13.2
 package com.github.sidhant92.boolparser.parser.antlr;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;

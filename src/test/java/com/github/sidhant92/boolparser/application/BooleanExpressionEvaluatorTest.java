@@ -517,6 +517,19 @@ public class BooleanExpressionEvaluatorTest {
     }
 
     @Test
+    public void testContainsAnyTrueConditionDefault() {
+        final Map<String, Object> data = new HashMap<>();
+        final List<Integer> ages = new ArrayList<>();
+        ages.add(1);
+        ages.add(2);
+        ages.add(3);
+        data.put("age", ages);
+        final Try<Boolean> booleanOptional = booleanExpressionEvaluator.evaluate("contains_any (2)", data, "age");
+        assertTrue(booleanOptional.isSuccess());
+        assertTrue(booleanOptional.get());
+    }
+
+    @Test
     public void testContainsAnyFalseCondition() {
         final Map<String, Object> data = new HashMap<>();
         final List<Integer> ages = new ArrayList<>();
