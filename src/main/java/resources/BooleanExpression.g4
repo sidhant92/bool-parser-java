@@ -18,9 +18,9 @@ expression
  | left=arithmeticFunction data=wordlist                             #arithmeticFunctionExpression
  | left=expression op=binary right=expression                        #binaryExpression
  | types                                                             #typesExpression
- | (field=FIELD) lower=numericTypes TO upper=numericTypes            #toExpression
- | (field=FIELD) (not=NOT)? IN data=wordlist                         #inExpression
- | (field=FIELD) op=arrayOperators data=wordlist                     #arrayExpression
+ | (field=FIELD)? lower=numericTypes TO upper=numericTypes            #toExpression
+ | (field=FIELD)? (not=NOT)? IN data=wordlist                         #inExpression
+ | (field=FIELD)? op=arrayOperators data=wordlist                     #arrayExpression
  ;
 
 comparator
